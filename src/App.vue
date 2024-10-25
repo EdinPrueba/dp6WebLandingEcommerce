@@ -78,11 +78,11 @@ const appFooter = () => import(/* webpackChunkName: "app-Footer" */'@/components
 const appBannerTop = () => import(/* webpackChunkName: "app-Banner-Top" */ '@/components/header/app-banner-top');
 
 function mounted() {
-	document.addEventListener('click', () => {
-		if (this.showMenu) {
-			this.showMenu = false;
-		}
-	});
+	// document.addEventListener('click', () => {
+	// if (this.showMenu) {
+	// 	this.showMenu = false;
+	// }
+	// });
 	this.bannerTopAndHeaderHeight();
 }
 
