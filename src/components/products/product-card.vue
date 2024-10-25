@@ -617,6 +617,11 @@ export default {
 				height: 35px;
 				z-index: 2;
 			}
+
+			@media screen and (max-width: 600px) {
+				top: 5%;
+				width: 15%;
+			}
 		}
 	}
 	.without-stock-text {
@@ -635,6 +640,12 @@ export default {
 		@media screen and (min-width: 600px) {
 			font-size: 20px;
 			// margin-top: 10px;
+		}
+
+		@media screen and (max-width: 600px) {
+			height: 75%;
+			font-size: 2vw;
+			border-radius: 10px;
 		}
 	}
 
