@@ -236,9 +236,15 @@ function goToCategories(item) {
 }
 
 function discountPercentage() {
-	const { price, priceDiscount } = this.product;
+	const { price, priceDiscount, priceList } = this.product;
+	const ecommerce = JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+	const defaultIdPiceList = ecommerce.settings.salPriceListId;
+	const discount = priceList
+		? priceList[defaultIdPiceList].discount
+		: null;
 	const percentage = Number((((price - priceDiscount) / price) * 100).toFixed(2));
-	return percentage >= 0 ? percentage : 0;
+	const validPercentage = percentage >= 0 ? percentage : 0;
+	return discount || validPercentage;
 }
 
 function animatingCard() {
@@ -387,6 +393,9 @@ export default {
 			max-width: 250px;
 			width: 100%;
 			
+		}
+		@media screen and (max-width: 600px) {
+			padding: 0 5px;	
 		}
 
 		&.small {
