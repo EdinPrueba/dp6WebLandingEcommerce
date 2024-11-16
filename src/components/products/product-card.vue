@@ -39,7 +39,7 @@
 							{ 'loading loading-dark': indeterminate },
 						]"
 					>
-						<span v-if="!indeterminate">- {{discountPercentage}}%</span>
+						<span v-if="!indeterminate">- {{ discountPercentage | round(0) }}%</span>
 					</div>
 					<div class="product-favorite">
 						<div class="heart-content"
