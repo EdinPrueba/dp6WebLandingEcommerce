@@ -134,7 +134,11 @@ function imagesHandler(newImages) {
 		if (this.movilLocalImages.length === 0) {
 			this.movilLocalImages = this.webLocalImages;
 		}
-		if (this.webLocalImages.length === 0 && this.movilLocalImages.length > 0) {
+		console.log(window.innerWidth);
+		console.log(this.webLocalImages.length === 0
+			&& this.movilLocalImages.length > 0 && window.innerWidth < 767);
+		if (this.webLocalImages.length === 0
+			&& this.movilLocalImages.length > 0 && window.innerWidth < 767) {
 			this.webLocalImages = this.movilLocalImages;
 		}
 		if (this.webLocalImages.length > 0) {
