@@ -33,14 +33,21 @@
 			v-if="webLocalImages && webLocalImages.length"
 		>
 			<swiper ref="mySwiper" :options="swiperOption">
-				<swiper-slide v-for="image in webLocalImages" :key="image.id" v-if="image.select">
-					<div :class="['wrapper-image', { 'sold-out': noStock }]" data-cy="presentation-img">
-					<img
-						:src="image.urlImage"
-						:alt="image.name"
-						@error="handleImageError"
-						class="image-product-slider"
-					/>
+				<swiper-slide
+					v-for="image in webLocalImages"
+					:key="image.id"
+					v-if="image.select"
+				>
+					<div
+						:class="['wrapper-image', { 'sold-out': noStock }]"
+						data-cy="presentation-img"
+					>
+						<img
+							:src="image.urlImage"
+							:alt="image.name"
+							@error="handleImageError"
+							class="image-product-slider"
+						/>
 					</div>
 				</swiper-slide>
 			</swiper>
@@ -81,7 +88,7 @@
 	</div>
 </template>
 <script>
-import { getDeeper, isEmpty, map, setNewProperty } from '@/shared/lib';
+import { getDeeper, isEmpty } from '@/shared/lib';
 import TypeProduct from '@/shared/enums/typeProduct';
 import ProductConversionsHeader from '@/components/products/product-conversion-header';
 import helper from '@/shared/helper';
@@ -92,10 +99,14 @@ function swiper() {
 
 function goToSlider(index, image) {
 	// this.swiper.slideTo(index + 1, 1000, false);
-	this.webLocalImages = map(
-		setNewProperty('select', img => img.id === image.id),
-		this.webLocalImages,
-	);
+	this.webLocalImages = this.webLocalImages.map(img => ({
+		...img,
+		select: img.id === image.id,
+	}));
+	// this.webLocalImages = map(
+	// 	setNewProperty('select', img => img.id === image.id),
+	// 	this.webLocalImages,
+	// );
 }
 
 function imagesHandler(newImages) {
@@ -105,27 +116,30 @@ function imagesHandler(newImages) {
 
 		newImages.forEach((img) => {
 			if (img.fromApp === 0) {
-				const imageToValidate = new Image();
-				imageToValidate.src = img.urlImage;
-				imageToValidate.onload = () => {
-					if (imageToValidate.complete) {
-						this.webLocalImages.push(img);
-					} else {
-						this.webLocalImages.push(this.data);
-					}
-				};
+				// const imageToValidate = new Image();
+				// imageToValidate.src = img.urlImage;
+				// imageToValidate.onload = () => {
+				// 	if (imageToValidate.complete) {
+				// 		this.webLocalImages.push(img);
+				// 	} else {
+				// 		this.webLocalImages.push(this.data);
+				// 	}
+				// };
 
-				imageToValidate.onerror = () => {
+				// imageToValidate.onerror = () => {
+				// 	this.webLocalImages.push(this.data);
+				// };
+				if (img.urlImage) {
+					this.webLocalImages.push(img);
+				} else {
 					this.webLocalImages.push(this.data);
-				};
+				}
 			} else if (img.urlImage === '/static/icons/no-picture-found.svg') {
 				this.movilLocalImages.push(this.data);
 			} else {
 				this.movilLocalImages.push(img);
 			}
 		});
-		console.log(this.movilLocalImages);
-		console.log(this.webLocalImages);
 		if (this.movilLocalImages.length === 0) {
 			this.movilLocalImages = this.webLocalImages;
 		}
@@ -139,11 +153,6 @@ function imagesHandler(newImages) {
 		if (this.webLocalImages.length > 0) {
 			this.$set(this.webLocalImages[0], 'select', true);
 		}
-		console.log(this.movilLocalImages.length === 0);
-		console.log(this.webLocalImages.length === 0 &&
-			this.movilLocalImages.length > 0 &&
-			window.innerWidth < 767);
-		console.log(this.webLocalImages.length > 0);
 	}
 }
 
