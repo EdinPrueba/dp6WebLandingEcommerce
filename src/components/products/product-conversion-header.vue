@@ -112,6 +112,7 @@ export default {
         position: absolute;
         right: 15px;
         top: 20px;
+		z-index: 10;
 
         @media (min-width: 950px) {
             display: none !important;
