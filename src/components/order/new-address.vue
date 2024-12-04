@@ -115,7 +115,7 @@
 				]"
 				:location="{ lat: newAddress.latitude, lng: newAddress.longitude }"
 				:center="{ lat: newAddress.latitude, lng: newAddress.longitude }"
-				@update-address="updateAddressLine1"	
+				@update-address="updateAddressLine1"
 			/>
 		</div>
 	</form>
@@ -166,35 +166,46 @@ function googleSearch() {
 	const disctrictName = this.districts.filter(
 		d => d.id === this.newAddress.district,
 	);
-	geocoder.geocode(
-		{
-			address: `${departmentName[0].name} ${provinceName[0].name} ${disctrictName[0].name} ${this.newAddress.addressLine1}`,
-		},
-		(results, status) => {
-			if (status === google.maps.GeocoderStatus.OK) {
-				const lat = results[0].geometry.location.lat();
-				const lng = results[0].geometry.location.lng();
-				this.newAddress.latitude = lat;
-				this.newAddress.longitude = lng;
-				this.showMap = true;
-				this.setCustomerAddress();
-			} else {
-				this.showNotification(
-					'No se encontro esa ubicación en el mapa.',
-					'error',
-					null,
-					false,
-					4000,
-				);
-				console.error('Request failed.');
-			}
-		},
-	);
+
+	if (
+		!departmentName.length ||
+		!provinceName.length ||
+		!disctrictName.length ||
+		!this.newAddress.addressLine1
+	) {
+		this.showNotification(
+			'La dirección está incompleta o es incorrecta.',
+			'error',
+		);
+		return;
+	}
+
+	const fullAddress = `${departmentName[0].name} ${provinceName[0].name} ${disctrictName[0].name} ${this.newAddress.addressLine1}`;
+
+	geocoder.geocode({ address: fullAddress }, (results, status) => {
+		if (status === google.maps.GeocoderStatus.OK) {
+			const lat = results[0].geometry.location.lat();
+			const lng = results[0].geometry.location.lng();
+			this.newAddress.latitude = lat;
+			this.newAddress.longitude = lng;
+			this.showMap = true;
+			this.setCustomerAddress();
+		} else {
+			this.showNotification(
+				'No se encontró esa ubicación en el mapa.',
+				'error',
+				null,
+				false,
+				2000,
+			);
+		}
+	});
 }
 
 function selectDepartment(provinceId) {
 	this.newAddress.province = null;
 	this.newAddress.district = null;
+	this.showMap = false;
 	this.newAddress.addressLine1 = null;
 	this.$store.commit('SET_PROVINCES', []);
 	this.$store.commit('SET_DISTRICTS', []);
@@ -213,6 +224,7 @@ function selectProvince(cityId) {
 	// });
 	this.$store.dispatch('LOAD_DISTRICTS', { context: this, cityId });
 	this.setCustomerAddress();
+	this.showMap = false;
 }
 
 function selectDistrict(parishId) {
@@ -223,6 +235,7 @@ function selectDistrict(parishId) {
 		parishId,
 	});
 	this.setCustomerAddress();
+	this.showMap = false;
 }
 
 async function calculateShippingCost(locationId, location) {
@@ -236,13 +249,13 @@ async function calculateShippingCost(locationId, location) {
 		if (error.data.message === 'PRICE_NOT_CONFIGURATION') {
 			this.$store.dispatch('setShippingCostError', true);
 			this.$store.dispatch('setNoShippingCost');
-			this.showNotification(
-				'No es posible hacer envios a ese destino.',
-				'error',
-				null,
-				false,
-				8000,
-			);
+			// this.showNotification(
+			// 	'No es posible hacer envios a ese destino.',
+			// 	'error',
+			// 	null,
+			// 	false,
+			// 	2000,
+			// );
 		}
 	}
 }
@@ -254,7 +267,7 @@ async function calculateShippingCost(locationId, location) {
  * @param { number } geoLocation.parishId - id de la parroquia seleccionada
  */
 function buildBody(geoLocation) {
-	const details = this.getProductToBuy.map((p) => {
+	const details = this.getProductToBuy.map(p => {
 		const newP = {};
 		newP.weight = p.weigth || 0;
 		newP.quantity = p.quantity;
