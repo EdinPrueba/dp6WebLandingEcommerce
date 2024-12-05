@@ -4,35 +4,36 @@
 			v-if="user.discount && user.showCustomerDiscountMessage"
 			:discount="user.discount"
 		/>
-		<app-banner-top ref="bannerTop" v-if="!indeterminate" :data="bannerTop"/>
+		<app-banner-top ref="bannerTop" v-if="!indeterminate" :data="bannerTop" />
 		<app-header
 			v-if="!isValid"
 			ref="ecoHeader"
-			:logo="logo" 
+			:logo="logo"
 			:menu="showMenu"
 			:user="user"
-			@change-menu="changeMenu" 
+			@change-menu="changeMenu"
 		/>
 		<transition name="slide-fade">
-			<div 
-				class="v-overlay v-overlay--absolute v-overlay--active mobile-overlay" 
+			<div
+				class="v-overlay v-overlay--absolute v-overlay--active mobile-overlay"
 				@click="changeMenu"
-				v-show="showMenu">
-			</div>
-  		</transition>
-	<transition name="slide-fade">
-		<app-menu-category 
-			v-if="showMenu" 
-			:img-user="user"
-			:color-base="colorBase"
-			:color-border="colorBorder"
-		/>
-  	</transition>
-	<router-view></router-view>
-	<section-visa v-if="existcreditsCard"></section-visa>
-	<form-bulletin />
-	<app-footer></app-footer>
-	<v-snackbar
+				v-show="showMenu"
+			></div>
+		</transition>
+		<transition name="slide-fade">
+			<app-menu-category
+				v-if="showMenu"
+				:img-user="user"
+				:color-base="colorBase"
+				:color-border="colorBorder"
+			/>
+		</transition>
+		<router-view></router-view>
+		<section-visa v-if="existcreditsCard"></section-visa>
+		<form-bulletin />
+		<app-footer></app-footer>
+		<app-botton-whatsapp></app-botton-whatsapp>
+		<v-snackbar
 			:timeout="snackbar.timeout"
 			:color="snackbar.color"
 			top
@@ -40,11 +41,8 @@
 			v-model="snackbar.isVisible"
 		>
 			{{ snackbar.text }}
-			<div
-				v-if="snackbar.html"
-				v-html="snackbar.html">
-			</div>
-		
+			<div v-if="snackbar.html" v-html="snackbar.html"></div>
+
 			<v-btn
 				flat
 				class="white--text"
@@ -70,12 +68,26 @@ import { mapGetters } from 'vuex';
 import appHeader from '@/components/header/app-header';
 import { isEmpty, getDeeper } from '@/shared/lib';
 import appCustomerDiscount from '@/components/header/app-customer-discount';
+import appBottonWhatsapp from '@/components/footer/app-botton-whatsapp';
 
-const appMenuCategory = () => import(/* webpackChunkName: "app-Menu-Category" */'@/components/header/app-category');
-const formBulletin = () => import(/* webpackChunkName: "form-Bulletin" */'@/components/shared/form/form-bulletin');
-const sectionVisa = () => import(/* webpackChunkName: "section-Visa" */'@/components/footer/section-visa');
-const appFooter = () => import(/* webpackChunkName: "app-Footer" */'@/components/footer/app-footer');
-const appBannerTop = () => import(/* webpackChunkName: "app-Banner-Top" */ '@/components/header/app-banner-top');
+const appMenuCategory = () =>
+	import(
+		/* webpackChunkName: "app-Menu-Category" */ '@/components/header/app-category'
+	);
+const formBulletin = () =>
+	import(
+		/* webpackChunkName: "form-Bulletin" */ '@/components/shared/form/form-bulletin'
+	);
+const sectionVisa = () =>
+	import(
+		/* webpackChunkName: "section-Visa" */ '@/components/footer/section-visa'
+	);
+const appFooter = () =>
+	import(/* webpackChunkName: "app-Footer" */ '@/components/footer/app-footer');
+const appBannerTop = () =>
+	import(
+		/* webpackChunkName: "app-Banner-Top" */ '@/components/header/app-banner-top'
+	);
 
 function mounted() {
 	// document.addEventListener('click', () => {
@@ -117,7 +129,6 @@ function snackbar() {
 function changeMenu() {
 	this.showMenu = !this.showMenu;
 }
-
 
 function routeHandler() {
 	this.showMenu = false;
@@ -178,6 +189,7 @@ export default {
 		appMenuCategory,
 		formBulletin,
 		sectionVisa,
+		appBottonWhatsapp,
 	},
 	methods: {
 		bannerTopAndHeaderHeight,
@@ -194,7 +206,8 @@ export default {
 </script>
 
 <style lang="scss">
-html, body {
+html,
+body {
 	color: color(black) !important;
 	font-family: font(regular) !important;
 	font-size: size(medium);
@@ -230,11 +243,11 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .slide-fade-enter-active {
-  	transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-leave-active {
-  	transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .transparent-select {
@@ -243,7 +256,6 @@ input.app-input::-webkit-input-placeholder {
 	height: 30px !important;
 
 	.v-input__control {
-		
 		.v-input__slot {
 			border: 1px solid color(border) !important;
 			border-radius: 7px !important;
@@ -279,7 +291,7 @@ input.app-input::-webkit-input-placeholder {
 
 	.v-input__control {
 		height: inherit;
-		
+
 		.v-input__slot {
 			border: 1px solid color(border) !important;
 			border-radius: 7px !important;
@@ -305,9 +317,10 @@ input.app-input::-webkit-input-placeholder {
 	}
 }
 
-.slide-fade-enter, .slide-fade-leave-to {
+.slide-fade-enter,
+.slide-fade-leave-to {
 	opacity: 0;
-  transform: translateX(-10px);
+	transform: translateX(-10px);
 }
 
 .mobile-overlay {
@@ -319,10 +332,12 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .banner-carousel {
-	.swiper-container-horizontal > .swiper-pagination-bullets .swiper-pagination-bullet {
+	.swiper-container-horizontal
+		> .swiper-pagination-bullets
+		.swiper-pagination-bullet {
 		border: 1px solid color(white);
 		height: 12px;
-    	width: 12px;
+		width: 12px;
 	}
 
 	.swiper-pagination-bullet {
@@ -344,7 +359,8 @@ input.app-input::-webkit-input-placeholder {
 	}
 }
 
-.categories-carousel-slider, .section-settlement  {
+.categories-carousel-slider,
+.section-settlement {
 	.swiper-button-next {
 		background-image: none;
 		right: 0;
@@ -355,7 +371,8 @@ input.app-input::-webkit-input-placeholder {
 		left: 0;
 	}
 
-	.swiper-button-next, .swiper-button-prev {
+	.swiper-button-next,
+	.swiper-button-prev {
 		background-size: auto;
 		cursor: pointer;
 		height: 40px;
@@ -373,12 +390,11 @@ input.app-input::-webkit-input-placeholder {
 	}
 }
 
-
 .filters-category {
 	.theme--light.v-messages {
 		display: none;
 	}
-	
+
 	.v-input input {
 		color: color(base);
 	}
@@ -414,16 +430,15 @@ input.app-input::-webkit-input-placeholder {
 
 	.v-input--slider {
 		position: relative;
-   		right: 46px;
+		right: 46px;
 	}
-}		   
+}
 .text-area {
 	color: color(border) !important;
 	font-family: font(medium) !important;
 	font-size: size(small) !important;
 
 	.v-input__control {
-		
 		.v-input__slot {
 			background-color: white !important;
 			border: solid 1px color(border) !important;
@@ -443,11 +458,11 @@ input.app-input::-webkit-input-placeholder {
 			max-width: 100% !important;
 		}
 	}
-
 }
 
 .section-settlement {
-	.swiper-button-next, .swiper-button-prev {
+	.swiper-button-next,
+	.swiper-button-prev {
 		@media (max-width: 1161px) {
 			display: none;
 		}
@@ -502,7 +517,7 @@ input.app-input::-webkit-input-placeholder {
 	.swiper-container {
 		width: 100%;
 	}
-	
+
 	.swiper-button-next {
 		background-image: none;
 		height: 40px;
@@ -522,7 +537,7 @@ input.app-input::-webkit-input-placeholder {
 		left: 0;
 		position: absolute;
 		width: 40px;
-		
+
 		@media (max-width: 650px) {
 			left: -6px;
 			outline: none;
@@ -560,7 +575,8 @@ input.app-input::-webkit-input-placeholder {
 		font-size: size(medium);
 	}
 
-	.theme--light.v-breadcrumbs .v-breadcrumbs__divider, .theme--light.v-breadcrumbs .v-breadcrumbs__item--disabled {
+	.theme--light.v-breadcrumbs .v-breadcrumbs__divider,
+	.theme--light.v-breadcrumbs .v-breadcrumbs__item--disabled {
 		color: color(primary);
 		font-family: font(bold);
 	}
@@ -575,7 +591,8 @@ input.app-input::-webkit-input-placeholder {
 		background-image: url('/static/img/slider-arrow-left.svg');
 	}
 
-	.swiper-button-next, .swiper-button-prev {
+	.swiper-button-next,
+	.swiper-button-prev {
 		background-size: auto;
 		cursor: pointer;
 		height: 19px;
@@ -586,7 +603,8 @@ input.app-input::-webkit-input-placeholder {
 	}
 
 	@media screen and (max-width: 975px) {
-		.swiper-button-next, .swiper-button-prev {
+		.swiper-button-next,
+		.swiper-button-prev {
 			display: none;
 		}
 
@@ -595,7 +613,7 @@ input.app-input::-webkit-input-placeholder {
 				display: none;
 			}
 
-			.product-favorite{
+			.product-favorite {
 				margin: auto;
 			}
 		}
@@ -610,7 +628,6 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .billing-style {
-
 	.v-input--selection-controls__input {
 		width: 46px !important;
 
@@ -631,7 +648,6 @@ input.app-input::-webkit-input-placeholder {
 			border-radius: 3px !important;
 			top: calc(50% - 7px) !important;
 		}
-
 	}
 
 	&.v-input--is-dirty .v-input--selection-controls__ripple,
@@ -679,53 +695,53 @@ input.app-input::-webkit-input-placeholder {
 
 	.theme--light.v-pagination .v-pagination__navigation .v-icon {
 		padding: 0 !important;
-	} 
-}	
-	.v-dialog {
-		@media screen and (max-width: 764px) {
-			margin: 0 !important;
+	}
+}
+.v-dialog {
+	@media screen and (max-width: 764px) {
+		margin: 0 !important;
 
-			.v-card  {
-				height: 100vh;
-			}
+		.v-card {
+			height: 100vh;
 		}
 	}
+}
 
-	.v-dialog:not(.v-dialog--fullscreen) {
-		@media screen and (max-width: 764px) {
-			max-height: none !important;
-		}
+.v-dialog:not(.v-dialog--fullscreen) {
+	@media screen and (max-width: 764px) {
+		max-height: none !important;
 	}
+}
 
-	.go-left-enter {
-		opacity: 0;
-		transform: translateX(100%);
-	}
+.go-left-enter {
+	opacity: 0;
+	transform: translateX(100%);
+}
 
-	.go-right-enter {
-		opacity: 0;
-		transform: translateX(-100%);
-	}
+.go-right-enter {
+	opacity: 0;
+	transform: translateX(-100%);
+}
 
-	.go-left-leave-to {
-		opacity: 0;
-		transform: translateX(-100%);
-	}
+.go-left-leave-to {
+	opacity: 0;
+	transform: translateX(-100%);
+}
 
-	.go-right-leave-to {
-		opacity: 0;
-		transform: translateX(100%);
-	}
+.go-right-leave-to {
+	opacity: 0;
+	transform: translateX(100%);
+}
 
-	.go-left-enter-active,
-	.go-right-enter-active,
-	.go-right-leave-active,
-	.go-left-leave-active {
-		transition: all 0.2s cubic-bezier(.32,1.09,.62,.98);
+.go-left-enter-active,
+.go-right-enter-active,
+.go-right-leave-active,
+.go-left-leave-active {
+	transition: all 0.2s cubic-bezier(0.32, 1.09, 0.62, 0.98);
 }
 
 .list-category {
-		.slide-enter-active {
+	.slide-enter-active {
 		transition-duration: 0.5s;
 		transition-timing-function: ease-in;
 	}
@@ -735,12 +751,14 @@ input.app-input::-webkit-input-placeholder {
 		transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
 	}
 
-	.slide-enter-to, .slide-leave {
+	.slide-enter-to,
+	.slide-leave {
 		max-height: 1000px;
 		overflow: hidden;
 	}
 
-	.slide-enter, .slide-leave-to {
+	.slide-enter,
+	.slide-leave-to {
 		overflow: hidden;
 		max-height: 0;
 	}
@@ -751,7 +769,7 @@ input.app-input::-webkit-input-placeholder {
 		margin: 10px auto !important;
 
 		@media (max-width: 986px) {
-				margin: 0 !important;
+			margin: 0 !important;
 		}
 	}
 }
@@ -770,7 +788,6 @@ input.app-input::-webkit-input-placeholder {
 				padding: 10px 1.5%;
 
 				& > .v-treeview-node__root {
-					
 					.v-treeview-node__label {
 						font-family: font(demi);
 					}
@@ -883,7 +900,6 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .conversions-select {
-
 	.ecommerce-select {
 		background-color: white !important;
 	}
@@ -904,11 +920,10 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .xchange-btn {
-
 	button {
 		background-position: top !important;
-    	background-size: cover !important;
-    	height: 50px !important;
+		background-size: cover !important;
+		height: 50px !important;
 		width: 210px !important;
 	}
 }
@@ -934,21 +949,21 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .wpwl-label-cardNumber::after {
-	content: "Numero de la Tarjeta:";
+	content: 'Numero de la Tarjeta:';
 	position: relative;
-    right: 80px;
+	right: 80px;
 	visibility: visible;
 }
 
 .wpwl-label-expiry {
 	visibility: hidden;
-	text-decoration: none;	
+	text-decoration: none;
 }
 
 .wpwl-label-expiry::after {
-	content: "Expira:";
+	content: 'Expira:';
 	position: relative;
-    right: 66px;
+	right: 66px;
 	visibility: visible;
 }
 
@@ -961,11 +976,10 @@ input.app-input::-webkit-input-placeholder {
 	display: none;
 }
 
-
 .wpwl-label-cardHolder::after {
-	content: "Nom. (Igual que en la tarjeta)";
+	content: 'Nom. (Igual que en la tarjeta)';
 	position: relative;
-    right: 66px;
+	right: 66px;
 	visibility: visible;
 }
 
@@ -976,14 +990,19 @@ input.app-input::-webkit-input-placeholder {
 }
 
 .wpwl-label-brand::after {
-	content: "Tipo de Tarjeta:";
+	content: 'Tipo de Tarjeta:';
 	position: relative;
-    right: 36px;
+	right: 36px;
 	top: 5px;
 	visibility: visible;
 }
 
-.wpwl-label-brand, .wpwl-wrapper-brand, .wpwl-wrapper-registration-registrationId, .wpwl-wrapper-registration-brand, .wpwl-wrapper-registration-number, .wpwl-wrapper-registration-expiry {
+.wpwl-label-brand,
+.wpwl-wrapper-brand,
+.wpwl-wrapper-registration-registrationId,
+.wpwl-wrapper-registration-brand,
+.wpwl-wrapper-registration-number,
+.wpwl-wrapper-registration-expiry {
 	padding: 0 !important;
 }
 

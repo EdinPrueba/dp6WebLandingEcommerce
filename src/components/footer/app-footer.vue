@@ -6,7 +6,7 @@
 			<router-link :to="{ name: 'reclamaciones' }" v-if="isPeru">
 				Libro de Reclamaciones
 			</router-link>
-			<div>
+			<div class="social-networks">
 				<a
 					v-for="social in getCommerceData.socialNetworks"
 					:key="social.id"
@@ -115,5 +115,9 @@ export default {
 	height: 30px;
 	margin-left: 10px;
 	object-fit: cover;
+}
+
+.social-networks {
+	padding-right: 30px;
 }
 </style>
