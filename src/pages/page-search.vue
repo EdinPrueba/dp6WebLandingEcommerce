@@ -358,7 +358,7 @@ export default {
 			if (features) {
 				this.features = features;
 			} else {
-				const { data: response } = await this.$httpProducts.get('features');
+				const { data: response } = await this.$httpProducts.get('features/public');
 				this.features = response;
 				const json = JSON.stringify(response);
 				localStorage.setItem('ecommerce::features', json);
