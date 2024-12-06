@@ -24,11 +24,11 @@
 					:border="globalColors.primary"
 					@click="$emit('close')"
 				/>
-				<app-button
+				<!-- <app-button
 					action="Filtrar"
 					class="btn-modal"
 					:background="globalColors.secondary"
-				/>
+				/> -->
 			</div>
 		</div>
 		<button class="btn-menu-category" @click="$emit('toggle')">
