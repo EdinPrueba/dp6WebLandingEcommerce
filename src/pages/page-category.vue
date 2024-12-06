@@ -1,61 +1,79 @@
 <template>
-<div>
-	<div class="page-category">
-		<cart-bottom></cart-bottom>
-		<div class="name-select-mobile" v-if="!open">
-			<div class="flex-center flex-60">
-				<img 
-					:src="categorySelected.webImage" 
-					:alt="categorySelected.title" 
-					class="mr-2" 
-					height="21">
-				<span class="text-select" :style="`color: ${globalColors.primary}`">{{categorySelected.title}}</span>
-			</div>
-			<div class="flex-center flex-40">
-				<button @click="toggleMenu">
-					<img 
-						src="/static/img/icons/icon-filter-category.svg" 
-						alt="filtro"
+	<div>
+		<div class="page-category">
+			<cart-bottom></cart-bottom>
+			<div class="name-select-mobile" v-if="!open">
+				<div class="flex-center flex-60">
+					<img
+						:src="categorySelected.webImage"
+						:alt="categorySelected.title"
 						class="mr-2"
-						height="16"
-					>
-					<span>Filtrar por</span>
-				</button>
+						height="21"
+					/>
+					<span class="text-select" :style="`color: ${globalColors.primary}`">{{
+						categorySelected.title
+					}}</span>
+				</div>
+				<div class="flex-center flex-40">
+					<button @click="toggleMenu">
+						<img
+							src="/static/img/icons/icon-filter-category.svg"
+							alt="filtro"
+							class="mr-2"
+							height="16"
+						/>
+						<span>Filtrar por</span>
+					</button>
+				</div>
 			</div>
-		</div>
-		<div class="menu-category" :class="{open: open, toggle: toggle}" v-if="open">
-			<button class="btn-close" @click="closeOpen">
-				<img 
-					src="/static/img/icons/close.svg" 
-					alt="cerrar" 
-					height="17">
-			</button>
-			<menu-category
-				:attributes="attributes"
-				:categories="categories"
-				:breadcrumbs="breadcrumbs"
-				:toggle="toggle"
-				:reset-attributes="resetAttributes"
-				@attribute-selected="setAttribute"
-				@change-category="changeCategory"
-				@open-category="openCategory"
-				@toggle="toggleCategory"
-				@close="closeOpen"
-			></menu-category>
-		</div>
-		<div class="wrapper-results" :class="{toggle: toggle, close: open}">
-			<div class="wrapper-results-pagination">
-				<v-breadcrumbs :items="breadcrumbs" divider=">">
-					<template slot="item" slot-scope="props">
-						<button
-							:style="props.item.disabled ? `color: ${globalColors.primary}` : `color: ${globalColors.dark}`"
-							@click="linkCategories(props.item)"
-							>{{ props.item.title }}</button>
-					</template>
-				</v-breadcrumbs>
-				<section class="section-pagination-category">
-						<p class="total-products" v-if="listProducts.length">{{listProducts.length}} productos</p>
-						<v-layout class="text-xs-center" v-show="totalPages" v-if="lastPage > 1">
+			<div
+				class="menu-category"
+				:class="{ open: open, toggle: toggle }"
+				v-if="open"
+			>
+				<button class="btn-close" @click="closeOpen">
+					<img src="/static/img/icons/close.svg" alt="cerrar" height="17" />
+				</button>
+				<menu-category
+					:attributes="attributes"
+					:categories="categories"
+					:breadcrumbs="breadcrumbs"
+					:toggle="toggle"
+					:reset-attributes="resetAttributes"
+					:features="features"
+					@attribute-selected="setAttribute"
+					@change-category="changeCategory"
+					@open-category="openCategory"
+					@toggle="toggleCategory"
+					@close="closeOpen"
+					@on-features="onFeatures"
+				></menu-category>
+			</div>
+			<div class="wrapper-results" :class="{ toggle: toggle, close: open }">
+				<div class="wrapper-results-pagination">
+					<v-breadcrumbs :items="breadcrumbs" divider=">">
+						<template slot="item" slot-scope="props">
+							<button
+								:style="
+									props.item.disabled
+										? `color: ${globalColors.primary}`
+										: `color: ${globalColors.dark}`
+								"
+								@click="linkCategories(props.item)"
+							>
+								{{ props.item.title }}
+							</button>
+						</template>
+					</v-breadcrumbs>
+					<section class="section-pagination-category">
+						<p class="total-products" v-if="listProducts.length">
+							{{ listProducts.length }} productos
+						</p>
+						<v-layout
+							class="text-xs-center"
+							v-show="totalPages"
+							v-if="lastPage > 1"
+						>
 							<v-pagination
 								:length="lastPage"
 								:total-visible="totalPages"
@@ -64,44 +82,48 @@
 								:color="globalColors.secondary"
 							></v-pagination>
 						</v-layout>
+					</section>
+				</div>
+				<div class="loading-products">
+					<spinner-loading :loading="loadingProducts"></spinner-loading>
+				</div>
+				<section class="section-product-card" v-if="listProducts.length">
+					<product-card
+						class="product-card"
+						v-for="product in listProducts"
+						:key="product.id"
+						:product="product"
+						:page-last="page"
+					/>
+				</section>
+				<p
+					v-if="!loadingProducts && listProducts.length === 0"
+					class="not-products"
+				>
+					No se encontraron productos
+				</p>
+				<section class="section-pagination-category container-end">
+					<p class="total-products" v-if="listProducts.length">
+						{{ listProducts.length }} productos
+					</p>
+					<div class="text-xs-center" v-show="totalPages" v-if="lastPage > 1">
+						<v-pagination
+							:length="lastPage"
+							:total-visible="totalPages"
+							v-model="page"
+							@input="updateProductCard"
+							:color="globalColors.secondary"
+						></v-pagination>
+					</div>
 				</section>
 			</div>
-			<div class = "loading-products">
-				<spinner-loading  :loading="loadingProducts" ></spinner-loading>
-			</div>
-			<section 
-				class="section-product-card"
-				v-if="listProducts.length"
-			>
-				<product-card
-					class="product-card"
-					v-for="product in listProducts"
-					:key="product.id"
-					:product="product"
-					:page-last="page"
-					/>
-			</section>
-			<p v-if="!loadingProducts && listProducts.length === 0" class="not-products">No se encontraron productos</p>
-			<section class="section-pagination-category container-end">
-				<p class="total-products" v-if="listProducts.length">{{listProducts.length}} productos</p>
-				<div class="text-xs-center" v-show="totalPages" v-if="lastPage > 1">
-					<v-pagination
-						:length="lastPage"
-						:total-visible="totalPages"
-						v-model="page"
-						@input="updateProductCard"
-						:color="globalColors.secondary"
-					></v-pagination>
-				</div>
-		</section>
 		</div>
-	</div>
-	<app-banner-top
-		v-if="getPromotionalBanner"
-		:data="getPromotionalBanner"
-		:color="globalColors.secondary"
-		big/>
-	
+		<app-banner-top
+			v-if="getPromotionalBanner"
+			:data="getPromotionalBanner"
+			:color="globalColors.secondary"
+			big
+		/>
 	</div>
 </template>
 
@@ -118,8 +140,14 @@ import { compose, setNewProperty } from '@/shared/lib';
 import helper from '@/shared/helper';
 
 async function created() {
-	const categoriesEcommerceLocal = this.getLocalStorage('ecommerce::categories');
-	this.categories = this.getCategories.length === 0 ? categoriesEcommerceLocal : this.getCategories;
+	const categoriesEcommerceLocal = this.getLocalStorage(
+		'ecommerce::categories',
+	);
+	this.categories =
+		this.getCategories.length === 0
+			? categoriesEcommerceLocal
+			: this.getCategories;
+	this.loadFeatures();
 }
 
 function mounted() {
@@ -138,20 +166,30 @@ async function loadProduct() {
 			page: this.page,
 			codeAttribute: this.attributeCodes,
 			flagCommerce: true,
+			code: this.featuresParams,
 		};
 		const url = 'products-public';
 		const { data: products, headers } = process.env.PRODUCTS_READ_REPORT
-			? await this.$httpProductsReadPublic.get(url, { params }) :
-			await this.$httpProductsPublic.get(url, { params });
-		const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
-		const commercePriceListId = user && user.salPriceListId ? user.salPriceListId :
-			this.getCommerceData.settings.salPriceListId;
+			? await this.$httpProductsReadPublic.get(url, { params })
+			: await this.$httpProductsPublic.get(url, { params });
+		const user =
+			JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
+		const commercePriceListId =
+			user && user.salPriceListId
+				? user.salPriceListId
+				: this.getCommerceData.settings.salPriceListId;
 		// const commercePriceListId = this.getCommerceData.settings.salPriceListId;
 		this.listProducts = products.map(
 			compose(
-				setNewProperty('price', product => helper.setPrices(product, commercePriceListId, 'price')),
-				setNewProperty('priceDiscount', product => helper.setPrices(product, commercePriceListId, 'priceDiscount')),
-				setNewProperty('createdAt', ({ createdAt }) => helper.formatDate(createdAt)),
+				setNewProperty('price', product =>
+					helper.setPrices(product, commercePriceListId, 'price'),
+				),
+				setNewProperty('priceDiscount', product =>
+					helper.setPrices(product, commercePriceListId, 'priceDiscount'),
+				),
+				setNewProperty('createdAt', ({ createdAt }) =>
+					helper.formatDate(createdAt),
+				),
 			),
 		);
 		this.lastPage = Number(headers['x-last-page']);
@@ -167,7 +205,9 @@ function updateProductCard(value) {
 }
 
 function selectCategory() {
-	const categoriesEcommerceLocal = this.getLocalStorage('ecommerce::categories');
+	const categoriesEcommerceLocal = this.getLocalStorage(
+		'ecommerce::categories',
+	);
 	this.breadcrumbs = [];
 	const lastPage = this.getLocalStorage('last-page-category');
 	if (lastPage && lastPage > 0) {
@@ -176,7 +216,10 @@ function selectCategory() {
 	localStorage.removeItem('last-page-category');
 	this.setAttribute();
 	this.loadProduct();
-	this.categories = this.getCategories.length === 0 ? categoriesEcommerceLocal : this.getCategories;
+	this.categories =
+		this.getCategories.length === 0
+			? categoriesEcommerceLocal
+			: this.getCategories;
 	this.currentSelect = this.getCurrentcategory(this.categories, this.id);
 	this.updateMetaTag(this.currentSelect);
 	if (this.breadcrumbs.length) {
@@ -265,7 +308,8 @@ function data() {
 		attributeCodes: null,
 		attributeCodesArr: [],
 		bannerTop: {
-			urlImage: 'https://s3.amazonaws.com/apprunn-acl/COM-PRU-01/ARQ88/image/big.png',
+			urlImage:
+				'https://s3.amazonaws.com/apprunn-acl/COM-PRU-01/ARQ88/image/big.png',
 			image: 'descuento',
 		},
 		categories: [],
@@ -276,6 +320,8 @@ function data() {
 		lastPage: 0,
 		listSubCategories: [],
 		listProducts: [],
+		features: [],
+		featuresParams: null,
 		page: 1,
 		resetAttributes: false,
 		totalPages: 7,
@@ -297,17 +343,11 @@ export default {
 		cartBottom,
 	},
 	computed: {
-		...mapGetters([
-			'getCategories',
-			'getPromotionalBanner',
-			'getCommerceData',
-		]),
+		...mapGetters(['getCategories', 'getPromotionalBanner', 'getCommerceData']),
 		...mapState({
 			attributes: state => state.catAttributes,
 		}),
-		...mapGetters('loading', [
-			'isLoading',
-		]),
+		...mapGetters('loading', ['isLoading']),
 	},
 	methods: {
 		changeCategory,
@@ -323,6 +363,14 @@ export default {
 		toggleMenu,
 		updateMetaTag,
 		updateProductCard,
+		async loadFeatures() {
+			const { data: response } = await this.$httpProducts.get('features');
+			this.features = response;
+		},
+		onFeatures(value) {
+			this.featuresParams = value;
+			this.loadProduct();
+		},
 	},
 	created,
 	mounted,
@@ -346,7 +394,7 @@ export default {
 	padding: 0 0 0 27px;
 	left: 0;
 	position: relative;
-	transition: all .2s linear 0s;
+	transition: all 0.2s linear 0s;
 
 	@media (max-width: 986px) {
 		height: 100%;
@@ -381,7 +429,7 @@ export default {
 	justify-content: space-between;
 	margin: 28px auto;
 	width: 100%;
-	
+
 	@media (max-width: 980px) {
 		border-bottom: 1px solid color(disabled);
 		height: 77px;
@@ -426,7 +474,7 @@ export default {
 	display: none;
 	height: 59px;
 	position: sticky;
-  top: 75px;
+	top: 75px;
 	z-index: 3;
 
 	@media (max-width: 986px) {

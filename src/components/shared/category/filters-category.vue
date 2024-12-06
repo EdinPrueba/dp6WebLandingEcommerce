@@ -3,15 +3,13 @@
 		<div
 			class="section-filter-row"
 			:style="`border-color:${globalColors.primary}`"
+			@click="showFilter"
 		>
 			<div class="content-filter-title">
-				<button-image
-				:data="iconFilter"
-				></button-image>
-				<p
-					class="title-section"
-					:style="`color: ${globalColors.primary}`"
-				>Filtros</p>
+				<button-image :data="iconFilter"></button-image>
+				<p class="title-section" :style="`color: ${globalColors.primary}`">
+					Filtros
+				</p>
 			</div>
 			<div class="simple-svg-container">
 				<simple-svg
@@ -19,13 +17,28 @@
 					:fill="globalColors.primary"
 					width="11"
 					class="icon"
-					:class="{'rotate-icon': false }"
+					:class="{ 'rotate-icon': false }"
 				/>
 			</div>
 		</div>
-		<div class="content-filter mt-4" v-if="contentFilters">
-			<!-- <p class="text-price">Precio</p> -->
-			<!-- <v-layout row>
+		<div class="dynamic-filters" v-if="show">
+			<div v-for="c in characteristics" :key="c.id" class="filter-section">
+				<h3>
+					{{ c.name }}
+				</h3>
+				<label v-for="feature in c.features" :key="feature.id">
+					<input
+						type="checkbox"
+						:value="feature.name"
+						v-model="selectedFeatures"
+					/>
+					{{ feature.name }}
+				</label>
+			</div>
+		</div>
+		<!-- <div class="content-filter mt-4" v-if="contentFilters"> -->
+		<!-- <p class="text-price">Precio</p> -->
+		<!-- <v-layout row>
 				<v-flex shrink class="input-number-price-min">
 				<v-text-field
 					class="mt-0"
@@ -52,12 +65,17 @@
 				<p class="number-filter">{{getCurrencySymbol}} {{filters.priceMin}}</p>
 				<p class="number-filter">{{getCurrencySymbol}} {{filters.priceMax}}</p>
 			</div> -->
-			<!-- <app-input
+		<!-- <app-input
 			class="field"
 			type="text"
 			v-model="filters.price" /> -->
-			<v-layout mt-2 mb-2 v-for="(attr, indexAttr) in attributes" :key="indexAttr">
-				<app-select 
+		<!-- <v-layout
+				mt-2
+				mb-2
+				v-for="(attr, indexAttr) in attributes"
+				:key="indexAttr"
+			>
+				<app-select
 					returnObject
 					item-text="name"
 					class="input-filter"
@@ -67,7 +85,7 @@
 					@input="setAttributes($event, attr)"
 				/>
 			</v-layout>
-		</div>
+		</div> -->
 	</div>
 </template>
 
@@ -76,7 +94,6 @@ import { mapGetters } from 'vuex';
 import appInput from '@/components/shared/inputs/app-input';
 import appSelect from '@/components/shared/inputs/app-select';
 import buttonImage from '@/components/shared/buttons/app-button-image';
-
 
 function closeCategory() {
 	this.closeFilters = true;
@@ -110,12 +127,14 @@ function data() {
 	return {
 		filters: {},
 		arrowUp: {
-			image: 'https://s3.amazonaws.com/apprunn-acl/COM-PRU-01/ARQ88/image/arrow-down-sign-to-navigate.svg',
+			image:
+				'https://s3.amazonaws.com/apprunn-acl/COM-PRU-01/ARQ88/image/arrow-down-sign-to-navigate.svg',
 			name: 'up',
 			height: 15,
 		},
 		arrowDown: {
-			image: 'https://s3.amazonaws.com/apprunn-acl/COM-PRU-01/ARQ88/image/up-arrow.svg',
+			image:
+				'https://s3.amazonaws.com/apprunn-acl/COM-PRU-01/ARQ88/image/up-arrow.svg',
 			name: 'down',
 			height: 15,
 		},
@@ -127,16 +146,15 @@ function data() {
 		closeFilters: true,
 		contentFilters: true,
 		openUp: false,
+		show: true,
+		selectedFeatures: [],
 	};
 }
 
 export default {
 	name: 'filters-category',
 	computed: {
-		...mapGetters([
-			'getCurrencySymbol',
-			'token',
-		]),
+		...mapGetters(['getCurrencySymbol', 'token']),
 	},
 	components: {
 		appInput,
@@ -148,6 +166,9 @@ export default {
 		closeCategory,
 		openFilters,
 		setAttributes,
+		showFilter() {
+			this.show = !this.show;
+		},
 	},
 	props: {
 		attributes: {
@@ -158,9 +179,17 @@ export default {
 			type: Boolean,
 			required: true,
 		},
+		characteristics: {
+			type: Array,
+			required: true,
+		},
 	},
 	watch: {
 		resetAttributes,
+		selectedFeatures(newValue) {
+			const result = newValue.join(', ');
+			this.$emit('on-features', result);
+		},
 	},
 };
 </script>
@@ -169,6 +198,7 @@ export default {
 .filters-category {
 	border-top: 1px solid color(border);
 	padding-top: 40px;
+	padding-bottom: 30px;
 }
 
 .title-section {
@@ -256,5 +286,61 @@ export default {
 }
 .simple-svg-container {
 	width: 1rem;
+}
+
+.dynamic-filters {
+	font-family: Arial, sans-serif;
+	background-color: #f9f9f9; /* Fondo claro para los filtros */
+	border: 1px solid #ddd; /* Bordes sutiles */
+	border-radius: 8px;
+	padding: 15px;
+	max-width: 300px;
+}
+
+.filter-section {
+	margin-bottom: 20px; /* Espaciado entre secciones */
+}
+
+.filter-section h3 {
+	font-size: 16px; /* Tamaño de letra adecuado */
+	font-weight: bold;
+	color: #333; /* Color oscuro para el texto */
+	margin-bottom: 10px; /* Separación con las opciones */
+}
+
+label {
+	display: flex;
+	align-items: center; /* Alinea el checkbox con el texto */
+	margin-bottom: 8px; /* Espaciado entre opciones */
+	cursor: pointer; /* Indica interactividad */
+}
+
+input[type='checkbox'] {
+	margin-right: 8px; /* Espaciado entre el checkbox y el texto */
+	width: 16px; /* Ajusta el tamaño del checkbox */
+	height: 16px;
+	accent-color: #007bff; /* Cambia el color del checkbox cuando está activo */
+}
+
+label:hover {
+	background-color: #f0f0f0; /* Fondo al pasar el ratón */
+	border-radius: 4px;
+}
+
+.dynamic-filters button {
+	display: block;
+	margin: 20px auto 0; /* Centra el botón */
+	background-color: #007bff; /* Color del botón */
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.dynamic-filters button:hover {
+	background-color: #0056b3; /* Color más oscuro al pasar el ratón */
 }
 </style>

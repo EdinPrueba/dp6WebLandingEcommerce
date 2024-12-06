@@ -6,26 +6,29 @@
 				:data="category"
 				:key="category.id"
 				:breadcrumbs="breadcrumbs"
-        		@change-category="changeCategory"
-				@open-category="openCategory"/>
+				@change-category="changeCategory"
+				@open-category="openCategory"
+			/>
 			<filters-category
 				:reset-attributes="resetAttributes"
 				:attributes="attributes"
+				:characteristics="features"
+				@on-features="onFeatures"
 				@attributes="setAtributes"
 			></filters-category>
 			<div class="wrapper-btns py-3">
-				<app-button 
+				<app-button
 					action="Cerrar"
 					class="btn-modal mr-2"
 					:active="false"
 					:border="globalColors.primary"
 					@click="$emit('close')"
 				/>
-				<app-button 
+				<app-button
 					action="Filtrar"
 					class="btn-modal"
 					:background="globalColors.secondary"
-					/>
+				/>
 			</div>
 		</div>
 		<button class="btn-menu-category" @click="$emit('toggle')">
@@ -34,7 +37,7 @@
 				:fill="globalColors.primary"
 				width="11"
 				class="icon"
-				:class="{'rotate-icon': toggle }"
+				:class="{ 'rotate-icon': toggle }"
 			/>
 		</button>
 	</div>
@@ -80,6 +83,9 @@ export default {
 		filterCategory,
 		openCategory,
 		setAtributes,
+		onFeatures(value) {
+			this.$emit('on-features', value);
+		},
 	},
 	props: {
 		attributes: {
@@ -107,6 +113,10 @@ export default {
 		toggle: {
 			type: Boolean,
 			required: true,
+		},
+		features: {
+			type: Array,
+			default: () => [],
 		},
 	},
 };
@@ -184,5 +194,4 @@ export default {
 		transform: rotateZ(180deg);
 	}
 }
-
 </style>
