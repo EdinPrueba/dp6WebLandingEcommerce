@@ -147,7 +147,6 @@ async function created() {
 		this.getCategories.length === 0
 			? categoriesEcommerceLocal
 			: this.getCategories;
-	this.loadFeatures();
 }
 
 function mounted() {
@@ -158,6 +157,7 @@ function mounted() {
 }
 
 async function loadProduct() {
+	this.loadFeatures();
 	try {
 		const params = {
 			limit: 20,
@@ -364,11 +364,18 @@ export default {
 		updateMetaTag,
 		updateProductCard,
 		async loadFeatures() {
-			const { data: response } = await this.$httpProducts.get('features');
-			this.features = response;
+			const features = this.getLocalStorage('ecommerce::features');
+			if (features) {
+				this.features = features;
+			} else {
+				const { data: response } = await this.$httpProducts.get('features');
+				this.features = response;
+				const json = JSON.stringify(response);
+				localStorage.setItem('ecommerce::features', json);
+			}
 		},
 		onFeatures(value) {
-			this.featuresParams = value;
+			this.featuresParams = value || null;
 			this.loadProduct();
 		},
 	},
