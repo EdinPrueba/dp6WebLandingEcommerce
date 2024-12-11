@@ -3,21 +3,22 @@
 		<div
 			class="section-filter-row"
 			:style="`border-color:${globalColors.primary}`"
-			@click="showFilter"
 		>
-			<div class="content-filter-title">
-				<button-image :data="iconFilter"></button-image>
+			<div class="content-filter-title" @click="showFilter">
 				<p class="title-section" :style="`color: ${globalColors.primary}`">
 					Filtros
 				</p>
 			</div>
 			<div class="simple-svg-container">
+				<v-icon @click="clearFilters">delete</v-icon>
+			</div>
+			<div class="simple-svg-container" @click="showFilter">
 				<simple-svg
 					filepath="/static/img/arrow-left.svg"
 					:fill="globalColors.primary"
 					width="11"
 					class="icon"
-					:class="{ 'rotate-icon': false }"
+					:class="{ 'rotate-icon': show }"
 				/>
 			</div>
 		</div>
@@ -25,15 +26,23 @@
 			<div v-for="c in characteristics" :key="c.id" class="filter-section">
 				<h3>
 					{{ c.name }}
+					<v-icon @click="toggleFilter(c.id)">
+						expand_more
+					</v-icon>
 				</h3>
-				<label v-for="feature in c.features" :key="feature.id">
-					<input
-						type="checkbox"
-						:value="feature.name"
-						v-model="selectedFeatures"
-					/>
-					{{ feature.name }}
-				</label>
+				<div v-if="c.showFilters">
+					<label v-for="feature in c.features" :key="feature.id">
+						<input
+							type="checkbox"
+							:value="feature.name"
+							v-model="selectedFeatures"
+						/>
+						{{ feature.name }}
+					</label>
+				</div>
+			</div>
+			<div class="apply-button" @click="applyFilters">
+				<span>Aplicar filtros</span>
 			</div>
 		</div>
 		<!-- <div class="content-filter mt-4" v-if="contentFilters"> -->
@@ -138,16 +147,12 @@ function data() {
 			name: 'down',
 			height: 15,
 		},
-		iconFilter: {
-			image: '/static/img/icons/filter-category-red.svg',
-			name: 'icon-filter',
-			height: 21,
-		},
 		closeFilters: true,
 		contentFilters: true,
 		openUp: false,
 		show: true,
 		selectedFeatures: [],
+		characteristics: this.features,
 	};
 }
 
@@ -169,6 +174,22 @@ export default {
 		showFilter() {
 			this.show = !this.show;
 		},
+		toggleFilter(id) {
+			this.characteristics = this.characteristics.map((c) => {
+				const newC = { ...c };
+				if (c.id === id) {
+					newC.showFilters = !c.showFilters;
+				}
+				return newC;
+			});
+		},
+		applyFilters() {
+			this.$emit('on-features', this.selectedFeatures);
+		},
+		clearFilters() {
+			this.selectedFeatures = [];
+			this.$emit('on-features', null);
+		},
 	},
 	props: {
 		attributes: {
@@ -179,17 +200,13 @@ export default {
 			type: Boolean,
 			required: true,
 		},
-		characteristics: {
+		features: {
 			type: Array,
 			required: true,
 		},
 	},
 	watch: {
 		resetAttributes,
-		selectedFeatures(newValue) {
-			const result = newValue.join(', ');
-			this.$emit('on-features', result);
-		},
 	},
 };
 </script>
@@ -197,7 +214,7 @@ export default {
 <style lang="scss" scoped>
 .filters-category {
 	border-top: 1px solid color(border);
-	padding-top: 40px;
+	padding-top: 20px;
 	padding-bottom: 30px;
 }
 
@@ -221,6 +238,7 @@ export default {
 	justify-content: space-between;
 	padding: 0 20px 15px 20px;
 	width: 100%;
+	cursor: pointer;
 }
 
 .input-price {
@@ -290,15 +308,28 @@ export default {
 
 .dynamic-filters {
 	font-family: Arial, sans-serif;
-	background-color: #f9f9f9; /* Fondo claro para los filtros */
-	border: 1px solid #ddd; /* Bordes sutiles */
+	background-color: #f9f9f9;
+	border: 1px solid #ddd;
 	border-radius: 8px;
 	padding: 15px;
-	max-width: 300px;
+	position: relative;
+	max-height: 500px;
+	overflow-y: auto;
+
+	.apply-button {
+		position: sticky;
+		bottom: 0;
+		background-color: #fff;
+		padding: 10px 0;
+		text-align: center;
+		box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+		border-radius: 10px;
+	}
 }
 
 .filter-section {
-	margin-bottom: 20px; /* Espaciado entre secciones */
+	margin-bottom: 20px;
+	padding-left: 10px;
 }
 
 .filter-section h3 {
@@ -325,22 +356,5 @@ input[type='checkbox'] {
 label:hover {
 	background-color: #f0f0f0; /* Fondo al pasar el ratón */
 	border-radius: 4px;
-}
-
-.dynamic-filters button {
-	display: block;
-	margin: 20px auto 0; /* Centra el botón */
-	background-color: #007bff; /* Color del botón */
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	border-radius: 5px;
-	font-size: 14px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-}
-
-.dynamic-filters button:hover {
-	background-color: #0056b3; /* Color más oscuro al pasar el ratón */
 }
 </style>

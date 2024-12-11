@@ -166,7 +166,7 @@ async function loadProduct() {
 			page: this.page,
 			codeAttribute: this.attributeCodes,
 			flagCommerce: true,
-			code: this.featuresParams,
+			code: this.featuresParams ? this.featuresParams.join(',') : null,
 		};
 		const url = 'products-public';
 		const { data: products, headers } = process.env.PRODUCTS_READ_REPORT
@@ -368,8 +368,14 @@ export default {
 			if (features) {
 				this.features = features;
 			} else {
-				const { data: response } = await this.$httpProducts.get('features/public');
-				this.features = response;
+				const { data: response } = await this.$httpProducts.get(
+					'features/public',
+				);
+				this.features = response.map((f) => {
+					const newC = { ...f };
+					newC.showFilters = false;
+					return newC;
+				});
 				const json = JSON.stringify(response);
 				localStorage.setItem('ecommerce::features', json);
 			}

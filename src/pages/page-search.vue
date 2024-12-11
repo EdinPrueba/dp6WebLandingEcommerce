@@ -160,7 +160,7 @@ async function loadProduct() {
 			flagGrouper: this.$store.getters.productParams.flagGrouper,
 			page: this.page,
 			codeAttribute: this.attributeCodes,
-			code: this.featuresParams,
+			code: this.featuresParams ? this.featuresParams.join(',') : null,
 		};
 		const url = 'products-public';
 		const { data: products, headers } = process.env.PRODUCTS_READ_REPORT
@@ -349,7 +349,6 @@ export default {
 		updateMetaTag,
 		updateProductCard,
 		onFeatures(value) {
-			console.log('value', value);
 			this.featuresParams = value || null;
 			this.loadProduct();
 		},
@@ -358,8 +357,14 @@ export default {
 			if (features) {
 				this.features = features;
 			} else {
-				const { data: response } = await this.$httpProducts.get('features/public');
-				this.features = response;
+				const { data: response } = await this.$httpProducts.get(
+					'features/public',
+				);
+				this.features = response.map((f) => {
+					const newC = { ...f };
+					newC.showFilters = false;
+					return newC;
+				});
 				const json = JSON.stringify(response);
 				localStorage.setItem('ecommerce::features', json);
 			}

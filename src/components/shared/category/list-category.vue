@@ -11,13 +11,7 @@
 				@click="$emit('change-category', data)"	
 			>
 				<!-- <img :src="data.webImage" class="mr-3" width="25"> -->
-				<v-icon
-					class="mr-2"
-					size="30"
-					color="info">
-					radio_button_checked
-				</v-icon>
-				<span>{{data.title}}</span>
+				<span class="ml-3">{{data.title}}</span>
 			</button>
 			<button
 				v-if="data.detail.length"
