@@ -39,7 +39,7 @@
 							{ 'loading loading-dark': indeterminate },
 						]"
 					>
-						<span v-if="!indeterminate">- {{discountPercentage}}%</span>
+						<span v-if="!indeterminate">- {{ discountPercentage | round(0) }}%</span>
 					</div>
 					<div class="product-favorite">
 						<div class="heart-content"
@@ -236,9 +236,15 @@ function goToCategories(item) {
 }
 
 function discountPercentage() {
-	const { price, priceDiscount } = this.product;
+	const { price, priceDiscount, priceList } = this.product;
+	const ecommerce = JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+	const defaultIdPiceList = ecommerce.settings.salPriceListId;
+	const discount = priceList
+		? priceList[defaultIdPiceList].discount
+		: null;
 	const percentage = Number((((price - priceDiscount) / price) * 100).toFixed(2));
-	return percentage >= 0 ? percentage : 0;
+	const validPercentage = percentage >= 0 ? percentage : 0;
+	return discount || validPercentage;
 }
 
 function animatingCard() {
@@ -387,6 +393,9 @@ export default {
 			max-width: 250px;
 			width: 100%;
 			
+		}
+		@media screen and (max-width: 600px) {
+			padding: 0 5px;	
 		}
 
 		&.small {
@@ -617,6 +626,11 @@ export default {
 				height: 35px;
 				z-index: 2;
 			}
+
+			@media screen and (max-width: 600px) {
+				top: 5%;
+				width: 15%;
+			}
 		}
 	}
 	.without-stock-text {
@@ -635,6 +649,12 @@ export default {
 		@media screen and (min-width: 600px) {
 			font-size: 20px;
 			// margin-top: 10px;
+		}
+
+		@media screen and (max-width: 600px) {
+			height: 75%;
+			font-size: 2vw;
+			border-radius: 10px;
 		}
 	}
 

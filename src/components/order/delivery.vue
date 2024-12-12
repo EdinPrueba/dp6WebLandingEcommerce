@@ -271,9 +271,7 @@ function warehouseSelected(id) {
 		w.location = { lat: lat || x, lng: lng || y };
 	}
 	this.$store.commit('SET_DELIVERY_PLACE', w);
-	this.selectedWarehouse.id = w.id;
-	this.selectedWarehouse.name = w.name;
-	this.selectedWarehouse.location = w.location;
+	this.selectedWarehouse = w;
 }
 
 function directionSelected(id) {
