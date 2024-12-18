@@ -549,4 +549,5 @@ export default {
 		max-width: 178px;
 		padding: 5px 8px;
 	}
+	
 </style>
