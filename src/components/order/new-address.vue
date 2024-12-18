@@ -267,7 +267,7 @@ async function calculateShippingCost(locationId, location) {
  * @param { number } geoLocation.parishId - id de la parroquia seleccionada
  */
 function buildBody(geoLocation) {
-	const details = this.getProductToBuy.map(p => {
+	const details = this.getProductToBuy.map((p) => {
 		const newP = {};
 		newP.weight = p.weigth || 0;
 		newP.quantity = p.quantity;

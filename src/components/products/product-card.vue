@@ -239,7 +239,7 @@ function discountPercentage() {
 	const { price, priceDiscount, priceList } = this.product;
 	const ecommerce = JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
 	const defaultIdPiceList = ecommerce.settings.salPriceListId;
-	const discount = priceList
+	const discount = priceList && priceList[defaultIdPiceList]
 		? priceList[defaultIdPiceList].discount
 		: null;
 	const percentage = Number((((price - priceDiscount) / price) * 100).toFixed(2));
