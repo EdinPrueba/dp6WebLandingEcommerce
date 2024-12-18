@@ -320,14 +320,15 @@ async function calculateShippingCost(location) {
 			if (error.data.message === 'PRICE_NOT_CONFIGURATION') {
 				this.$store.dispatch('setShippingCostError', true);
 				this.$store.dispatch('setNoShippingCost');
-				// this.showNotification('No es posible hacer envios a ese destino.', 'error', null, false, 8000);
+				// this.showNotification('No es posible hacer envios a ese destino.',
+				// 'error', null, false, 8000);
 			}
 		}
 	}
 }
 
 function buildBody(cityId, parishId, provinceId) {
-	const details = this.getProductToBuy.map(p => {
+	const details = this.getProductToBuy.map((p) => {
 		const newP = {};
 		newP.weight = p.weigth || 0;
 		newP.quantity = p.quantity;
