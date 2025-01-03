@@ -300,7 +300,7 @@ function setAttribute(attr) {
 		this.attributeCodes = null;
 		this.resetAttributes = true;
 	}
-	this.loadProduct();
+	// this.loadProduct();
 }
 
 function data() {
