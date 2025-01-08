@@ -160,7 +160,7 @@ async function loadProduct() {
 			flagGrouper: this.$store.getters.productParams.flagGrouper,
 			page: this.page,
 			codeAttribute: this.attributeCodes,
-			code: this.featuresParams ? this.featuresParams.join(',') : null,
+			code: this.featuresParams && this.featuresParams.length ? this.featuresParams.join(',') : null,
 		};
 		const url = 'products-public';
 		const { data: products, headers } = process.env.PRODUCTS_READ_REPORT
