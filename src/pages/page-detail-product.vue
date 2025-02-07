@@ -33,6 +33,7 @@
 				:show-unity="Boolean(showUnity)"
 				:stock-avaible="stockAvaible"
 				:wholeSalePrice="wholeSalePrice"
+				:exceed-quantity="exceedQuantity"
 				class="container-product-detail"
 				@update="loadData"
 				@selected="selectFeature"
@@ -394,7 +395,7 @@ function inputQuantity(num) {
 		this.productInstance.updateQuantity(num);
 		this.productDetails = { ...this.productInstance.getProductDetails() };
 	} else {
-		this.showNotification(`Cantidad: ${num} no disponible inputQuantity`, 'primary');
+		this.showNotification(`¡La cantidad de ${num} no está disponible!`, 'primary');
 	}
 }
 
@@ -403,7 +404,9 @@ function checkValidQuantity(quantity) {
 		return true;
 	}
 	const { stock } = this.productInstance;
-	return stock >= quantity;
+	const quantityCalc = (this.productInstance.unit.quantity * quantity) || quantity;
+	this.exceedQuantity = !(stock >= quantityCalc);
+	return stock >= quantityCalc;
 }
 
 async function openDialog() {
@@ -429,6 +432,7 @@ function selectedUnit(unit) {
 		quantity: 1,
 	};
 	this.unitProductValid = unit || unitDefault;
+	this.exceedQuantity = this.quantityStock > this.product.stockWarehouse;
 	if (this.quantityStock > this.product.stockWarehouse) {
 		const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
 		const newProductdetail = { ...this.product };
@@ -477,6 +481,7 @@ function data() {
 		disabledBtn: false,
 		dialogWarehouses: false,
 		disabledBuy: false,
+		exceedQuantity: false,
 		features: [],
 		featureSelect: [],
 		featuresFather: [],
