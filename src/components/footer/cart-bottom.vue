@@ -54,8 +54,8 @@
 					<button
 						@click="onClickEvent($event, 'add')"
 						class="btn-confirm"
-						:disabled="exceedQuantity"
-						:class="{ 'btn-disabled': exceedQuantity }"
+						:disabled="exceedQuantity && !$allowOrderStockNegative"
+						:class="{ 'btn-disabled': exceedQuantity && !$allowOrderStockNegative }"
 					>
 						Agregar
 					</button>

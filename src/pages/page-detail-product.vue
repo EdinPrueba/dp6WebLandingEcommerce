@@ -433,7 +433,7 @@ function selectedUnit(unit) {
 	};
 	this.unitProductValid = unit || unitDefault;
 	this.exceedQuantity = this.quantityStock > this.product.stockWarehouse;
-	if (this.quantityStock > this.product.stockWarehouse) {
+	if (this.quantityStock > this.product.stockWarehouse && !this.$allowOrderStockNegative) {
 		const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
 		const newProductdetail = { ...this.product };
 		this.$set(newProductdetail, 'quantity', validQuantity);
