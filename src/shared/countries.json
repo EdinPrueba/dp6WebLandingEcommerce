@@ -1,14 +1,44 @@
 {
-    "PER": {
-        "department": "Departamento",
-        "district": "Distrito",
-        "dni": "dni",
-        "province": "Provincia"
-    },
-    "ECU": {
-        "department": "Provincia",
-        "dni": "Cédula",
-        "district": "Parroquia",
-        "province": "Ciudad"
-    }
+	"PER": {
+		"department": "Departamento",
+		"district": "Distrito",
+		"dni": "DNI",
+		"province": "Provincia"
+	},
+	"ECU": {
+		"department": "Provincia",
+		"dni": "Cédula",
+		"district": "Parroquia",
+		"province": "Ciudad"
+	},
+	"CHL": {
+		"department": "Región",
+		"district": "Comuna",
+		"dni": "RUT",
+		"province": "Provincia"
+	},
+	"ARG": {
+		"department": "Provincia",
+		"district": "Localidad",
+		"dni": "DNI",
+		"province": "Provincia"
+	},
+	"DOM": {
+		"department": "Provincia",
+		"district": "Municipio",
+		"dni": "Cédula",
+		"province": "Provincia"
+	},
+	"COL": {
+		"department": "Departamento",
+		"district": "Municipio",
+		"dni": "Cédula",
+		"province": "Departamento"
+	},
+	"BOL": {
+		"department": "Departamento",
+		"district": "Municipio",
+		"dni": "Cédula de Identidad",
+		"province": "Provincia"
+	}
 }
