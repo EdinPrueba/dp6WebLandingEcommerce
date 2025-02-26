@@ -426,7 +426,7 @@ function closeModal(value) {
 
 function selectedUnit(unit) {
 	this.stockAvaible = parseInt(this.product.stockWarehouse / unit.quantity, 10);
-	this.quantityStock = parseInt(unit.quantity * this.product.quantity, 10);
+	this.quantityStock = parseInt((unit.quantity || 1) * this.product.quantity, 10);
 	const unitDefault = {
 		name: 'UNIDAD',
 		quantity: 1,
@@ -434,11 +434,11 @@ function selectedUnit(unit) {
 	this.unitProductValid = unit || unitDefault;
 	this.exceedQuantity = this.quantityStock > this.product.stockWarehouse;
 	if (this.quantityStock > this.product.stockWarehouse && !this.$allowOrderStockNegative) {
-		const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
-		const newProductdetail = { ...this.product };
-		this.$set(newProductdetail, 'quantity', validQuantity);
-		this.product = { ...newProductdetail };
-		this.productInstance.updateQuantity(validQuantity);
+		// const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
+		// const newProductdetail = { ...this.product };
+		// this.$set(newProductdetail, 'quantity', validQuantity);
+		// this.product = { ...newProductdetail };
+		// this.productInstance.updateQuantity(validQuantity);
 		this.showNotification(`El producto ${this.product.name}
 		no cuenta con más stock en la presentación ${unit.name}`, 'warning');
 	} else {
