@@ -390,13 +390,13 @@ function inputQuantity(num) {
 	const newProductdetail = { ...this.product };
 	const validQuantity = this.checkValidQuantity(num);
 	if (validQuantity) {
-		this.$set(newProductdetail, 'quantity', num);
-		this.product = { ...newProductdetail };
 		this.productInstance.updateQuantity(num);
 		this.productDetails = { ...this.productInstance.getProductDetails() };
 	} else {
 		this.showNotification(`¡La cantidad de ${num} no está disponible!`, 'primary');
 	}
+	this.$set(newProductdetail, 'quantity', num);
+	this.product = { ...newProductdetail };
 }
 
 function checkValidQuantity(quantity) {
