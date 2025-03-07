@@ -112,6 +112,7 @@
 			@open-dialog="$emit('open-dialog')"
 		/>
 		<cart-bottom
+			:exceed-quantity="exceedQuantity"
 			:disabled-order="disabledOrder"
 			:disabled-buy="disabledBuy"
 			:open-warehouse="openWarehouse"
@@ -291,6 +292,10 @@ export default {
 			default: false,
 		},
 		disabledBuy: {
+			type: Boolean,
+			default: false,
+		},
+		exceedQuantity: {
 			type: Boolean,
 			default: false,
 		},
