@@ -36,6 +36,7 @@
 			<div v-if="stepOne">
 				<app-button
 					data-cy="make-order"
+					:disabled="!allStock"
 					:action="`Hacer pedido ${getCurrencySymbol}. ${listenerPriceOrder}`"
 					class="btn-order"
 					:background="globalColors.primary"
@@ -113,6 +114,10 @@ function stepTwo() {
 }
 
 function goToMakeOrder() {
+	if (!this.validateStock) {
+		this.showGenericError(this.message);
+		return;
+	}
 	if (this.orderPrice) {
 		this.isNoOrderPrice = true;
 		return;
@@ -233,6 +238,20 @@ export default {
 		goToMakeOrder,
 		makeOrder,
 		buildPayloadPhones,
+	},
+	props: {
+		validateStock: {
+			type: Boolean,
+			default: false,
+		},
+		message: {
+			type: String,
+			default: '',
+		},
+		allStock: {
+			type: Boolean,
+			default: false,
+		},
 	},
 };
 </script>

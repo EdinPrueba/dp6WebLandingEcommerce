@@ -2,13 +2,24 @@
 	<div class="buy-container">
 		<section class="rejected-transaction" v-if="showTransactionInfo">
 			<div class="header">
-				<h4>La transacción <span>{{ transactionId }}</span> fue rechazada</h4>
+				<h4>
+					La transacción <span>{{ transactionId }}</span> fue rechazada
+				</h4>
 				<button class="close-btn" @click="closeTransaction">×</button>
 			</div>
 			<div class="content">
-				<h5>Nro pedido: <span>{{ getOrderInfo.id }}</span></h5>
-				<h5>Fecha: <span>{{ getOrderInfo.createdAt | formatDate }}</span></h5>
-				<h5>Razón: <span>{{ getOrderInfo.additionalInformation.paymentGateway.status }}</span></h5>
+				<h5>
+					Nro pedido: <span>{{ getOrderInfo.id }}</span>
+				</h5>
+				<h5>
+					Fecha: <span>{{ getOrderInfo.createdAt | formatDate }}</span>
+				</h5>
+				<h5>
+					Razón:
+					<span>{{
+						getOrderInfo.additionalInformation.paymentGateway.status
+					}}</span>
+				</h5>
 			</div>
 		</section>
 		<div
@@ -16,24 +27,29 @@
 			:style="`border-bottom: 3px solid ${globalColors.primary});`"
 			class="summary"
 		>
-			<summary-in-payment
-				:delivery="{}"
-				:billing="{}"
-			/>
+			<summary-in-payment :delivery="{}" :billing="{}" />
 		</div>
 		<div class="buy-layout">
 			<section class="big">
 				<div v-if="stepOneAndTwo" class="mb-5">
 					<div @click="toogleCollapse" class="contend-title">
 						<div class="section-title" v-if="stepTwo">
-							<img :src="logo.section" alt="logo del método de pago">
-							<h2 class="payment-section-title">PRODUCTOS </h2>
+							<img :src="logo.section" alt="logo del método de pago" />
+							<h2 class="payment-section-title">PRODUCTOS</h2>
 						</div>
-						<img v-if="stepTwo" height="16" width="18" :style="collapseStep" :src="arrow.section" alt="arrow" class="arrow"/>
+						<img
+							v-if="stepTwo"
+							height="16"
+							width="18"
+							:style="collapseStep"
+							:src="arrow.section"
+							alt="arrow"
+							class="arrow"
+						/>
 					</div>
 					<div v-show="isCollapseProduct" class="section-collapse-step1">
 						<product-in-car
-							:show-unity="showUnity"
+							:show-unity="Boolean(showUnity)"
 							data-cy="product-in-car"
 							v-for="(product, indexProduct) in getProductToBuy"
 							:key="indexProduct"
@@ -42,8 +58,11 @@
 						<div class="footter-products-buy">
 							<div class="total-product" :style="`color: #acaaaa`">
 								<span>Total de productos: </span>
-								<div class="amount-total-products" :style="`background-color: ${globalColors.title}`">
-									<output>{{getTotalQuantityProducts}}</output>
+								<div
+									class="amount-total-products"
+									:style="`background-color: ${globalColors.title}`"
+								>
+									<output>{{ getTotalQuantityProducts }}</output>
 								</div>
 							</div>
 							<app-button
@@ -61,7 +80,12 @@
 				</div>
 			</section>
 			<section class="small">
-				<summary-order @close-collapse="closeCollapse"/>
+				<summary-order
+					:all-stock="allStock"
+					:validate-stock="validateStock"
+					:message="messageStock"
+					@close-collapse="closeCollapse"
+				/>
 			</section>
 		</div>
 	</div>
@@ -79,9 +103,12 @@ function created() {
 	const ecommerceLocal = this.getLocalStorage('ecommerce::ecommerce-data');
 	const localOrder = this.getLocalStorage('ecommerce-order');
 	if (ecommerceLocal || this.getCommerceData.company) {
-		const company = this.getCommerceData.company ?
-			this.getCommerceData.company : ecommerceLocal.company;
-		this.showUnity = company.settings ? company.settings.flagShowBaseUnit : false;
+		const company = this.getCommerceData.company
+			? this.getCommerceData.company
+			: ecommerceLocal.company;
+		this.showUnity = company.settings
+			? company.settings.flagShowBaseUnit
+			: false;
 	} else {
 		this.showUnity = false;
 	}
@@ -97,15 +124,21 @@ async function loadProductsQuery() {
 	// const validSettings = this.getCommerceData && this.getCommerceData.settings ?
 	// 	this.getCommerceData : null;
 	const ecommerceLocal = this.getLocalStorage('ecommerce::ecommerce-data');
-	const commerceData = this.getCommerceData.company ? ecommerceLocal : this.getCommerceData;
+	const commerceData = this.getCommerceData.company
+		? ecommerceLocal
+		: this.getCommerceData;
 	const { settings } = commerceData;
 	const body = {
 		ids: numbersIds,
-		warehouseId: ecommerceLocal.warehousesRelated[0] || settings.defaultWarehouse.id,
+		warehouseId:
+			ecommerceLocal.warehousesRelated[0] || settings.defaultWarehouse.id,
 	};
 	localStorage.setItem('ids-products', numbersIds);
 	try {
-		const response = await this.$httpProducts.post('products/by-ids-public', body);
+		const response = await this.$httpProducts.post(
+			'products/by-ids-public',
+			body,
+		);
 		this.productsBuys = response.data.map((product) => {
 			const newRow = { ...product };
 			this.addToCar(newRow.product || newRow);
@@ -133,7 +166,10 @@ async function mounted() {
 	if (this.$route.query.ids) {
 		this.loadProductsQuery();
 	}
-	this.$store.commit('SET_IS_COLLAPSE_PRODUCT', getDeeper('meta.step')(this.$route) !== 2);
+	this.$store.commit(
+		'SET_IS_COLLAPSE_PRODUCT',
+		getDeeper('meta.step')(this.$route) !== 2,
+	);
 }
 
 function stepOneAndTwo() {
@@ -156,17 +192,23 @@ function getProductToBuyHandler(newProducts) {
 }
 
 function transactionId() {
-	const transactionNumber = getDeeper('additionalInformation.gatewayTransactionId');
+	const transactionNumber = getDeeper(
+		'additionalInformation.gatewayTransactionId',
+	);
 	return transactionNumber(this.getOrderInfo);
 }
 
 function isNiubiz() {
-	const codeNiubiz = getDeeper('additionalInformation.gatewayCode')(this.getOrderInfo);
+	const codeNiubiz = getDeeper('additionalInformation.gatewayCode')(
+		this.getOrderInfo,
+	);
 	return codeNiubiz === niubiz;
 }
 
 function collapseStep() {
-	return `transform: ${this.isCollapseProduct ? 'rotate(0deg)' : 'rotate(180deg)'};`;
+	return `transform: ${
+		this.isCollapseProduct ? 'rotate(0deg)' : 'rotate(180deg)'
+	};`;
 }
 
 function toogleCollapse() {
@@ -188,6 +230,7 @@ function data() {
 		},
 		productsBuys: [],
 		isVisible: true,
+		messageStock: null,
 	};
 }
 
@@ -208,8 +251,10 @@ export default {
 			'isCollapseProduct',
 		]),
 		isNiubiz,
-		isOpenPay()	{
-			const codeOpenPay = getDeeper('additionalInformation.gatewayCode')(this.getOrderInfo);
+		isOpenPay() {
+			const codeOpenPay = getDeeper('additionalInformation.gatewayCode')(
+				this.getOrderInfo,
+			);
 			return codeOpenPay === openpay;
 		},
 		showTransactionInfo() {
@@ -220,6 +265,42 @@ export default {
 		stepTwo,
 		transactionId,
 		collapseStep,
+		allStock() {
+			return this.getProductToBuy.every(prod => prod.stockWarehouse);
+		},
+		validateStock() {
+			const exceededStockProducts = this.getProductToBuy.filter(
+				(prod, index, array) => {
+					const totalQuantity = array
+						.filter(p => p.id === prod.id)
+						.reduce((sum, p) => sum + (p.quantity * (p.unit.quantity || 1)), 0);
+					return totalQuantity > prod.stockWarehouse;
+				},
+			);
+
+			const products = this.getProductToBuy;
+			const totals = products.reduce(
+				(acc, { id, name, stockWarehouse, quantity, unit }) => {
+					const totalQuantity = quantity * (unit.quantity || 1);
+					acc[id] = acc[id] || { name, stockWarehouse, totalQuantity: 0 };
+					acc[id].totalQuantity += totalQuantity;
+					return acc;
+				},
+				{},
+			);
+
+			this.messageStock = Object.values(totals)
+				.map((product) => {
+					const validate =
+						product.totalQuantity > product.stockWarehouse
+							? `El poducto ${product.name} excede el stock.`
+							: null;
+					return validate;
+				})
+				.join('\n');
+
+			return !exceededStockProducts.length;
+		},
 	},
 	created,
 	data,
@@ -243,158 +324,158 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.buy-container {
-		display: grid;
-		grid-template-rows: 1fr;
-		margin: 0 auto;
-		max-width: 1000px;
-		padding: 40px 0;
-		width: 100%;
-	}
+.buy-container {
+	display: grid;
+	grid-template-rows: 1fr;
+	margin: 0 auto;
+	max-width: 1000px;
+	padding: 40px 0;
+	width: 100%;
+}
 
-	.buy-layout {
-		align-items: flex-start;
-		display: flex;
-		flex-wrap: wrap;
-		height: 100%;
-		padding: 0 10px;
+.buy-layout {
+	align-items: flex-start;
+	display: flex;
+	flex-wrap: wrap;
+	height: 100%;
+	padding: 0 10px;
 
-		@media (max-width: 875px) {
-			height: auto;
-		}
-	}
-
-	.big {
-		flex: 1 0 60%;
-		height: max-content;
-		margin-bottom: 20px;
-		
-		@media (min-width: 750px) {
-			margin-right: 10px;
-		}
-	}
-
-	.small {
-		flex: 0 0 20%;
+	@media (max-width: 875px) {
 		height: auto;
-		margin: 0 auto;
-		position: sticky;
-		top: 8rem;
 	}
+}
 
-	.footter-products-buy {
-		align-items: center;
-		display: flex;
-		justify-content: space-between;
+.big {
+	flex: 1 0 60%;
+	height: max-content;
+	margin-bottom: 20px;
+
+	@media (min-width: 750px) {
+		margin-right: 10px;
 	}
+}
 
-	.total-product {
-		align-items: center;
-		display: flex;
-		flex-wrap: wrap;
+.small {
+	flex: 0 0 20%;
+	height: auto;
+	margin: 0 auto;
+	position: sticky;
+	top: 8rem;
+}
+
+.footter-products-buy {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+}
+
+.total-product {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	font-family: font(demi);
+	@media (max-width: 669px) {
+		display: block;
+		font-size: size(small);
+	}
+}
+
+.amount-total-products {
+	align-items: center;
+	border-radius: 5px;
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.18);
+	color: white;
+	display: flex;
+	height: 38px;
+	justify-content: center;
+	margin-left: 5px;
+	width: 102px;
+
+	output {
 		font-family: font(demi);
-		@media (max-width: 669px) {
-			display: block;
-			font-size: size(small);
-		}
+		font-size: size(large);
+		font-weight: bold;
 	}
+}
 
-	.amount-total-products {
-		align-items: center;
-		border-radius: 5px;
-		box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.18);
-		color: white;
-		display: flex;
-		height: 38px;
-		justify-content: center;
-		margin-left: 5px;
-		width: 102px;
+.continue-buying {
+	width: 200px;
 
-		output {
-			font-family: font(demi);
-			font-size: size(large);
-			font-weight: bold;
-		}
+	@media (max-width: 600px) {
+		width: 190px !important;
 	}
+}
 
-	.continue-buying {
-		width: 200px;
+.summary {
+	margin-bottom: 30px;
+	padding: 30px 0;
+}
 
-		@media (max-width: 600px) {
-			width: 190px !important;
-		}
-	}
+.payment-section-title {
+	color: color(dark);
+	font-size: size(medium);
+	font-family: font(bold);
+	margin-left: 12px;
+	text-transform: uppercase;
+}
 
-	.summary {
-		margin-bottom: 30px;
-		padding: 30px 0;
-	}
+.section-title {
+	align-items: baseline;
+	display: flex;
+	justify-content: flex-start;
+}
 
-	.payment-section-title {
-		color: color(dark);
-		font-size: size(medium);
-		font-family: font(bold);
-		margin-left: 12px;
-		text-transform: uppercase;
-	}
+.rejected-transaction {
+	background-color: rgba(237, 100, 100, 0.15);
+	border: 1px solid color(error);
+	color: color(error);
+	margin: 0 3rem;
+	padding: 1rem;
+}
 
-	.section-title {
-		align-items: baseline;
-		display: flex;
-		justify-content: flex-start;
-	}
+.contend-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.arrow {
+	transform: rotate(180deg);
+}
 
-	.rejected-transaction {
-		background-color: rgba(237, 100, 100, 0.15);
-		border: 1px solid color(error);
-		color: color(error);
-		margin: 0 3rem;
-		padding: 1rem;
-	}
-
-	.contend-title{
-		display: flex;
-		justify-content:space-between;
-		align-items: center;
-		margin-bottom: 20px;
-	}
-	.arrow{
-		transform: rotate(180deg);
-	}
-
-	.container-routes {
-		margin-top: -30px;
-	}
-	.rejected-transaction {
-  background-color: #ffebee;
-  border: 1px solid #f44336;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 20px 0;
-  position: relative;
-  color: #b71c1c;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.container-routes {
+	margin-top: -30px;
+}
+.rejected-transaction {
+	background-color: #ffebee;
+	border: 1px solid #f44336;
+	border-radius: 8px;
+	padding: 16px;
+	margin: 20px 0;
+	position: relative;
+	color: #b71c1c;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .close-btn {
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #b71c1c;
+	background: transparent;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: #b71c1c;
 }
 
 .close-btn:hover {
-  color: #f44336;
+	color: #f44336;
 }
 
 .content h5 {
-  margin: 8px 0;
+	margin: 8px 0;
 }
 </style>
