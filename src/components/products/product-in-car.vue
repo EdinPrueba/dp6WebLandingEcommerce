@@ -84,13 +84,6 @@
 					{{ getCurrencySymbol }} {{ product.total | currencyFormat }}
 				</p>
 			</div>
-			<!-- <div class="comments">
-				<text-area
-					v-if="show"
-					label="Comentarios"
-					v-model="comments"
-				/>
-			</div> -->
 		</section>
 
 		<div v-else class="grid-product">
@@ -136,6 +129,12 @@
 				Total: {{ getCurrencySymbol }}. {{ product.total | currencyFormat }}
 			</h3>
 		</div>
+
+		<v-flex xs12 sm8 md8 v-if="!$allowOrderStockNegative && product.stockWarehouse === 0">
+				<p :style="`color: red;`" class="product-title">
+					Este producto no cuenta con sotck
+				</p>
+			</v-flex>
 
 		<!-- <section class="actions">
 			<comments-component class="action" @click="showComments"/>

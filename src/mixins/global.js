@@ -68,7 +68,7 @@ function showNotification(text, color = 'success', html = null, isBtn = false, t
 	this.$store.dispatch('showSnackBar', { text, color, html, isBtn, timeout });
 }
 
-function showGenericError(text = 'Ups, ocurrió algún problema', timeout = 10000) {
+function showGenericError(text = 'Ups, ocurrió algún problema', timeout = 4000) {
 	this.showNotification(text, 'error', null, false, timeout);
 }
 
