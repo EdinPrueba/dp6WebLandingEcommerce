@@ -1,7 +1,7 @@
 <template>
 	<div
 		class="whatsapp-button"
-		v-if="ecommerceLocal.whatsappNumber"
+		v-if="ecommerceLocal && ecommerceLocal.whatsappNumber"
 		@click="openWhatsApp"
 	>
 		<a href="https://wa.me/11234567890" target="_blank" class="whatsapp-icon">
