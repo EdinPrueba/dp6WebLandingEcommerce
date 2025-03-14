@@ -49,7 +49,9 @@
 							{ 'loading loading-dark': indeterminate },
 						]"
 					>
-						<span v-if="!indeterminate">- {{ discountPercentage }}%</span>
+						<span v-if="!indeterminate"
+							>- {{ discountPercentage | round(0) }}%</span
+						>
 					</div>
 					<div class="product-favorite">
 						<div
@@ -279,11 +281,19 @@ function goToCategories(item) {
 }
 
 function discountPercentage() {
-	const { price, priceDiscount } = this.product;
+	const { price, priceDiscount, priceList } = this.product;
+	const ecommerce =
+		JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+	const defaultIdPiceList = ecommerce.settings.salPriceListId;
+	const discount =
+		priceList && priceList[defaultIdPiceList]
+			? priceList[defaultIdPiceList].discount
+			: null;
 	const percentage = Number(
 		(((price - priceDiscount) / price) * 100).toFixed(2),
 	);
-	return percentage >= 0 ? percentage : 0;
+	const validPercentage = percentage >= 0 ? percentage : 0;
+	return discount || validPercentage;
 }
 
 function animatingCard() {
@@ -406,13 +416,16 @@ export default {
 			target.src = this.fallbackImage;
 		},
 		getPriceList() {
-			const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
+			const user =
+				JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
 			const salPriceListDefault = user.company.salPriceListDefault.id;
 			const priceListDefault = this.product.priceList[salPriceListDefault];
-			const priceList = Object.entries(priceListDefault.units).map(([id, unit]) => ({
-				id,
-				...unit,
-			}));
+			const priceList = Object.entries(priceListDefault.units).map(
+				([id, unit]) => ({
+					id,
+					...unit,
+				}),
+			);
 			if (this.$flagShowBaseUnit === 1 && priceList.length > 0) {
 				this.product.priceDiscount = priceList[0].price;
 			}
@@ -450,6 +463,14 @@ export default {
 		margin: 3px auto;
 		max-width: 250px;
 		width: 100%;
+	}
+	@media screen and (max-width: 600px) {
+		padding: 0 5px;
+	}
+
+	&.small {
+		min-height: 319px;
+		max-width: 179px;
 	}
 
 	&.small {
@@ -644,6 +665,36 @@ export default {
 
 	.v-icon {
 		padding: 0.3rem !important;
+		.without-stock-tag {
+			// background-color: #acacac;
+			color: white;
+			display: flex;
+			font-size: 18px;
+			font-family: font(bold);
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			left: 0;
+			top: 45%;
+			width: 50%;
+			height: 35px;
+			z-index: 2;
+			text-transform: uppercase;
+			@media screen and (min-width: 600px) {
+				font-size: 19px;
+				background-color: #acacac;
+				left: 10%;
+				top: 20%;
+				width: 80%;
+				height: 35px;
+				z-index: 2;
+			}
+
+			@media screen and (max-width: 600px) {
+				top: 5%;
+				width: 15%;
+			}
+		}
 	}
 }
 
@@ -675,6 +726,12 @@ export default {
 			width: 80%;
 			height: 35px;
 			z-index: 2;
+		}
+
+		@media screen and (max-width: 600px) {
+			height: 75%;
+			font-size: 2vw;
+			border-radius: 10px;
 		}
 	}
 }

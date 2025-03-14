@@ -2,10 +2,19 @@
 	<div class="main-container-delivery" :style="styleBtnMobile">
 		<div @click="toogleCollapse('address')" class="contend-title">
 			<div class="section-title">
-				<img :src="logo.section" alt="logo del método de pago">
-				<h2 class="payment-section-title">¿COMÓ QUIERES RECIBIR TU PRODUCTO? </h2>
+				<img :src="logo.section" alt="logo del método de pago" />
+				<h2 class="payment-section-title">
+					¿COMÓ QUIERES RECIBIR TU PRODUCTO?
+				</h2>
 			</div>
-			<img height="16" width="18" :style="collapseStep" :src="arrow.section" alt="arrow" class="arrow"/>
+			<img
+				height="16"
+				width="18"
+				:style="collapseStep"
+				:src="arrow.section"
+				alt="arrow"
+				class="arrow"
+			/>
 		</div>
 		<div v-show="collapseSection" class="section-forms">
 			<section class="delivery" data-cy="delivery-buttons">
@@ -16,7 +25,7 @@
 					:active="getFlagPickUp === house.value"
 					@click="selected(house)"
 				>
-					<location-svg :active="getFlagPickUp === house.value"/>
+					<location-svg :active="getFlagPickUp === house.value" />
 				</app-button-order>
 				<app-button-order
 					v-if="atStore"
@@ -25,7 +34,7 @@
 					:active="getFlagPickUp === store.value"
 					@click="selected(store)"
 				>
-					<coffee-svg :active="getFlagPickUp === store.value"/>
+					<coffee-svg :active="getFlagPickUp === store.value" />
 				</app-button-order>
 			</section>
 
@@ -45,11 +54,11 @@
 				@input="warehouseSelected"
 			/>
 
-			<responsible-form/>
-			
+			<responsible-form />
+
 			<div v-if="getFlagPickUp === house.value && atHouse">
 				<div v-if="!isGetDirections" class="container-btn-new-address">
-					<h5 class="mt-2 mx-2">Seleccionar dirección de envío </h5>
+					<h5 class="mt-2 mx-2">Seleccionar dirección de envío</h5>
 					<address-component
 						class="select-address"
 						v-if="getDirections.length > 1"
@@ -64,26 +73,42 @@
 						@input="directionSelected"
 					/>
 					<div :style="floatBtn" class="box-btn-address">
-						<button @click="visibleFormAddress()" 
-							class="btn-new-address mt-2 mx-2">
-							{{txtBtnNewddress}}
+						<button
+							@click="visibleFormAddress()"
+							class="btn-new-address mt-2 mx-2"
+						>
+							{{ txtBtnNewddress }}
 						</button>
 					</div>
 				</div>
-				<h5 class="mt-2 mx-2 txt-new-address" v-show="visibleNewAddress">Nueva Dirección</h5>
-				<new-address v-show="visibleNewAddress"/>
+				<h5 class="mt-2 mx-2 txt-new-address" v-show="visibleNewAddress">
+					Nueva Dirección
+				</h5>
+				<new-address v-show="visibleNewAddress" />
 			</div>
 		</div>
-		
+
 		<section class="billing-section">
-			<billing/>
+			<billing />
 		</section>
 		<div @click="toogleCollapse('comment')" class="contend-title">
 			<div class="section-title">
-				<img height="26" width="28" :src="comment.section" alt="comentario icono">
+				<img
+					height="26"
+					width="28"
+					:src="comment.section"
+					alt="comentario icono"
+				/>
 				<h2 class="comment-section-title">COMENTARIO</h2>
 			</div>
-			<img height="16" width="18" :style="collapseStepComment" :src="arrow.section" alt="arrow" class="arrow"/>
+			<img
+				height="16"
+				width="18"
+				:style="collapseStepComment"
+				:src="arrow.section"
+				alt="arrow"
+				class="arrow"
+			/>
 		</div>
 		<div v-show="collapseSectionComment" class="section-comments">
 			<text-area
@@ -96,7 +121,6 @@
 			>
 			</text-area>
 		</div>
-		
 	</div>
 </template>
 <script>
@@ -117,7 +141,10 @@ function created() {
 	this.collapseSection = true;
 	Promise.all([
 		this.$store.dispatch('LOAD_DIRECTIONS', this),
-		this.$store.dispatch('LOAD_WAREHOUSES', { context: this, params: { flagEcommerce: 1 } }),
+		this.$store.dispatch('LOAD_WAREHOUSES', {
+			context: this,
+			params: { flagEcommerce: 1 },
+		}),
 	]).then(() => {
 		if (that.noOrder) {
 			that.setDefaultDelivery();
@@ -190,7 +217,7 @@ function warehousesMarkers() {
 			const marker = {};
 			marker.id = id;
 			marker.name = name;
-			marker.location = location ? { lat: (lat || x), lng: (lng || y) } : {};
+			marker.location = location ? { lat: lat || x, lng: lng || y } : {};
 			return list.concat(marker);
 		}
 		return list;
@@ -199,23 +226,28 @@ function warehousesMarkers() {
 }
 
 function singleOrMultiMarkersOnWarehouses() {
-	return this.selectedWarehouse.id ? [this.selectedWarehouse] : this.warehousesMarkers;
+	return this.selectedWarehouse.id
+		? [this.selectedWarehouse]
+		: this.warehousesMarkers;
 }
 
 function warehouesesCenter() {
 	const len = this.singleOrMultiMarkersOnWarehouses.length;
-	const avrg = this.singleOrMultiMarkersOnWarehouses.reduce((o, { location }) => {
-		const newO = o;
-		if (location) {
-			const { lat, lng, x, y } = location;
-			newO.lat = (newO.lat || 0) + (lat || x);
-			newO.lng = (newO.lng || 0) + (lng || y);
+	const avrg = this.singleOrMultiMarkersOnWarehouses.reduce(
+		(o, { location }) => {
+			const newO = o;
+			if (location) {
+				const { lat, lng, x, y } = location;
+				newO.lat = (newO.lat || 0) + (lat || x);
+				newO.lng = (newO.lng || 0) + (lng || y);
+				return newO;
+			}
+			newO.lat = 0;
+			newO.lng = 0;
 			return newO;
-		}
-		newO.lat = 0;
-		newO.lng = 0;
-		return newO;
-	}, {});
+		},
+		{},
+	);
 	return { lat: avrg.lat / len, lng: avrg.lng / len };
 }
 
@@ -236,12 +268,10 @@ function warehouseSelected(id) {
 	const w = this.getWarehouses[index];
 	if (w.location) {
 		const { lat, lng, x, y } = w.location;
-		w.location = { lat: (lat || x), lng: (lng || y) };
+		w.location = { lat: lat || x, lng: lng || y };
 	}
 	this.$store.commit('SET_DELIVERY_PLACE', w);
-	this.selectedWarehouse.id = w.id;
-	this.selectedWarehouse.name = w.name;
-	this.selectedWarehouse.location = w.location;
+	this.selectedWarehouse = w;
 }
 
 function directionSelected(id) {
@@ -290,7 +320,8 @@ async function calculateShippingCost(location) {
 			if (error.data.message === 'PRICE_NOT_CONFIGURATION') {
 				this.$store.dispatch('setShippingCostError', true);
 				this.$store.dispatch('setNoShippingCost');
-				this.showNotification('No es posible hacer envios a ese destino.', 'error', null, false, 8000);
+				// this.showNotification('No es posible hacer envios a ese destino.',
+				// 'error', null, false, 8000);
 			}
 		}
 	}
@@ -375,11 +406,15 @@ function toogleCollapse(section) {
 }
 
 function collapseStep() {
-	return `transform: ${this.collapseSection ? 'rotate(0deg)' : 'rotate(180deg)'};`;
+	return `transform: ${
+		this.collapseSection ? 'rotate(0deg)' : 'rotate(180deg)'
+	};`;
 }
 
 function collapseStepComment() {
-	return `transform: ${this.collapseSectionComment ? 'rotate(0deg)' : 'rotate(180deg)'};`;
+	return `transform: ${
+		this.collapseSectionComment ? 'rotate(0deg)' : 'rotate(180deg)'
+	};`;
 }
 
 function data() {
@@ -418,7 +453,9 @@ function handlerGetDirections() {
 }
 
 function txtBtnNewddress() {
-	return this.visibleNewAddress ? 'Elejir una Dirección' : '+ Agregar Nueva Dirección';
+	return this.visibleNewAddress
+		? 'Elejir una Dirección'
+		: '+ Agregar Nueva Dirección';
 }
 
 export default {
@@ -489,111 +526,109 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.delivery {
-		align-items: center;
-		display: grid;
-		grid-gap: 10px;
-		grid-auto-flow: column;
-		@media (max-width: 325px) {
-			grid-auto-flow: row;
-		}
+.delivery {
+	align-items: center;
+	display: grid;
+	grid-gap: 10px;
+	grid-auto-flow: column;
+	@media (max-width: 325px) {
+		grid-auto-flow: row;
 	}
+}
 
-	.btn {
-		flex: 1 1 40%;
-		margin: 0 10px;
+.btn {
+	flex: 1 1 40%;
+	margin: 0 10px;
 
-		@media (max-width: 600px) {
-			font-size: size(msmall);
-		}
+	@media (max-width: 600px) {
+		font-size: size(msmall);
 	}
+}
 
-	.responsible {
-		align-items: center;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		margin-top: 30px;
-	}
+.responsible {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	margin-top: 30px;
+}
 
-	.responsible-field {
-		flex: 1 1 47%;
-	}
+.responsible-field {
+	flex: 1 1 47%;
+}
 
-	.select-address{
-		margin-top: 10px;
-	}
+.select-address {
+	margin-top: 10px;
+}
 
-	.billing-section {
-		margin-top: 40px;
-	}
+.billing-section {
+	margin-top: 40px;
+}
 
-	.payment-section-title {
-		color: color(dark);
-		font-size: size(medium);
-		font-family: font(bold);
-		margin-left: 12px;
-		text-transform: uppercase;
-	}
-	.comment-section-title{
-		color: color(dark);
-		font-size: size(medium);
-		font-family: font(bold);
-		margin-left: 19px;
-		text-transform: uppercase;
-	}
+.payment-section-title {
+	color: color(dark);
+	font-size: size(medium);
+	font-family: font(bold);
+	margin-left: 12px;
+	text-transform: uppercase;
+}
+.comment-section-title {
+	color: color(dark);
+	font-size: size(medium);
+	font-family: font(bold);
+	margin-left: 19px;
+	text-transform: uppercase;
+}
 
-	.section-title {
-		align-items: baseline;
-		display: flex;
-		justify-content: flex-start;
-	}
+.section-title {
+	align-items: baseline;
+	display: flex;
+	justify-content: flex-start;
+}
 
-	.main-container-delivery {
-		margin-top: 60px;
-	}
+.main-container-delivery {
+	margin-top: 60px;
+}
 
-	.container-btn-new-address {
-		color: #002074;
-		
-	}
-	.box-btn-address{
-		display: flex;
-		align-items: center;
-		justify-content: end;
-		width: 100%;
-	}
+.container-btn-new-address {
+	color: #002074;
+}
+.box-btn-address {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	width: 100%;
+}
 
-	.btn-new-address {
-		background-color: var(--bg-mobile-color);
-		border-radius: 10px;
-		width: auto;
-		height: 31px;
-		padding: 6px 19px 7px;
-		color: white;
-		font-size: 13px;
-		margin-bottom: 10px;
-	}
+.btn-new-address {
+	background-color: var(--bg-mobile-color);
+	border-radius: 10px;
+	width: auto;
+	height: 31px;
+	padding: 6px 19px 7px;
+	color: white;
+	font-size: 13px;
+	margin-bottom: 10px;
+}
 
-	.txt-new-address {
-		color: #002074;
-	}
+.txt-new-address {
+	color: #002074;
+}
 
-	.contend-title{
-		display: flex;
-		justify-content:space-between;
-		align-items: center;
-	}
-	.arrow{
-		transform: rotate(180deg);
-	}
+.contend-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.arrow {
+	transform: rotate(180deg);
+}
 
-	.section-forms{
-		margin-top: 20px;
-	}
+.section-forms {
+	margin-top: 20px;
+}
 
-	.section-comments{
-		margin-top: 20px;
-	}
-
+.section-comments {
+	margin-top: 20px;
+}
 </style>

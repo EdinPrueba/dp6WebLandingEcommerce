@@ -209,6 +209,11 @@ class ProductDetails {
 	}
 	updateProductPrices() {
 		const priceList = this.selectedProduct.priceList[this.priceListId] || null;
+		if (!priceList) {
+			this.selectedProduct.priceDiscount = 0;
+			this.selectedProduct.price = 0;
+			return;
+		}
 		let { discount } = priceList;
 		const { units, price } = priceList;
 		const rightConversion = units[this.selectedProduct.unitSelected];
@@ -225,6 +230,7 @@ class ProductDetails {
 
 	getWholeSalePrice() {
 		const priceList = this.selectedProduct.priceList[this.priceListId];
+		if (!priceList) return [];
 		const { units } = priceList;
 		const rightRanges = units[this.selectedProduct.unitSelected];
 		const { ranges } = rightRanges || priceList;

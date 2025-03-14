@@ -1,31 +1,59 @@
 <template>
 	<div class="wrapper-big-category">
 		<div class="wrapper-list-category">
-			<list-category
-				v-for="category in categories"
-				:data="category"
-				:key="category.id"
-				:breadcrumbs="breadcrumbs"
-        		@change-category="changeCategory"
-				@open-category="openCategory"/>
+			<div class="filters-category">
+				<div
+					@click="showCategory"
+					class="section-filter-row"
+					:style="`border-color: ${globalColors.primary}`"
+				>
+					<div class="content-filter-title">
+						<p class="title-section" :style="`color: ${globalColors.primary}`">
+							Categorías
+						</p>
+					</div>
+					<div class="simple-svg-container">
+						<simple-svg
+							filepath="/static/img/arrow-left.svg"
+							:fill="globalColors.primary"
+							width="11"
+							class="icon-c"
+							:class="{ 'rotate-icon-c': showC }"
+						/>
+					</div>
+				</div>
+				<div v-if="showC" class="category-list">
+					<list-category
+						v-for="category in categories"
+						:key="category.id"
+						:data="category"
+						:breadcrumbs="breadcrumbs"
+						@change-category="changeCategory"
+						@open-category="openCategory"
+					/>
+				</div>
+			</div>
+
 			<filters-category
 				:reset-attributes="resetAttributes"
 				:attributes="attributes"
+				:features="features"
+				@on-features="onFeatures"
 				@attributes="setAtributes"
 			></filters-category>
 			<div class="wrapper-btns py-3">
-				<app-button 
+				<app-button
 					action="Cerrar"
 					class="btn-modal mr-2"
 					:active="false"
 					:border="globalColors.primary"
 					@click="$emit('close')"
 				/>
-				<app-button 
+				<!-- <app-button
 					action="Filtrar"
 					class="btn-modal"
 					:background="globalColors.secondary"
-					/>
+				/> -->
 			</div>
 		</div>
 		<button class="btn-menu-category" @click="$emit('toggle')">
@@ -34,7 +62,7 @@
 				:fill="globalColors.primary"
 				width="11"
 				class="icon"
-				:class="{'rotate-icon': toggle }"
+				:class="{ 'rotate-icon': toggle }"
 			/>
 		</button>
 	</div>
@@ -64,6 +92,7 @@ function setAtributes(attr) {
 function data() {
 	return {
 		close: true,
+		showC: false,
 	};
 }
 
@@ -80,6 +109,12 @@ export default {
 		filterCategory,
 		openCategory,
 		setAtributes,
+		onFeatures(value) {
+			this.$emit('on-features', value);
+		},
+		showCategory() {
+			this.showC = !this.showC;
+		},
 	},
 	props: {
 		attributes: {
@@ -107,6 +142,10 @@ export default {
 		toggle: {
 			type: Boolean,
 			required: true,
+		},
+		features: {
+			type: Array,
+			default: () => [],
 		},
 	},
 };
@@ -185,4 +224,52 @@ export default {
 	}
 }
 
+.icon-c {
+	transform: rotateZ(270deg);
+
+	&.rotate-icon-c {
+		transform: rotateZ(450deg);
+	}
+}
+
+.filters-category {
+	border-top: 1px solid var(--color-border);
+	padding-top: 20px;
+	padding-bottom: 30px;
+
+	.section-filter-row {
+		align-items: center;
+		border-bottom: 3px solid;
+		display: flex;
+		justify-content: space-between;
+		padding: 0 20px 15px 20px;
+		width: 100%;
+		cursor: pointer;
+	}
+	
+	.content-filter-title {
+		display: flex;
+		align-items: center;
+
+		.title-section {
+			font-family: font(bold);
+			font-size: size(xlarge);
+			margin: 0 0 0 11px;
+		}
+	}
+
+	.simple-svg-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.category-list {
+		padding-top: 15px;
+	}
+}
+
+.icon {
+	transition: transform 0.3s ease;
+}
 </style>
