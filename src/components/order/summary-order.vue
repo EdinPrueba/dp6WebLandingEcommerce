@@ -36,13 +36,17 @@
 			<div v-if="stepOne">
 				<app-button
 					data-cy="make-order"
-					:disabled="!allStock"
+					:disabled="!allStock && !$allowOrderStockNegative"
 					:action="`Hacer pedido ${getCurrencySymbol}. ${listenerPriceOrder}`"
 					class="btn-order"
 					:background="globalColors.primary"
 					@click="goToMakeOrder"
 				/>
-				<span v-if="isNoOrderPrice && orderPrice" class="text-min-order">El monto mínimo para realizar un pedido es de {{getCurrencySymbol}} {{minOrderPrice}}, pero tu pedido actual es de {{getCurrencySymbol}} {{listenerPriceOrder}}.</span>
+				<span v-if="isNoOrderPrice && orderPrice" class="text-min-order"
+					>El monto mínimo para realizar un pedido es de
+					{{ getCurrencySymbol }} {{ minOrderPrice }}, pero tu pedido actual es
+					de {{ getCurrencySymbol }} {{ listenerPriceOrder }}.</span
+				>
 			</div>
 			<app-button
 				data-cy="go-pay"
@@ -75,7 +79,7 @@ import { creditCard } from '@/shared/enums/wayPayment';
 
 function total() {
 	const totalBuyWithShipp =
-		(this.getTotalToBuy - this.discount) + this.getShippingCost;
+		this.getTotalToBuy - this.discount + this.getShippingCost;
 	const newTotal = Number(totalBuyWithShipp.toFixed(2));
 	this.$store.commit('SET_TOTAL_BUY_SHIPP', newTotal);
 	return newTotal;
@@ -225,10 +229,12 @@ export default {
 		listenerPriceOrder,
 		styleBtnMobile,
 		orderPrice() {
-			const ecommerce = JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+			const ecommerce =
+				JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
 			if (ecommerce) {
 				this.minOrderPrice = ecommerce.settings.minOrderPrice;
-				const isMinOrderPrice = this.minOrderPrice > Number(this.listenerPriceOrder);
+				const isMinOrderPrice =
+					this.minOrderPrice > Number(this.listenerPriceOrder);
 				return isMinOrderPrice;
 			}
 			return false;
