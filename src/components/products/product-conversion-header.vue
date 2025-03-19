@@ -1,17 +1,17 @@
 <template>
 	<!-- v-if="conversionsComputed.length > 0" -->
-	<div
-		class="conversions-container"
-	>
+	<div class="conversions-container">
 		<v-flex xs12>
-			<div
-				:class="{ 'loading conversions-select-container': indeterminate }"
-			>
+			<div :class="{ 'loading conversions-select-container': indeterminate }">
 				<div v-if="!indeterminate" class="column">
 					<v-btn
 						v-for="(item, index) in conversionsComputed"
 						class="btn-conversions pa-1"
-						:style="`border:1px solid ${item.isSelected ? globalColors.primary : '#bbbbbb'};color: ${item.isSelected ? globalColors.primary : '#bbbbbb'}`"
+						:style="
+							`border:1px solid ${
+								item.isSelected ? globalColors.primary : '#bbbbbb'
+							};color: ${item.isSelected ? globalColors.primary : '#bbbbbb'}`
+						"
 						:key="index"
 						type="button"
 						v-model="conversionSelected"
@@ -38,19 +38,24 @@ function conversionsChanges(conversions) {
 			Object.keys(conversions),
 		);
 	}
-	if (this.showUnit) {
-		this.conversionsComputed = conversionsFormatted;
-	} else {
-		this.conversionsComputed = [].concat(this.defaultUnit, conversionsFormatted);
-	}
+	this.conversionsComputed = [].concat(this.defaultUnit, conversionsFormatted);
 	this.conversionsComputed = this.conversionsComputed.map((p, index) => {
 		const newP = { ...p };
 		newP.isSelected = index === 0;
 		return newP;
 	});
+	if (this.$flagShowBaseUnit === 1) {
+		this.conversionsComputed = this.conversionsComputed.filter(
+			p => p.id !== this.defaultUnit.id,
+		);
+	} else if (this.$flagShowBaseUnit === 2) {
+		this.conversionsComputed = this.conversionsComputed.filter(
+			p => p.id === this.defaultUnit.id,
+		);
+	}
 }
 
-function selectedConversion(item)	{
+function selectedConversion(item) {
 	this.conversionsComputed = this.conversionsComputed.map((o) => {
 		const newData = { ...o };
 		newData.isSelected = item.id === o.id;
@@ -72,9 +77,7 @@ export default {
 		AppSelect,
 	},
 	computed: {
-		...mapGetters([
-			'indeterminate',
-		]),
+		...mapGetters(['indeterminate']),
 	},
 	data,
 	methods: {
@@ -105,48 +108,48 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.conversions-container {
-		align-items: center;
-		display: flex;
-		padding: 15px 0;
-        position: absolute;
-        right: 15px;
-        top: 20px;
-		z-index: 10;
+.conversions-container {
+	align-items: center;
+	display: flex;
+	padding: 15px 0;
+	position: absolute;
+	right: 15px;
+	top: 20px;
+	z-index: 10;
 
-        @media (min-width: 950px) {
-            display: none !important;
-        }
+	@media (min-width: 950px) {
+		display: none !important;
 	}
+}
 
-    .column {
-        display: flex;
-        flex-direction: column;
-    }
+.column {
+	display: flex;
+	flex-direction: column;
+}
 
-	.conversions-title {
-		margin: 0 10px;
+.conversions-title {
+	margin: 0 10px;
+}
+
+.conversions-select-container {
+	height: 24px;
+	margin-left: 10px;
+	width: 100%;
+}
+
+.btn-conversions {
+	background-color: white !important;
+	box-shadow: none !important;
+	border-radius: 16px;
+	font-family: font(bold);
+	font-size: 10px;
+	height: 25px;
+	margin: 3px 0px;
+	min-width: 60px !important;
+
+	&.active {
+		background-color: red;
+		color: white;
 	}
-
-	.conversions-select-container {
-		height: 24px;
-		margin-left: 10px;
-		width: 100%;
-	}
-
-	.btn-conversions {
-        background-color: white !important;
-		box-shadow: none !important;
-		border-radius: 16px;
-		font-family: font(bold);
-        font-size: 10px;
-        height: 25px;
-        margin: 3px 0px;
-		min-width: 60px !important;
-
-		&.active {
-			background-color: red;
-			color: white;
-		}
-	}
+}
 </style>

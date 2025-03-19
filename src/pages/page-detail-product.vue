@@ -214,6 +214,7 @@ async function loadData(id) {
 	if (!Array.isArray(this.productDetails.sections)) {
 		this.showNotification('Se esta cargando mal la información del producto', 'warning');
 	}
+	this.getPriceList();
 	this.productImages = [...this.productInstance.getImages()] || [];
 	this.allFeatures = this.childrens.reduce((acum, children) => acum.concat(children.features), []);
 	this.features = this.allFeatures.reduce((acum, feature) => {
@@ -562,6 +563,18 @@ export default {
 		selectFeature,
 		selectedUnit,
 		inputQuantity,
+		getPriceList() {
+			const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
+			const salPriceListDefault = user.company.salPriceListDefault.id;
+			const priceListDefault = this.productDetails.priceList[salPriceListDefault];
+			const priceList = Object.entries(priceListDefault.units).map(([id, unit]) => ({
+				id,
+				...unit,
+			}));
+			if (this.$flagShowBaseUnit === 1 && priceList.length > 0) {
+				this.productDetails.priceDiscount = priceList[0].price;
+			}
+		},
 	},
 	props: {
 		id: {
