@@ -1,43 +1,27 @@
 <template>
 	<div class="form-bulletin">
 		<div class="form-bulletin-description-company">
-			<div class="content-date-company" @click="redirectToWhatsApp(getCommerceData.phone)" style="cursor: pointer;">
-				<PhoneIcon/>
-				<p
-					:class="[
-						'item-date-company',
-						{ 'loading': indeterminate },
-					]"
-				>
+			<div class="content-date-company">
+				<PhoneIcon />
+				<p :class="['item-date-company', { loading: indeterminate }]">
 					{{ getCommerceData.phone }}
 				</p>
 			</div>
-			<div class="content-date-company" @click="sendEmail(getCommerceData.email)" style="cursor: pointer;">
-				<EmailIcon/>
-				<p
-					:class="[
-						'item-date-direction email',
-						{ 'loading': indeterminate },
-					]"
-				>
+			<div class="content-date-company">
+				<EmailIcon />
+				<p :class="['item-date-direction email', { loading: indeterminate }]">
 					Correo: {{ getCommerceData.email }}
 				</p>
 			</div>
-			<div class="content-date-company" @click="openMap(getCommerceData.address)" style="cursor: pointer;">
-				<LocationIcon/>
-				<p
-					:class="[
-						'item-date-direction',
-						{ 'loading': indeterminate },
-					]"
-				>
+			<div class="content-date-company">
+				<LocationIcon />
+				<p :class="['item-date-direction', { loading: indeterminate }]">
 					{{ getCommerceData.address }}
 				</p>
 			</div>
 		</div>
 	</div>
 </template>
-
 
 <script>
 import { mapGetters } from 'vuex';
@@ -62,15 +46,14 @@ export default {
 			window.location.href = mailtoUrl;
 		},
 		openMap(address) {
-			const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+			const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+				address,
+			)}`;
 			window.open(mapUrl, '_blank');
 		},
 	},
 	computed: {
-		...mapGetters([
-			'getCommerceData',
-			'indeterminate',
-		]),
+		...mapGetters(['getCommerceData', 'indeterminate']),
 	},
 };
 </script>
@@ -92,7 +75,7 @@ export default {
 .text-subscription {
 	color: color(dark);
 	font-family: font(demi);
-	font-size:  size(medium);
+	font-size: size(medium);
 	margin-bottom: 45px;
 	text-align: center;
 
@@ -103,19 +86,18 @@ export default {
 }
 
 .text-subscription::before {
-		border-top: 1px solid color(base);
-		content: '';
-		color: color(dark);
-		height: 3px;
-		left: 10px;
-		position: absolute;
-		top: 9px;
-		width: 110px;
+	border-top: 1px solid color(base);
+	content: '';
+	color: color(dark);
+	height: 3px;
+	left: 10px;
+	position: absolute;
+	top: 9px;
+	width: 110px;
 	@media (max-width: 850px) {
 		left: 15px;
 		width: 80px;
 	}
-
 }
 
 .text-subscription::after {
@@ -160,6 +142,7 @@ export default {
 
 	@media (max-width: 850px) {
 		font-size: size(xlarge);
+		margin: 0;
 		max-width: 151px;
 		padding-top: 17px;
 		white-space: break-spaces;
@@ -183,6 +166,7 @@ export default {
 	max-width: 170px;
 
 	@media (max-width: 850px) {
+		margin: 0px;
 		padding-top: 17px;
 		text-align: center;
 	}
