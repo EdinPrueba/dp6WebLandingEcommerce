@@ -210,8 +210,8 @@ class ProductDetails {
 	updateProductPrices() {
 		const priceList = this.selectedProduct.priceList[this.priceListId] || null;
 		if (!priceList) {
-			this.selectedProduct.price = null;
-			this.selectedProduct.priceDiscount = null;
+			this.selectedProduct.priceDiscount = 0;
+			this.selectedProduct.price = 0;
 			return;
 		}
 		let { discount } = priceList;

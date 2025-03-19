@@ -459,11 +459,11 @@ export default {
 	}
 
 	.app-category-user, .btn-collapse, .menu-mobile {
-		display: none;
+		display: block;
 
-		@media (max-width: 764px) {
-			display: block;
-		}
+		// @media (max-width: 764px) {
+		// 	display: block;
+		// }
 	}
 
 	.list-name-category {

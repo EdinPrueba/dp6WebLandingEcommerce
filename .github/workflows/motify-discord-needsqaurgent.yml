@@ -1,0 +1,19 @@
+name: Notify Discord on Pull Request
+
+on:
+  pull_request:
+    types: [opened, labeled]
+
+jobs:
+  notify-discord:
+    if: ${{ github.event.action == 'opened' && contains(github.event.pull_request.labels.*.name, 'needs-qa-urgent') || github.event.action == 'labeled' && github.event.label.name == 'needs-qa-urgent' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send notification to Discord
+        env:
+          DISCORD_QA_FRONT: ${{ secrets.DISCORD_QA_FRONT }}
+        run: |
+          MENTION="<@481837609199599636>"
+          PAYLOAD=$(jq -n --arg url "${{ github.event.pull_request.html_url }}" --arg mention "$MENTION" '{"content": "🚨 **Nuevo pull request que necesita QA URGENTE** 🚨:\n\($url)\n📢 Mencionado: \($mention)"}')
+          curl -H "Content-Type: application/json" -d "$PAYLOAD" $DISCORD_QA_FRONT
