@@ -36,6 +36,22 @@ export default {
 		LocationIcon,
 		PhoneIcon,
 	},
+	methods: {
+		redirectToWhatsApp(phone) {
+			const whatsappUrl = `https://wa.me/${phone}`;
+			window.open(whatsappUrl, '_blank');
+		},
+		sendEmail(email) {
+			const mailtoUrl = `mailto:${email}`;
+			window.location.href = mailtoUrl;
+		},
+		openMap(address) {
+			const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+				address,
+			)}`;
+			window.open(mapUrl, '_blank');
+		},
+	},
 	computed: {
 		...mapGetters(['getCommerceData', 'indeterminate']),
 	},

@@ -59,7 +59,6 @@
 		<div class="container-detail-bottom">
 			<div class="d-center">
 				<span
-					v-show="data.priceDiscount"
 					:class="[isLoading ? 'loading' : 'text-price-dis']"
 					:style="`color: ${globalColors.primary}`"
 				>
@@ -113,6 +112,7 @@
 			@open-dialog="$emit('open-dialog')"
 		/>
 		<cart-bottom
+			:exceed-quantity="exceedQuantity"
 			:disabled-order="disabledOrder"
 			:disabled-buy="disabledBuy"
 			:open-warehouse="openWarehouse"
@@ -292,6 +292,10 @@ export default {
 			default: false,
 		},
 		disabledBuy: {
+			type: Boolean,
+			default: false,
+		},
+		exceedQuantity: {
 			type: Boolean,
 			default: false,
 		},
@@ -550,4 +554,5 @@ export default {
 		max-width: 178px;
 		padding: 5px 8px;
 	}
+	
 </style>

@@ -62,6 +62,8 @@
 					<quantityButton
 						class="continer-quantity-button"
 						:number="product.quantity"
+						:product="product"
+						@input="inputQuantity"
 						@click="clickQuantity"
 						:max-quantity="maxQuantity"
 					/>
@@ -84,13 +86,6 @@
 					{{ getCurrencySymbol }} {{ product.total | currencyFormat }}
 				</p>
 			</div>
-			<!-- <div class="comments">
-				<text-area
-					v-if="show"
-					label="Comentarios"
-					v-model="comments"
-				/>
-			</div> -->
 		</section>
 
 		<div v-else class="grid-product">
@@ -137,6 +132,12 @@
 			</h3>
 		</div>
 
+		<v-flex xs12 sm8 md8 v-if="!$allowOrderStockNegative && product.stockWarehouse === 0">
+				<p :style="`color: red;`" class="product-title">
+					Este producto no cuenta con sotck
+				</p>
+			</v-flex>
+
 		<!-- <section class="actions">
 			<comments-component class="action" @click="showComments"/>
 			<trash-component class="action" @click="deleteProduct"/>
@@ -163,15 +164,32 @@ function showComments() {
 	this.show = !this.show;
 }
 
+function inputQuantity(value) {
+	this.product.quantity = Number(value);
+	this.clickQuantity();
+}
+
 function clickQuantity(val) {
 	let { quantity } = this.product;
 	const { unit } = this.product;
-	const opt = {
-		more: 1,
-		less: -1,
-	};
-	quantity += opt[val];
-	quantity = quantity < 1 ? 1 : quantity;
+	if (val) {
+		if (this.product.category.type === 2) {
+			this.opt = {
+				more: 0.1,
+				less: -0.1,
+			};
+			quantity += this.opt[val];
+			quantity = +quantity.toFixed(2);
+			quantity = quantity < 0.1 ? 0.1 : quantity;
+		} else {
+			this.opt = {
+				more: 1,
+				less: -1,
+			};
+			quantity += this.opt[val];
+			quantity = quantity < 1 ? 1 : quantity;
+		}
+	}
 	this.quantityStock = parseInt(unit.quantity * quantity, 10);
 	if (this.showUnity) {
 		if (quantity >= this.stockAvaible && !this.$allowOrderStockNegative) {
@@ -222,6 +240,7 @@ function data() {
 	return {
 		comments: '',
 		show: false,
+		opt: {},
 		maxQuantity: false,
 	};
 }
@@ -245,6 +264,7 @@ export default {
 		deleteProduct,
 		showComments,
 		goToProduct,
+		inputQuantity,
 	},
 	props: {
 		product: {
