@@ -187,11 +187,11 @@ function validateForm() {
 }
 
 function labelCountry() {
-	return getDeeper('company.country.countryCode')(this.user) === 'ECU' ? 'Cédula' : 'DNI';
+	return this.countryLabels.dni;
 }
 
 function labelError() {
-	return getDeeper('company.country.countryCode')(this.user) === 'ECU' ? 'El número de documento es requerido' : 'El DNI es requerido';
+	return `${this.countryLabels.dni} es requerido`;
 }
 
 function setResponsible(who) {

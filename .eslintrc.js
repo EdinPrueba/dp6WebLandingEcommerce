@@ -51,7 +51,6 @@ module.exports = {
 				vue: 'never',
 			},
 		],
-		// allow optionalDependencies
 		'import/no-extraneous-dependencies': [
 			'error',
 			{

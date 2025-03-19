@@ -6,7 +6,7 @@
 			<router-link :to="{ name: 'reclamaciones' }" v-if="isPeru">
 				Libro de Reclamaciones
 			</router-link>
-			<div>
+			<div class="social-networks">
 				<a
 					v-for="social in getCommerceData.socialNetworks"
 					:key="social.id"
@@ -62,6 +62,7 @@ export default {
 				youtube: '/static/img/icons/youtube.svg',
 				instagram: '/static/img/icons/instagram.svg',
 				twitter: '/static/img/icons/twitter.svg',
+				tiktok: '/static/img/icons/tiktok.svg',
 			},
 		};
 	},
@@ -114,5 +115,9 @@ export default {
 	height: 30px;
 	margin-left: 10px;
 	object-fit: cover;
+}
+
+.social-networks {
+	padding-right: 30px;
 }
 </style>

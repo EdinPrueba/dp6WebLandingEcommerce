@@ -30,9 +30,10 @@
 				:open-warehouse="stockWarehouse"
 				:data="productDetails"
 				:features="globalFeatures"
-				:show-unity="showUnity"
+				:show-unity="Boolean(showUnity)"
 				:stock-avaible="stockAvaible"
 				:wholeSalePrice="wholeSalePrice"
+				:exceed-quantity="exceedQuantity"
 				class="container-product-detail"
 				@update="loadData"
 				@selected="selectFeature"
@@ -213,6 +214,7 @@ async function loadData(id) {
 	if (!Array.isArray(this.productDetails.sections)) {
 		this.showNotification('Se esta cargando mal la información del producto', 'warning');
 	}
+	this.getPriceList();
 	this.productImages = [...this.productInstance.getImages()] || [];
 	this.allFeatures = this.childrens.reduce((acum, children) => acum.concat(children.features), []);
 	this.features = this.allFeatures.reduce((acum, feature) => {
@@ -389,13 +391,13 @@ function inputQuantity(num) {
 	const newProductdetail = { ...this.product };
 	const validQuantity = this.checkValidQuantity(num);
 	if (validQuantity) {
-		this.$set(newProductdetail, 'quantity', num);
-		this.product = { ...newProductdetail };
 		this.productInstance.updateQuantity(num);
 		this.productDetails = { ...this.productInstance.getProductDetails() };
 	} else {
-		this.showNotification(`Cantidad: ${num} no disponible inputQuantity`, 'primary');
+		this.showNotification(`¡La cantidad de ${num} no está disponible!`, 'primary');
 	}
+	this.$set(newProductdetail, 'quantity', num);
+	this.product = { ...newProductdetail };
 }
 
 function checkValidQuantity(quantity) {
@@ -403,7 +405,9 @@ function checkValidQuantity(quantity) {
 		return true;
 	}
 	const { stock } = this.productInstance;
-	return stock >= quantity;
+	const quantityCalc = (this.productInstance.unit.quantity * quantity) || quantity;
+	this.exceedQuantity = !(stock >= quantityCalc);
+	return stock >= quantityCalc;
 }
 
 async function openDialog() {
@@ -423,18 +427,19 @@ function closeModal(value) {
 
 function selectedUnit(unit) {
 	this.stockAvaible = parseInt(this.product.stockWarehouse / unit.quantity, 10);
-	this.quantityStock = parseInt(unit.quantity * this.product.quantity, 10);
+	this.quantityStock = parseInt((unit.quantity || 1) * this.product.quantity, 10);
 	const unitDefault = {
 		name: 'UNIDAD',
 		quantity: 1,
 	};
 	this.unitProductValid = unit || unitDefault;
-	if (this.quantityStock > this.product.stockWarehouse) {
-		const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
-		const newProductdetail = { ...this.product };
-		this.$set(newProductdetail, 'quantity', validQuantity);
-		this.product = { ...newProductdetail };
-		this.productInstance.updateQuantity(validQuantity);
+	this.exceedQuantity = this.quantityStock > this.product.stockWarehouse;
+	if (this.quantityStock > this.product.stockWarehouse && !this.$allowOrderStockNegative) {
+		// const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
+		// const newProductdetail = { ...this.product };
+		// this.$set(newProductdetail, 'quantity', validQuantity);
+		// this.product = { ...newProductdetail };
+		// this.productInstance.updateQuantity(validQuantity);
 		this.showNotification(`El producto ${this.product.name}
 		no cuenta con más stock en la presentación ${unit.name}`, 'warning');
 	} else {
@@ -477,6 +482,7 @@ function data() {
 		disabledBtn: false,
 		dialogWarehouses: false,
 		disabledBuy: false,
+		exceedQuantity: false,
 		features: [],
 		featureSelect: [],
 		featuresFather: [],
@@ -557,6 +563,18 @@ export default {
 		selectFeature,
 		selectedUnit,
 		inputQuantity,
+		getPriceList() {
+			const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
+			const salPriceListDefault = user.company.salPriceListDefault.id;
+			const priceListDefault = this.productDetails.priceList[salPriceListDefault];
+			const priceList = Object.entries(priceListDefault.units).map(([id, unit]) => ({
+				id,
+				...unit,
+			}));
+			if (this.$flagShowBaseUnit === 1 && priceList.length > 0) {
+				this.productDetails.priceDiscount = priceList[0].price;
+			}
+		},
 	},
 	props: {
 		id: {
