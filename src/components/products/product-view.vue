@@ -114,7 +114,7 @@ function imagesHandler(newImages) {
 		this.movilLocalImages = [];
 		this.webLocalImages = [];
 
-		newImages.forEach((img) => {
+		newImages.forEach(img => {
 			if (img.fromApp === 0) {
 				// const imageToValidate = new Image();
 				// imageToValidate.src = img.urlImage;
@@ -223,7 +223,7 @@ export default {
 		imagesHandler,
 		handleImageError(event) {
 			const target = event.target;
-			target.src = this.fallbackImage;
+			target.src = this.data.urlImage || this.fallbackImage;
 		},
 		validProductImage(image) {
 			return image.urlImage && image.urlImage.trim() !== ''
