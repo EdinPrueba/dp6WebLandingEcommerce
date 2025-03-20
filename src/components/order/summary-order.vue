@@ -118,7 +118,7 @@ function stepTwo() {
 }
 
 function goToMakeOrder() {
-	if (!this.validateStock) {
+	if (!this.validateStock && !this.$allowOrderStockNegative) {
 		this.showGenericError(this.message);
 		return;
 	}
