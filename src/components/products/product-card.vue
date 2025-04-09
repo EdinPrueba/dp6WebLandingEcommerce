@@ -246,12 +246,19 @@ function addToCar(unit) {
 			this.showNotStock = true;
 		}
 		if (unit) {
-			productSelected.unit = unit;
+			productSelected.unit = { ...unit, isSelected: false };
 			productSelected.priceDiscountOrigin =
-				this.product.originalPrice * unit.quantity;
+				this.product.originalPrice * (unit.quantity || 1);
 			productSelected.priceDiscount =
-				this.product.originalPrice * unit.quantity;
+				this.product.originalPrice * (unit.quantity || 1);
 		}
+		this.showNotification(
+			`${this.product.name}(${
+				unit ? unit.name : this.product.unit.name
+			}) agregado exitosamente`,
+			'success',
+			null,
+		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
 	}
 }
