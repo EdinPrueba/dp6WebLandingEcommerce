@@ -41,6 +41,9 @@ function addProductToBuyCar(context, product) {
 	const index = productsSelected.findIndex(
 		p => p.id === newProduct.id && p.unitSelected === newProduct.unitSelected,
 	);
+	console.log('index > -1', index > -1);
+	console.log('newProduct', newProduct);
+	console.log('productsSelected', productsSelected);
 	if (index > -1) {
 		const currentProduct = productsSelected[index];
 		const { stock, stockWarehouse, stockComposite } = currentProduct;

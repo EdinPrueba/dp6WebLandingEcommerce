@@ -30,6 +30,7 @@ const getters = {
 	getTotalToBuy(state) {
 		const { products, order } = state.order;
 		const newProducts = isEmpty(order) ? products : order.details;
+		console.log('isEmpty(order)', isEmpty(order));
 		if (newProducts) {
 			return newProducts.reduce(
 				(acc, { priceList, priceDiscount, salePrice, quantity, wholeSalePrice }) => {
@@ -39,8 +40,18 @@ const getters = {
 						quantity <= wholeSalePrice[0].to) {
 						return twoDecimals(wholeSalePrice[0].price * quantity) + acc;
 					}
+					const priceListArr = priceList
+						? Object.values(priceList)
+						: null;
+					console.log(priceListArr && priceListArr[0].ranges.length);
+					if (priceListArr && priceListArr[0].ranges.length) {
+						const range = priceListArr[0].ranges.find(
+							r => quantity >= r.from && quantity <= r.to,
+						);
+						const priceToShow = (priceDiscount || salePrice || priceList.price) || priceDiscount;
+						return range ? range.price : twoDecimals(priceToShow * quantity) + acc;
+					}
 					const priceToShow = (priceDiscount || salePrice || priceList.price) || priceDiscount;
-
 					return twoDecimals(priceToShow * quantity) + acc;
 				}, 0);
 		}

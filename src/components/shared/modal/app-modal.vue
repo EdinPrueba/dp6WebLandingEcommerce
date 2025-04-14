@@ -2,48 +2,72 @@
 	<div>
 		<section class="modal-header">
 			<div class="close-button">
-				<button type="button" :style="`color:${globalColors.primary}`" @click="$emit('close-modal')">x</button>
+				<button
+					type="button"
+					:style="`color:${globalColors.primary}`"
+					@click="$emit('close-modal')"
+				>
+					x
+				</button>
 			</div>
-			<h3 class="header-text" :style="`color:${globalColors.title}`">Se añadió al carrito</h3>
+			<h3 class="header-text" :style="`color:${globalColors.title}`">
+				Se añadió al carrito
+			</h3>
 		</section>
 		<section class="modal-content">
 			<img
 				data-cy="modal-add-to-cart-img"
 				:src="product.imagePresentation"
 				alt="imagen del producto"
-			>
+			/>
 			<p class="product-information">
 				<span class="product-name">{{ product.name }}</span>
 				<span>{{ product.description | cuttingWord(62) }}</span>
-				<span 
+				<span
 					class="product-price"
 					:style="`color:${globalColors.secondary}`"
-					v-if="wholeSalePrice.length > 0 &&
-					Number(product.quantity) >= wholeSalePrice[0].from &&
-					Number(product.quantity) <= wholeSalePrice[0].to &&
-					wholeSalePrice[0].price !== 0">
-					{{getCurrencySymbol}}{{Number(product.quantity) * Number(wholeSalePrice[0].price) | currencyFormat}}
+					v-if="
+						wholeSalePrice.length > 0 &&
+							Number(product.quantity) >= wholeSalePrice[0].from &&
+							Number(product.quantity) <= wholeSalePrice[0].to &&
+							wholeSalePrice[0].price !== 0
+					"
+				>
+					{{ getCurrencySymbol
+					}}{{
+						(Number(product.quantity) * Number(wholeSalePrice[0].price))
+							| currencyFormat
+					}}
 				</span>
 				<span
 					v-else
 					class="product-price"
 					:style="`color:${globalColors.secondary}`"
-				>{{getCurrencySymbol}}{{Number(product.quantity) * Number(product.priceDiscount) | currencyFormat}}</span>
+					>{{ getCurrencySymbol }}{{ getPrice | currencyFormat }}</span
+				>
 			</p>
-			<trash-component class="action" @click="deleteProduct"/>
+			<trash-component class="action" @click="deleteProduct" />
 		</section>
 		<section class="modal-footer">
-			<button 
+			<button
 				data-cy="go-to-cart"
 				type="button"
-				:style="`color:${globalColors.primary};border-color:${globalColors.primary}`"
+				:style="
+					`color:${globalColors.primary};border-color:${globalColors.primary}`
+				"
 				@click="redirect('buy')"
-			>Ir al carrito</button>
-			<button 
+			>
+				Ir al carrito
+			</button>
+			<button
 				type="button"
-				:style="`border-color:${globalColors.primary};background-color:${globalColors.primary};color:white`"
+				:style="
+					`border-color:${globalColors.primary};background-color:${globalColors.primary};color:white`
+				"
 				@click="redirect('page-home')"
-			>Seguir comprando</button>
+			>
+				Seguir comprando
+			</button>
 		</section>
 	</div>
 </template>
@@ -67,10 +91,19 @@ export default {
 		trashComponent,
 	},
 	computed: {
-		...mapGetters([
-			'getCurrencySymbol',
-			'getTotalToBuy',
-		]),
+		...mapGetters(['getCurrencySymbol', 'getTotalToBuy']),
+		getPrice() {
+			const priceList = this.product.priceList
+				? Object.values(this.product.priceList)
+				: null;
+			if (priceList && priceList[0].ranges.length) {
+				const range = priceList[0].ranges.find(
+					r => this.product.quantity >= r.from && this.product.quantity <= r.to,
+				);
+				return range.price;
+			}
+			return Number(this.product.quantity) * Number(this.product.priceDiscount);
+		},
 	},
 	methods: {
 		deleteProduct,
