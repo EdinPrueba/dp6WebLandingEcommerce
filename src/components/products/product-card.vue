@@ -7,53 +7,17 @@
 		@mouseleave="mouseOnCard = false"
 		:style="animatingCard"
 	>
-		<div :class="{ opacity: noStock }">
-			<div v-if="noStock" class="without-stock-tag">
-				<span
-					:style="`background-color: ${globalColors.primary};`"
-					class="without-stock-text"
-					>Agotado</span
-				>
-			</div>
-			<div class="position-relative">
-				<div class="product-favorite-mobile">
-					<div
-						class="heart-content"
-						:style="
-							`background-color:${
-								product.flagFavorite ? globalColors.primary : '#fff'
-							}`
-						"
-						:class="[{ favorite: product.flagFavorite }]"
+		<div v-if="showViewProduct">
+			<div :class="{ opacity: noStock }">
+				<div v-if="noStock" class="without-stock-tag">
+					<span
+						:style="`background-color: ${globalColors.primary};`"
+						class="without-stock-text"
+						>Agotado</span
 					>
-						<heart-component
-							@click="productFavo"
-							:value="product.flagFavorite"
-						/>
-					</div>
 				</div>
-				<section
-					:class="[
-						'product-header',
-						{ small: small },
-						{ noDiscount: !discountPercentage },
-					]"
-				>
-					<div
-						v-if="!!discountPercentage"
-						:style="
-							`background-color:${indeterminate ? 'transparent' : '#f42b17'}`
-						"
-						:class="[
-							'product-discount',
-							{ 'loading loading-dark': indeterminate },
-						]"
-					>
-						<span v-if="!indeterminate"
-							>- {{ discountPercentage | round(0) }}%</span
-						>
-					</div>
-					<div class="product-favorite">
+				<div class="position-relative">
+					<div class="product-favorite-mobile">
 						<div
 							class="heart-content"
 							:style="
@@ -69,66 +33,105 @@
 							/>
 						</div>
 					</div>
-				</section>
-				<section class="product-content" :class="[small ? 'small' : null]">
-					<div
-						class="product-content-img"
-						:class="[{ 'loading img-space': indeterminate }]"
+					<section
+						:class="[
+							'product-header',
+							{ small: small },
+							{ noDiscount: !discountPercentage },
+						]"
 					>
-						<div>
-							<span class="show-add" v-if="showAdd">
-								<v-icon color="#03ba00" size="15">check_circle</v-icon>
-								<span class="pl-1">
-									Agregado
-								</span>
-							</span>
-							<span class="show-agot" v-if="showNotStock">
-								<span class="pl-1">
-									SIN STOCK
-								</span>
-							</span>
-						</div>
-						<img
-							@click="goToProduct(product)"
-							v-if="!indeterminate"
-							:class="['product-img']"
-							:src="validProductImage"
-							@error="handleImageError"
-							alt="imagen del product"
-						/>
-					</div>
-					<div class="product-description-wrapper">
-						<p
-							class="mb-1"
-							@click="goToProduct(product)"
-							:class="[indeterminate ? 'loading text-field' : 'product-name']"
+						<div
+							v-if="!!discountPercentage"
+							:style="
+								`background-color:${indeterminate ? 'transparent' : '#f42b17'}`
+							"
+							:class="[
+								'product-discount',
+								{ 'loading loading-dark': indeterminate },
+							]"
 						>
-							{{ product.name }}
-						</p>
-						<!--span
+							<span v-if="!indeterminate"
+								>- {{ discountPercentage | round(0) }}%</span
+							>
+						</div>
+						<div class="product-favorite">
+							<div
+								class="heart-content"
+								:style="
+									`background-color:${
+										product.flagFavorite ? globalColors.primary : '#fff'
+									}`
+								"
+								:class="[{ favorite: product.flagFavorite }]"
+							>
+								<heart-component
+									@click="productFavo"
+									:value="product.flagFavorite"
+								/>
+							</div>
+						</div>
+					</section>
+					<section class="product-content" :class="[small ? 'small' : null]">
+						<div
+							class="product-content-img"
+							:class="[{ 'loading img-space': indeterminate }]"
+						>
+							<div>
+								<span class="show-add" v-if="showAdd">
+									<v-icon color="#03ba00" size="15">check_circle</v-icon>
+									<span class="pl-1">
+										Agregado
+									</span>
+								</span>
+								<span class="show-agot" v-if="showNotStock">
+									<span class="pl-1">
+										SIN STOCK
+									</span>
+								</span>
+							</div>
+							<img
+								@click="goToProduct(product)"
+								v-if="!indeterminate"
+								:class="['product-img']"
+								:src="validProductImage"
+								@error="handleImageError"
+								alt="imagen del product"
+							/>
+						</div>
+						<div class="product-description-wrapper">
+							<p
+								class="mb-1"
+								@click="goToProduct(product)"
+								:class="[indeterminate ? 'loading text-field' : 'product-name']"
+							>
+								{{ product.name }}
+							</p>
+							<!--span
 							v-if="product.description"
 							:class="[
 								indeterminate ? 'loading text-field' : 'product-description'
 							]"
 						>{{product.description | cuttingWord(53)}}</!--span-->
-						<!-- <small
+							<!-- <small
 							v-if="product.warehouseProduct && product.warehouseProduct.brand"
 							class="product-brand">{{product.warehouseProduct.brand.name}}</small> -->
-						<h3
-							class="mt-1"
-							:style="
-								`color: ${
-									indeterminate ? 'transparent' : globalColors.primary
-								};`
-							"
-							:class="[
-								indeterminate ? 'loading text-field' : 'product-price-discount',
-							]"
-						>
-							{{ getCurrencySymbol }}
-							{{ product.priceDiscount | currencyFormat }}
-						</h3>
-						<!-- 
+							<h3
+								class="mt-1"
+								:style="
+									`color: ${
+										indeterminate ? 'transparent' : globalColors.primary
+									};`
+								"
+								:class="[
+									indeterminate
+										? 'loading text-field'
+										: 'product-price-discount',
+								]"
+							>
+								{{ getCurrencySymbol }}
+								{{ product.priceDiscount | currencyFormat }}
+							</h3>
+							<!-- 
 							<small
 							v-if="product.price"
 							:class="[
@@ -139,36 +142,53 @@
 							{{getCurrencySymbol}} {{ product.price | currencyFormat }}
 						</small>
 						-->
-						<small
-							v-if="WholeSalePrice && WholeSalePrice.price > 0"
-							:class="[
-								indeterminate
-									? 'loading text-field'
-									: product.priceDiscount
-									? 'product-price-whole'
-									: 'product-price-whole',
-							]"
-							:style="
-								`color: ${
-									indeterminate ? 'transparent' : globalColors.primary
-								};`
-							"
-						>
-							x{{ WholeSalePrice.from }} {{ getCurrencySymbol }}
-							{{ WholeSalePrice.price | currencyFormat }}
-						</small>
-					</div>
-				</section>
+							<small
+								v-if="WholeSalePrice && WholeSalePrice.price > 0"
+								:class="[
+									indeterminate
+										? 'loading text-field'
+										: product.priceDiscount
+										? 'product-price-whole'
+										: 'product-price-whole',
+								]"
+								:style="
+									`color: ${
+										indeterminate ? 'transparent' : globalColors.primary
+									};`
+								"
+							>
+								x{{ WholeSalePrice.from }} {{ getCurrencySymbol }}
+								{{ WholeSalePrice.price | currencyFormat }}
+							</small>
+						</div>
+					</section>
+				</div>
+			</div>
+			<div v-if="!indeterminate" class="bottom-position">
+				<addcar-component
+					:disabled-add="disabledAdd"
+					active
+					@add-car="selectUnitCar"
+					@remove-car="removeProductFromCar"
+					:class="{ outstock: noStock }"
+				/>
 			</div>
 		</div>
-		<div v-if="!indeterminate" class="bottom-position">
-			<addcar-component
-				:disabled-add="disabledAdd"
-				active
-				@add-car="addToCar"
-				@remove-car="removeProductFromCar"
-				:class="{ outstock: noStock }"
-			/>
+		<div class="select-presentation" v-else>
+			<v-icon class="icon-close" @click="selectUnitCar">close</v-icon>
+			<div class="content-conversions">
+				<span class="title">Seleccione la presentación que desea añadir:</span>
+				<div class="button-container">
+					<v-btn
+						v-for="item in conversionsProducts"
+						:key="item.id"
+						class="btn-conversions"
+						@click="addToCar(item)"
+					>
+						{{ item.name }}
+					</v-btn>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -192,7 +212,7 @@ function mounted() {
 	this.WholeSalePrice = this.getWholeSalePrice();
 }
 
-function addToCar() {
+function addToCar(unit) {
 	if (this.product.priceDiscount <= 0) {
 		this.showNotification(
 			'El producto no se puede agregar al carrito, porque su precio es 0.',
@@ -215,7 +235,7 @@ function addToCar() {
 		// const { units } = priceList;
 		// const rightRanges = units[productSelected.unitSelected];
 		// const { ranges } = rightRanges || priceList;
-		productSelected.unitSelected = this.product.unitId;
+		productSelected.unitSelected = unit ? unit.id : this.product.unitId;
 		productSelected.wholeSalePrice = this.WholeSalePrice || [];
 		productSelected.priceDiscountOrigin = this.product.priceDiscount || 0;
 		const StockSoldOut =
@@ -225,6 +245,20 @@ function addToCar() {
 		if (StockSoldOut) {
 			this.showNotStock = true;
 		}
+		if (unit) {
+			productSelected.unit = { ...unit, isSelected: false };
+			productSelected.priceDiscountOrigin =
+				this.product.originalPrice * (unit.quantity || 1);
+			productSelected.priceDiscount =
+				this.product.originalPrice * (unit.quantity || 1);
+		}
+		this.showNotification(
+			`${this.product.name}(${
+				unit ? unit.name : this.product.unit.name
+			}) agregado exitosamente`,
+			'success',
+			null,
+		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
 	}
 }
@@ -373,6 +407,8 @@ function data() {
 		showAdd: false,
 		showNotStock: false,
 		fallbackImage: '/static/img/placeholder-product.png',
+		showViewProduct: true,
+		conversionsProducts: [],
 	};
 }
 
@@ -428,6 +464,28 @@ export default {
 			);
 			if (this.$flagShowBaseUnit === 1 && priceList.length > 0) {
 				this.product.priceDiscount = priceList[0].price;
+			}
+		},
+		selectUnitCar() {
+			if (
+				this.product.conversions &&
+				typeof this.product.conversions === 'object'
+			) {
+				this.conversionsProducts = Object.keys(this.product.conversions).map(
+					key => ({
+						id: key,
+						...this.product.conversions[key],
+					}),
+				);
+
+				if (this.conversionsProducts.length) {
+					this.showViewProduct = !this.showViewProduct;
+					this.conversionsProducts.unshift(this.product.unit);
+				} else {
+					this.addToCar();
+				}
+			} else {
+				this.addToCar();
 			}
 		},
 	},
@@ -741,7 +799,7 @@ export default {
 	align-items: center;
 	justify-content: center;
 	width: 100%;
-	height: 100%;
+	height: 40px;
 	z-index: 1;
 	color: white;
 	content: 'Agotado';
@@ -809,5 +867,47 @@ export default {
 	@media (min-width: 1024px) {
 		bottom: 125px;
 	}
+}
+
+.icon-close {
+	font-size: 24px;
+	color: #ff5722;
+	cursor: pointer;
+	margin: 10px;
+}
+
+.title {
+	padding: 8px 10px 0 6px !important;
+	font-size: 14px !important;
+	font-weight: 600;
+	color: #333;
+}
+.button-container {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 16px;
+}
+
+.btn-conversions {
+	border-radius: 10px;
+	font-family: 'Roboto', sans-serif;
+	font-weight: bold;
+	padding: 10px 20px;
+	text-transform: uppercase;
+	transition: background-color 0.3s ease;
+	border: 1px solid red;
+	cursor: pointer;
+	background-color: white !important;
+	color: red;
+}
+
+.btn-conversions:hover {
+	background-color: #3700b3;
+}
+
+.content-conversions {
+	text-align: center;
 }
 </style>
