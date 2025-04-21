@@ -33,6 +33,7 @@
 				:stock-avaible="stockAvaible"
 				:wholeSalePrice="wholeSalePrice"
 				:exceed-quantity="exceedQuantity"
+				:unit="unitProductValid"
 				class="container-product-detail"
 				@update="loadData"
 				@selected="selectFeature"
@@ -42,6 +43,7 @@
 				@open-dialog="openDialog"
 				@open-confirm-modal="showConfirmModal = true"
 				@unit-selection="selectedUnit"
+				@update-number="updateNumber"
 			/>
 		</div>
 		<div v-if="!disabled" class="detail-tab-publicity">
@@ -217,6 +219,7 @@ async function loadData(id) {
 	this.productInstance.firstProductSelected(this.product);
 	this.globalFeatures = [...this.productInstance.getFeatures()];
 	this.productDetails = { ...this.productInstance.getProductDetails() };
+	this.priceOrigin = this.productDetails.priceDiscount;
 	if (!Array.isArray(this.productDetails.sections)) {
 		this.showNotification(
 			'Se esta cargando mal la información del producto',
@@ -564,6 +567,7 @@ function data() {
 		warehouses: [],
 		wholeSalePrice: [],
 		totalPriceProduct: 0,
+		priceOrigin: null,
 	};
 }
 
@@ -629,6 +633,20 @@ export default {
 			);
 			if (this.$flagShowBaseUnit === 1 && priceList.length > 0) {
 				this.productDetails.priceDiscount = priceList[0].price;
+			}
+		},
+		updateNumber(num) {
+			this.productDetails.quantity = Number(num);
+			const priceList = this.productDetails.priceList
+				? Object.values(this.productDetails.priceList)
+				: null;
+			if (priceList && priceList[0].ranges.length) {
+				const range = priceList[0].ranges.find(
+					r => Number(num) >= r.from && Number(num) <= r.to,
+				);
+				this.productDetails.priceDiscount = range
+					? range.price
+					: this.priceOrigin;
 			}
 		},
 	},

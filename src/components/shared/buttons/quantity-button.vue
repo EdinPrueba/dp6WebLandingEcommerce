@@ -8,7 +8,7 @@
 			-
 		</button>
 		<input
-			v-if="product.category && product.category.type === 2"
+			v-if="(product && product.category.type === 2) || isEditNumber"
 			class="input-number"
 			type="number"
 			v-model="number"
@@ -47,6 +47,10 @@ export default {
 		},
 		product: {
 			type: Object,
+		},
+		isEditNumber: {
+			type: Boolean,
+			default: false,
 		},
 	},
 };
