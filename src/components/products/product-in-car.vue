@@ -177,22 +177,12 @@ function clickQuantity(val) {
 	let { quantity } = this.product;
 	const { unit } = this.product;
 	if (val) {
-		if (this.product.category.type === 2) {
-			this.opt = {
-				more: 0.1,
-				less: -0.1,
-			};
-			quantity += this.opt[val];
-			quantity = +quantity.toFixed(2);
-			quantity = quantity < 0.1 ? 0.1 : quantity;
-		} else {
-			this.opt = {
-				more: 1,
-				less: -1,
-			};
-			quantity += this.opt[val];
-			quantity = quantity < 1 ? 1 : quantity;
-		}
+		this.opt = {
+			more: 1,
+			less: -1,
+		};
+		quantity += this.opt[val];
+		quantity = quantity < 1 ? 1 : quantity;
 	}
 	this.quantityStock = parseInt(unit.quantity * quantity, 10);
 	if (this.showUnity) {
