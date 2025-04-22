@@ -131,7 +131,6 @@
 				Total: {{ getCurrencySymbol }}. {{ product.total | currencyFormat }}
 			</h3>
 		</div>
-
 		<v-flex
 			xs12
 			sm8
