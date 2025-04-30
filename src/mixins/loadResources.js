@@ -1,4 +1,5 @@
 async function created() {
+	this.loadDomians();
 	await this.loadCommerceData();
 	this.loadResource();
 }
@@ -22,6 +23,12 @@ async function loadResource() {
 export default {
 	created,
 	methods: {
+		async loadDomians() {
+			const requests = [
+				this.$store.dispatch('LOAD_DOMAINS', this),
+			];
+			await Promise.all(requests);
+		},
 		loadCommerceData,
 		loadResource,
 	},

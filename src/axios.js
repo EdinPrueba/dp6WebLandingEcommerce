@@ -1,22 +1,25 @@
 import axios from 'axios';
+import helper from '@/shared/helper';
 
 const aclInstance = axios.create({
 	baseURL: process.env.ACL_URL,
 });
 
+const productsUrl = helper.getKeyStorage('PRODUCTS_URL') || '';
 const productsInstance = axios.create({
-	baseURL: process.env.PRODUCTS_URL,
+	baseURL: productsUrl.endPoint || process.env.PRODUCTS_URL,
 });
 
 const productsPublicInstance = axios.create({
-	baseURL: process.env.PRODUCTS_URL,
+	baseURL: productsUrl.endPoint || process.env.PRODUCTS_URL,
 	headers: {
 		Authorization: `Bearer ${process.env.TOKEN}`,
 	},
 });
 
+const salesUrl = helper.getKeyStorage('SALES_URL') || '';
 const salesInstance = axios.create({
-	baseURL: process.env.SALES_URL,
+	baseURL: salesUrl.endPoint || process.env.SALES_URL,
 });
 
 const httpsMaps = axios.create({
@@ -46,26 +49,28 @@ const http2Instance = axios.create({
 	baseURL: process.env.SALES_URL_HTTP2,
 });
 
+const productsReadUrl = helper.getKeyStorage('PRODUCTS_REPORT') || '';
 const productsReadReportPublic = axios.create({
-	baseURL: process.env.PRODUCTS_READ_REPORT,
+	baseURL: productsReadUrl.endPoint || process.env.PRODUCTS_READ_REPORT,
 	headers: {
 		Authorization: `Bearer ${process.env.TOKEN}`,
 	},
 });
 
+const salesReadUrl = helper.getKeyStorage('SALES_REPORT') || '';
 const saleReadReportPublic = axios.create({
-	baseURL: process.env.SALES_READ_REPORT,
+	baseURL: salesReadUrl.endPoint || process.env.SALES_READ_REPORT,
 	headers: {
 		Authorization: `Bearer ${process.env.TOKEN}`,
 	},
 });
 
 const productsReadReport = axios.create({
-	baseURL: process.env.PRODUCTS_READ_REPORT,
+	baseURL: productsReadUrl.endPoint || process.env.PRODUCTS_READ_REPORT,
 });
 
 const saleReadReport = axios.create({
-	baseURL: process.env.SALES_READ_REPORT,
+	baseURL: salesReadUrl.endPoint || process.env.SALES_READ_REPORT,
 });
 
 export default function (Vue) {
