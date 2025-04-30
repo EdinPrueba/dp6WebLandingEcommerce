@@ -25,7 +25,7 @@ export default {
 	methods: {
 		async loadDomians() {
 			const requests = [
-				this.$store.dispatch('LOAD_DOMAINS', this),
+				this.$store.dispatch('LOAD_DOMAINS', { context: this }),
 			];
 			await Promise.all(requests);
 		},

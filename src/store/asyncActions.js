@@ -277,7 +277,7 @@ const asyncActions = {
 		const title = PAGE_TITLE === 'undefined' ? backUp : PAGE_TITLE;
 		pageTitle[0].innerHTML = title;
 	},
-	LOAD_DOMAINS: async (context) => {
+	LOAD_DOMAINS: async (store, { context }) => {
 		const codeCompany = process.env.ACL_COMPANY_CODE;
 		const codeProject = process.env.CODE_PROJECT;
 		const url = `project/${codeProject}/domains?codeCompany=${codeCompany}`;
