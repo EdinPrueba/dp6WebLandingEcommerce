@@ -277,6 +277,13 @@ const asyncActions = {
 		const title = PAGE_TITLE === 'undefined' ? backUp : PAGE_TITLE;
 		pageTitle[0].innerHTML = title;
 	},
+	LOAD_DOMAINS: async (store, { context }) => {
+		const codeCompany = process.env.ACL_COMPANY_CODE;
+		const codeProject = process.env.CODE_PROJECT;
+		const url = `project/${codeProject}/domains?codeCompany=${codeCompany}`;
+		const { data: res } = await context.$httpAcl.get(url);
+		context.setLocalData(`${process.env.STORAGE_USER_KEY}::domains`, res.domains);
+	},
 	MAKE_ORDER: async ({ dispatch, getters, commit }, { flagFinish, context }) => {
 		commit('SET_IS_TOOGLE_BTN', true);
 		const body = helper.buildOrderBody(flagFinish, getters);
