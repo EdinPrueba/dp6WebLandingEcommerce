@@ -454,7 +454,9 @@ export default {
 		getPriceList() {
 			const user =
 				JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
-			const salPriceListDefault = user.company.salPriceListDefault.id;
+			const salPriceListDefault =
+				user.company && user.company.salPriceListDefault.id;
+			if (!salPriceListDefault) return;
 			const priceListDefault = this.product.priceList[salPriceListDefault];
 			const priceList = Object.entries(priceListDefault.units).map(
 				([id, unit]) => ({

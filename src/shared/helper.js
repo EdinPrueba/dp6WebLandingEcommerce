@@ -273,6 +273,12 @@ const getRangesOfProduct = (product) => {
 	return priceList.ranges
 }
 
+function getKeyStorage(value) {
+	const urls = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`)) || [];
+	const keyFind = urls.find(p => p.code === value);
+	return keyFind || undefined;
+}
+
 const getPriceByRange = ({
 	ranges,
 	originalPrice,
@@ -316,7 +322,8 @@ const methods = {
 	stockGreaterThanCero,
 	updateOrderDetailsInLocalStorage,
 	getRangesOfProduct,
-	getPriceByRange
+	getPriceByRange,
+	getKeyStorage,
 };
 
 export default methods;
