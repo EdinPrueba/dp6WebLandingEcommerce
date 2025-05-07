@@ -98,6 +98,23 @@
 								alt="imagen del product"
 							/>
 						</div>
+						<div v-if="!indeterminate" class="bottom-position">
+							<!-- <quantityButton
+								class="continer-quantity-button"
+								:number="quantityAddProduct"
+								:product="product"
+								:max-quantity="maxQuantity"
+								@input="inputQuantity"
+								@click="clickQuantity"
+							/> -->
+							<addcar-component
+								:disabled-add="disabledAdd"
+								active
+								@add-car="selectUnitCar"
+								@remove-car="removeProductFromCar"
+								:class="{ outstock: noStock }"
+							/>
+						</div>
 						<div class="product-description-wrapper">
 							<p
 								class="mb-1"
@@ -164,15 +181,6 @@
 					</section>
 				</div>
 			</div>
-			<div v-if="!indeterminate" class="bottom-position">
-				<addcar-component
-					:disabled-add="disabledAdd"
-					active
-					@add-car="selectUnitCar"
-					@remove-car="removeProductFromCar"
-					:class="{ outstock: noStock }"
-				/>
-			</div>
 		</div>
 		<div class="select-presentation" v-else>
 			<v-icon class="icon-close" @click="selectUnitCar">close</v-icon>
@@ -201,6 +209,7 @@
 import { mapGetters } from 'vuex';
 import heartComponent from '@/components/shared/icons/heart-component';
 import addcarComponent from '@/components/shared/icons/addcar-component';
+import quantityButton from '@/components/shared/buttons/quantity-button';
 import { getDeeper } from '@/shared/lib';
 import TypeProduct from '@/shared/enums/typeProduct';
 import helper from '@/shared/helper';
@@ -265,6 +274,7 @@ function addToCar(unit) {
 			null,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
+		this.showViewProduct = true;
 	}
 }
 
@@ -408,7 +418,8 @@ function data() {
 		elHeight: 0,
 		mouseOnCard: false,
 		WholeSalePrice: null,
-		quantityAddProduct: 0,
+		quantityAddProduct: 1,
+		maxQuantity: false,
 		showAdd: false,
 		showNotStock: false,
 		fallbackImage: '/static/img/placeholder-product.png',
@@ -422,6 +433,7 @@ export default {
 	components: {
 		heartComponent,
 		addcarComponent,
+		quantityButton,
 	},
 	computed: {
 		...mapGetters([
@@ -452,6 +464,19 @@ export default {
 		removeProductFromCar,
 		getWholeSalePrice,
 		goToCategories,
+		inputQuantity(value) {
+			this.quantityAddProduct = Number(value);
+			this.clickQuantity();
+		},
+		clickQuantity(val) {
+			if (val) {
+				this.opt = {
+					more: 1,
+					less: -1,
+				};
+				this.quantityAddProduct += this.opt[val];
+			}
+		},
 		handleImageError(event) {
 			const target = event.target;
 			target.src = this.fallbackImage;
@@ -520,13 +545,13 @@ export default {
 	height: auto;
 	transform: perspective(0px) rotateY(deg) rotateX(0deg) scale3d(0, 0, 0);
 	transition: all 120ms ease;
+	margin: 3px auto;
 	@media (min-width: 600px) {
 		box-shadow: 0 2px 2px 0 rgba(31, 26, 26, 0.07);
 		border: 1px solid color(border);
 		border-radius: 5px;
 		height: 360px;
-		margin: 3px auto;
-		max-width: 250px;
+		margin: 3px auto !important;
 		width: 100%;
 	}
 	@media screen and (max-width: 600px) {
@@ -535,22 +560,16 @@ export default {
 
 	&.small {
 		min-height: 319px;
-		max-width: 179px;
-	}
-
-	&.small {
-		min-height: 319px;
-		max-width: 179px;
+		width: 100%;
+		max-width: none;
 	}
 }
 .bottom-position {
 	width: 50%;
-	position: absolute;
 	bottom: 3px;
 	right: 0;
 	@media (min-width: 600px) {
 		width: 100%;
-		position: absolute;
 		bottom: 3px;
 		right: 0;
 	}
@@ -575,6 +594,11 @@ export default {
 
 	&.noDiscount {
 		justify-content: flex-end;
+	}
+
+	@media (max-width: 600px) {
+		bottom: auto;
+		top: 51%;
 	}
 
 	@media (min-width: 600px) {
@@ -640,6 +664,7 @@ export default {
 
 .product-content {
 	align-items: center;
+	flex-direction: column;
 	display: flex;
 	justify-content: center;
 	margin: 0 0;
@@ -787,14 +812,16 @@ export default {
 			font-size: 19px;
 			background-color: #acacac;
 			left: 10%;
-			top: 20%;
+			top: 30%;
 			width: 80%;
 			height: 35px;
 			z-index: 2;
 		}
 
 		@media screen and (max-width: 600px) {
-			height: 75%;
+			top: 30%;
+			width: 75%;
+			left: 17%;
 			font-size: 2vw;
 			border-radius: 10px;
 		}
@@ -859,6 +886,11 @@ export default {
 
 	@media (min-width: 1024px) {
 		bottom: 95px;
+	}
+
+	@media (max-width: 600px) {
+		bottom: auto;
+		top: 44%;
 	}
 }
 .show-agot {

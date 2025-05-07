@@ -5,10 +5,12 @@
 			<div class="name-select-mobile" v-if="!open">
 				<div class="flex-center flex-60">
 					<img
+						v-if="categorySelected.webImage"
 						:src="categorySelected.webImage"
 						:alt="categorySelected.title"
 						class="mr-2"
 						height="21"
+						@error="handleImageError"
 					/>
 					<span class="text-select" :style="`color: ${globalColors.primary}`">{{
 						categorySelected.title
@@ -166,7 +168,10 @@ async function loadProduct() {
 			page: this.page,
 			codeAttribute: this.attributeCodes,
 			flagCommerce: true,
-			code: this.featuresParams && this.featuresParams.length ? this.featuresParams.join(',') : null,
+			code:
+				this.featuresParams && this.featuresParams.length
+					? this.featuresParams.join(',')
+					: null,
 		};
 		const url = 'products-public';
 		const { data: products, headers } = process.env.PRODUCTS_READ_REPORT
@@ -195,6 +200,7 @@ async function loadProduct() {
 		this.lastPage = Number(headers['x-last-page']);
 		this.loadingProducts = false;
 	} catch (error) {
+		console.log(error);
 		this.showGenericError();
 	}
 }
@@ -262,7 +268,7 @@ function changeCategory({ slug, id }) {
 }
 
 function openCategory(id) {
-	this.categories = this.categories.map((c) => {
+	this.categories = this.categories.map(c => {
 		const newCategory = { ...c };
 		newCategory.open = c.id === id ? !c.open : false;
 		return newCategory;
@@ -363,6 +369,9 @@ export default {
 		toggleMenu,
 		updateMetaTag,
 		updateProductCard,
+		handleImageError() {
+			this.categorySelected.webImage = null;
+		},
 		async loadFeatures() {
 			const features = this.getLocalStorage('ecommerce::features');
 			if (features) {
@@ -371,7 +380,7 @@ export default {
 				const { data: response } = await this.$httpProducts.get(
 					'features/public',
 				);
-				this.features = response.map((f) => {
+				this.features = response.map(f => {
 					const newC = { ...f };
 					newC.showFilters = false;
 					return newC;
@@ -471,6 +480,11 @@ export default {
 	@media (max-width: 986px) {
 		margin: 0;
 		width: 100%;
+		grid-template-columns: repeat(2, 200px) !important;
+	}
+
+	@media (min-width: 601px) and (max-width: 986px) {
+		grid-template-columns: repeat(3, 1fr);
 	}
 }
 

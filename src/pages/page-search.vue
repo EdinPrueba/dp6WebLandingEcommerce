@@ -160,19 +160,22 @@ async function loadProduct() {
 			flagGrouper: this.$store.getters.productParams.flagGrouper,
 			page: this.page,
 			codeAttribute: this.attributeCodes,
-			code: this.featuresParams && this.featuresParams.length ? this.featuresParams.join(',') : null,
+			code:
+				this.featuresParams && this.featuresParams.length
+					? this.featuresParams.join(',')
+					: null,
 		};
 		const url = 'products-public';
 		const { data: products, headers } = process.env.PRODUCTS_READ_REPORT
 			? await this.$httpProductsReadPublic.get(url, { params })
 			: await this.$httpProductsPublic.get(url, { params });
 		const commercePriceListId = this.getCommerceData.settings.salPriceListId;
-		const mappedProducts = products.map((el) => {
+		const mappedProducts = products.map(el => {
 			const { discount } = Object.entries(el.priceList).flat()[1];
 			let originalPrice = el.price;
 
 			if (discount > 0) {
-				originalPrice = (1 - (discount / 100)) * el.price;
+				originalPrice = (1 - discount / 100) * el.price;
 			}
 
 			return { ...el, originalPrice };
@@ -242,7 +245,7 @@ function changeCategory({ slug, id }) {
 }
 
 function openCategory(id) {
-	this.categories = this.categories.map((c) => {
+	this.categories = this.categories.map(c => {
 		const newCategory = { ...c };
 		newCategory.open = c.id === id ? !c.open : false;
 		return newCategory;
@@ -360,7 +363,7 @@ export default {
 				const { data: response } = await this.$httpProducts.get(
 					'features/public',
 				);
-				this.features = response.map((f) => {
+				this.features = response.map(f => {
 					const newC = { ...f };
 					newC.showFilters = false;
 					return newC;
@@ -455,6 +458,7 @@ export default {
 	@media (max-width: 986px) {
 		margin: 0;
 		width: 100%;
+		grid-template-columns: repeat(2, 200px) !important;
 	}
 }
 

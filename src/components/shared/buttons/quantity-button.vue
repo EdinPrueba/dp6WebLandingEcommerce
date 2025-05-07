@@ -8,7 +8,7 @@
 			-
 		</button>
 		<input
-			v-if="product.category.type === 2"
+			v-if="product && product.category && product.category.type === 2"
 			class="input-number"
 			type="number"
 			v-model="number"
