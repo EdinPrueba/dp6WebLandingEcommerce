@@ -185,7 +185,12 @@
 						class="btn-conversions"
 						@click="addToCar(item)"
 					>
-						{{ item.name }}
+						{{ item.name }} - {{ getCurrencySymbol }}
+						{{
+							item.quantity
+								? item.quantity * product.originalPrice
+								: product.originalPrice
+						}}
 					</v-btn>
 				</div>
 			</div>
