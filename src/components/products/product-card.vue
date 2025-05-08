@@ -545,6 +545,7 @@ export default {
 	height: auto;
 	transform: perspective(0px) rotateY(deg) rotateX(0deg) scale3d(0, 0, 0);
 	transition: all 120ms ease;
+	width: 20vh;
 	margin: 3px auto;
 	@media (min-width: 600px) {
 		box-shadow: 0 2px 2px 0 rgba(31, 26, 26, 0.07);
@@ -698,7 +699,7 @@ export default {
 .product-description-wrapper {
 	display: flex;
 	flex-direction: column;
-	width: 100%;
+	width: 107%;
 	padding: 1em 0 0;
 }
 
