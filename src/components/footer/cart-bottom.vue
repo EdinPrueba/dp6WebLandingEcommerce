@@ -140,26 +140,33 @@ function isNumber($event) {
 }
 
 function getTotalPrice() {
-	const selectedObject =
-		Object.values(this.product.priceList).find(
-			obj => obj.price === this.priceDiscount,
-		) ||
-		Object.values(this.product.priceList)
-			.map(obj =>
-				Object.values(obj.units).find(
-					unit => unit.price === this.priceDiscount,
-				),
-			)
-			.find(unit => unit);
-	if (selectedObject && selectedObject.ranges.length) {
-		const range = selectedObject.ranges.find(
-			r =>
-				Number(this.quantityInput) >= r.from &&
-				Number(this.quantityInput) <= r.to,
-		);
-		return range
-			? range.price
-			: Number(this.quantityInput) * this.priceDiscount;
+	if (this.product.priceList) {
+		const selectedObject =
+			Object.values(this.product.priceList).find(obj => {
+				const discounted = obj.price - (obj.discount / 100) * obj.price;
+				return (
+					Number(discounted.toFixed(2)) ===
+					Number(this.priceDiscount.toFixed(2))
+				);
+			}) ||
+			Object.values(this.product.priceList)
+				.map(obj =>
+					Object.values(obj.units).find(
+						unit => unit.price === this.priceDiscount,
+					),
+				)
+				.find(unit => unit);
+		if (selectedObject && selectedObject.ranges.length) {
+			const range = selectedObject.ranges.find(
+				r =>
+					Number(this.quantityInput) >= r.from &&
+					Number(this.quantityInput) <= r.to,
+			);
+			return range
+				? range.price
+				: Number(this.quantityInput) * this.priceDiscount;
+		}
+		return Number(this.quantityInput) * this.priceDiscount;
 	}
 	return Number(this.quantityInput) * this.priceDiscount;
 }

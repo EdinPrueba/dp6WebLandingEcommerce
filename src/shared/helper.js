@@ -147,7 +147,8 @@ function updateOrderDetailsInLocalStorage(products) {
 }
 
 function buildOrderBody(flagFinish, getters) {
-	const { id, name, address } = getters.getCommerceData.settings.defaultWarehouse;
+	const { defaultWarehouse, salPriceListId } = getters.getCommerceData.settings;
+	const { id, name, address } = defaultWarehouse;
 	const { getDeliveryAddress, getCustomerAddress, getCustomerAddressId } = getters;
 	const isStore = getters.getFlagPickUp === waysDeliveries.store.value;
 	const storeAddress = isStore ? getDeliveryAddress : null;
@@ -163,7 +164,7 @@ function buildOrderBody(flagFinish, getters) {
 		customerAddress: getCustomerAddressId || isStore ? null : getCustomerAddress,
 		customerBill: getters.getFlagBill ? getters.getBillingData : null,
 		deliveryAddress,
-		details: getOrderDetails(getters.getOrderDetails, id, name),
+		details: getOrderDetails(getters.getOrderDetails, id, name, salPriceListId),
 		flagPickUp: getters.getFlagPickUp,
 		responsiblePickUp: getters.getResponsible,
 		warehouseId: id,
@@ -189,7 +190,7 @@ function buildOrderBody(flagFinish, getters) {
 	return body;
 }
 
-function getOrderDetails(products, warehouseId, warehouseName) {
+function getOrderDetails(products, warehouseId, warehouseName, salPriceListId) {
 	return products.map((p) => {
 		const { taxes, conversions } = p;
 		const extractConversions = conversions ? Object.values(conversions) : null;
@@ -214,6 +215,7 @@ function getOrderDetails(products, warehouseId, warehouseName) {
 			productId: p.productId || p.id,
 			productImage: p.urlImage || p.productImage,
 			productName: p.name || p.productName,
+			priceList: p.priceList[salPriceListId] || null,
 			quantity: p.quantity,
 			salePrice:  p.wholeSalePrice && p.wholeSalePrice.length > 0 &&
 			Number(p.quantity) >= p.wholeSalePrice[0].from &&

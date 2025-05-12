@@ -64,45 +64,50 @@ export default {
 		...mapGetters('loading', ['isLoading']),
 		productTypeService,
 		editNumber() {
-			const array = Object.entries(this.product.priceList).map(
-				([
-					id,
-					{
-						price = 0,
-						taxes = 0,
-						discount = 0,
-						unitPrice = 0,
-						ranges = [],
-						units = {},
-					},
-				]) => ({
-					id,
-					price,
-					taxes,
-					discount,
-					unitPrice,
-					ranges,
-					units: Object.entries(units).map(([unitId, unit = {}]) => ({
-						id: unitId,
-						price: unit.price || 0,
-						taxes: unit.taxes || 0,
-						ranges: unit.ranges || [],
-						discount: unit.discount || 0,
-						unitPrice: unit.unitPrice || 0,
-					})),
-				}),
-			);
-			const priceList =
-				array.find(obj => Number(obj.id) === this.unit.id) ||
-				array
-					.map(obj => obj.units.find(unit => Number(unit.id) === this.unit.id))
-					.find(unit => unit);
-			const validate = priceList || array[0];
-			return Boolean(
-				validate &&
-					validate.ranges.length &&
-					validate.ranges.some(range => range.to !== 0 || range.price !== 0),
-			);
+			if (this.product.priceList) {
+				const array = Object.entries(this.product.priceList).map(
+					([
+						id,
+						{
+							price = 0,
+							taxes = 0,
+							discount = 0,
+							unitPrice = 0,
+							ranges = [],
+							units = {},
+						},
+					]) => ({
+						id,
+						price,
+						taxes,
+						discount,
+						unitPrice,
+						ranges,
+						units: Object.entries(units).map(([unitId, unit = {}]) => ({
+							id: unitId,
+							price: unit.price || 0,
+							taxes: unit.taxes || 0,
+							ranges: unit.ranges || [],
+							discount: unit.discount || 0,
+							unitPrice: unit.unitPrice || 0,
+						})),
+					}),
+				);
+				const priceList =
+					array.find(obj => Number(obj.id) === this.unit.id) ||
+					array
+						.map(obj =>
+							obj.units.find(unit => Number(unit.id) === this.unit.id),
+						)
+						.find(unit => unit);
+				const validate = priceList || array[0];
+				return Boolean(
+					validate &&
+						validate.ranges.length &&
+						validate.ranges.some(range => range.to !== 0 || range.price !== 0),
+				);
+			}
+			return false;
 		},
 	},
 	methods: {
