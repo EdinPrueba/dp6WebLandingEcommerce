@@ -98,21 +98,24 @@
 								alt="imagen del product"
 							/>
 						</div>
-						<div v-if="!indeterminate" class="bottom-position">
-							<!-- <quantityButton
-								class="continer-quantity-button"
+						<div v-if="!indeterminate">
+							<div class="bottom-position" v-if="addQuantity">
+								<addcar-component
+									:disabled-add="disabledAdd"
+									active
+									@add-car="eventAddQuantity"
+									:class="{ outstock: noStock }"
+								/>
+							</div>
+							<quantityButton
+								v-else
+								class="mt-3"
+								isEditNumber
 								:number="quantityAddProduct"
 								:product="product"
 								:max-quantity="maxQuantity"
 								@input="inputQuantity"
 								@click="clickQuantity"
-							/> -->
-							<addcar-component
-								:disabled-add="disabledAdd"
-								active
-								@add-car="selectUnitCar"
-								@remove-car="removeProductFromCar"
-								:class="{ outstock: noStock }"
 							/>
 						</div>
 						<div class="product-description-wrapper">
@@ -197,7 +200,7 @@
 						{{
 							item.quantity
 								? item.quantity * product.originalPrice
-								: product.originalPrice
+								: product.originalPrice | currencyFormat
 						}}
 					</v-btn>
 				</div>
@@ -238,7 +241,7 @@ function addToCar(unit) {
 
 	if (!this.noStock) {
 		this.showAdd = true;
-		this.quantityAddProduct += 1;
+		// this.quantityAddProduct += 1;
 		const productSelected = this.product;
 		// const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
 		// productSelected.unitSelected = this.product.unitId;
@@ -266,6 +269,7 @@ function addToCar(unit) {
 			productSelected.priceDiscount =
 				this.product.originalPrice * (unit.quantity || 1);
 		}
+		productSelected.quantity = this.quantityAddProduct;
 		this.showNotification(
 			`${this.product.name}(${
 				unit ? unit.name : this.product.unit.name
@@ -275,23 +279,8 @@ function addToCar(unit) {
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
 		this.showViewProduct = true;
+		this.quantityAddProduct = 1;
 	}
-}
-
-function removeProductFromCar() {
-	this.quantityAddProduct -= 1;
-	this.disabledAdd = !(this.quantityAddProduct < this.product.stockWarehouse);
-	if (this.quantityAddProduct < this.product.stockWarehouse) {
-		this.showNotStock = false;
-		this.showAdd = false;
-	}
-	const productsSelected =
-		JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
-	const product = productsSelected.find(p => p.id === this.product.id);
-	if (product && product.quantity < 2) {
-		this.showAdd = false;
-	}
-	this.$store.dispatch('removeProductToBuyCar', this.product);
 }
 
 function productFavo() {
@@ -411,6 +400,7 @@ function getWholeSalePrice() {
 
 function data() {
 	return {
+		addQuantity: true,
 		disabledAdd: false,
 		x: 0,
 		y: 0,
@@ -461,21 +451,34 @@ export default {
 		onCard,
 		productFavo,
 		addToCar,
-		removeProductFromCar,
 		getWholeSalePrice,
 		goToCategories,
 		inputQuantity(value) {
 			this.quantityAddProduct = Number(value);
-			this.clickQuantity();
 		},
 		clickQuantity(val) {
-			if (val) {
-				this.opt = {
-					more: 1,
-					less: -1,
-				};
-				this.quantityAddProduct += this.opt[val];
+			if (val === 'more') {
+				this.selectUnitCar();
+			} else {
+				this.removeProductFromCar();
 			}
+		},
+		removeProductFromCar() {
+			this.disabledAdd = !(
+				this.quantityAddProduct < this.product.stockWarehouse
+			);
+			if (this.quantityAddProduct < this.product.stockWarehouse) {
+				this.showNotStock = false;
+				this.showAdd = false;
+			}
+			const productsSelected =
+				JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
+			const product = productsSelected.find(p => p.id === this.product.id);
+			if (product && product.quantity < 2) {
+				this.showAdd = false;
+			}
+			this.product.quantity = this.quantityAddProduct;
+			this.$store.dispatch('removeProductToBuyCar', this.product);
 		},
 		handleImageError(event) {
 			const target = event.target;
@@ -519,6 +522,9 @@ export default {
 			} else {
 				this.addToCar();
 			}
+		},
+		eventAddQuantity() {
+			this.addQuantity = !this.addQuantity;
 		},
 	},
 	created,
@@ -574,6 +580,10 @@ export default {
 		bottom: 3px;
 		right: 0;
 	}
+
+	@media (max-width: 600px) {
+		width: 0;
+	}
 }
 
 .column-custom {
@@ -598,13 +608,12 @@ export default {
 	}
 
 	@media (max-width: 600px) {
-		bottom: auto;
-		top: 51%;
+		top: 89%;
 	}
 
 	@media (min-width: 600px) {
 		bottom: auto;
-		top: 156px;
+		top: 99%;
 	}
 }
 
@@ -886,12 +895,12 @@ export default {
 	position: absolute;
 
 	@media (min-width: 1024px) {
-		bottom: 95px;
+		bottom: 41%;
 	}
 
 	@media (max-width: 600px) {
 		bottom: auto;
-		top: 44%;
+		top: 52%;
 	}
 }
 .show-agot {
@@ -905,7 +914,12 @@ export default {
 	position: absolute;
 
 	@media (min-width: 1024px) {
-		bottom: 125px;
+		bottom: 50%;
+	}
+
+	@media (max-width: 600px) {
+		bottom: auto;
+		top: 44%;
 	}
 }
 

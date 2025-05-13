@@ -208,7 +208,6 @@ function addToCar() {
 		);
 		return;
 	}
-	console.log(this.data);
 	if (!this.noStock) {
 		this.$store.dispatch('addProductToBuyCar', this.data);
 		this.$emit('open-confirm-modal');
