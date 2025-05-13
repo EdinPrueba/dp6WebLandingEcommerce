@@ -93,6 +93,8 @@ export default {
 	computed: {
 		...mapGetters(['getCurrencySymbol', 'getTotalToBuy']),
 		getPrice() {
+			const price =
+				Number(this.product.quantity) * Number(this.product.priceDiscount);
 			const priceList = this.product.priceList
 				? Object.values(this.product.priceList)
 				: null;
@@ -100,9 +102,9 @@ export default {
 				const range = priceList[0].ranges.find(
 					r => this.product.quantity >= r.from && this.product.quantity <= r.to,
 				);
-				return range.price;
+				return range ? range.price : price;
 			}
-			return Number(this.product.quantity) * Number(this.product.priceDiscount);
+			return price;
 		},
 	},
 	methods: {
