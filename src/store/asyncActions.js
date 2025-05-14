@@ -47,7 +47,7 @@ const asyncActions = {
 				originalPrice = (1 - (discount / 100)) * el.price;
 			}
 
-			return ({ ...el, originalPrice });
+			return ({ ...el, originalPrice, unitDefault: el.unit });
 		});
 
 		const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];

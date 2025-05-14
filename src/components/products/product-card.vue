@@ -263,7 +263,7 @@ function addToCar(unit) {
 		}
 		this.showNotification(
 			`${this.product.name}(${
-				unit ? unit.name : this.product.unit.name
+				unit ? unit.name : this.product.unitDefault.name
 			}) agregado exitosamente`,
 			'success',
 			null,
@@ -490,7 +490,7 @@ export default {
 				);
 				if (this.conversionsProducts.length) {
 					this.showViewProduct = !this.showViewProduct;
-					this.conversionsProducts.unshift(this.product.unit);
+					this.conversionsProducts.unshift(this.product.unitDefault);
 				} else {
 					this.addToCar();
 				}
