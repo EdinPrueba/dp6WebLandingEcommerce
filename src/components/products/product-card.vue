@@ -186,7 +186,7 @@
 			</div>
 		</div>
 		<div class="select-presentation" v-else>
-			<v-icon class="icon-close" @click="selectUnitCar">close</v-icon>
+			<v-icon class="icon-close" @click="closeViewProduct">close</v-icon>
 			<div class="content-conversions">
 				<span class="title">Seleccione la presentación que desea añadir:</span>
 				<div class="button-container">
@@ -280,7 +280,7 @@ function addToCar(unit, show) {
 			null,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
-		this.quantityAddProduct = 1;
+		// this.quantityAddProduct = 1;
 	}
 }
 
@@ -459,6 +459,7 @@ export default {
 		},
 		clickQuantity(val) {
 			if (val === 'more') {
+				this.quantityAddProduct += 1;
 				this.addToCar();
 			} else {
 				this.removeProductFromCar();
@@ -526,6 +527,9 @@ export default {
 		eventAddQuantity() {
 			this.showViewProduct = false;
 			this.selectUnitCar();
+		},
+		closeViewProduct() {
+			this.showViewProduct = true;
 		},
 	},
 	created,
