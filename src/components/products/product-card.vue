@@ -99,7 +99,7 @@
 							/>
 						</div>
 						<div v-if="!indeterminate">
-							<div class="bottom-position" v-if="addQuantity">
+							<div class="bottom-position mt-2" v-if="addQuantity">
 								<addcar-component
 									:disabled-add="disabledAdd"
 									active
@@ -194,7 +194,7 @@
 						v-for="item in conversionsProducts"
 						:key="item.id"
 						class="btn-conversions"
-						@click="addToCar(item)"
+						@click="addToCar(item, false)"
 					>
 						{{ item.name }} - {{ getCurrencySymbol }}
 						{{
@@ -229,7 +229,8 @@ function mounted() {
 	this.WholeSalePrice = this.getWholeSalePrice();
 }
 
-function addToCar(unit) {
+function addToCar(unit, show) {
+	this.showViewProduct = !show;
 	if (this.product.priceDiscount <= 0) {
 		this.showNotification(
 			'El producto no se puede agregar al carrito, porque su precio es 0.',
@@ -252,7 +253,7 @@ function addToCar(unit) {
 		// const { units } = priceList;
 		// const rightRanges = units[productSelected.unitSelected];
 		// const { ranges } = rightRanges || priceList;
-		productSelected.unitSelected = unit ? unit.id : this.product.unitId;
+		productSelected.unitSelected = unit ? unit.id : this.product.unit.id;
 		productSelected.wholeSalePrice = this.WholeSalePrice || [];
 		productSelected.priceDiscountOrigin = this.product.priceDiscount || 0;
 		const StockSoldOut =
@@ -270,15 +271,15 @@ function addToCar(unit) {
 				this.product.originalPrice * (unit.quantity || 1);
 		}
 		productSelected.quantity = this.quantityAddProduct;
+		const unitDef = unit || productSelected.unit;
 		this.showNotification(
 			`${this.product.name}(${
-				unit ? unit.name : this.product.unit.name
+				unitDef ? unitDef.name : this.product.unitDefault.name
 			}) agregado exitosamente`,
 			'success',
 			null,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
-		this.showViewProduct = true;
 		this.quantityAddProduct = 1;
 	}
 }
@@ -458,7 +459,7 @@ export default {
 		},
 		clickQuantity(val) {
 			if (val === 'more') {
-				this.selectUnitCar();
+				this.addToCar();
 			} else {
 				this.removeProductFromCar();
 			}
@@ -512,19 +513,19 @@ export default {
 						...this.product.conversions[key],
 					}),
 				);
-
 				if (this.conversionsProducts.length) {
-					this.showViewProduct = !this.showViewProduct;
-					this.conversionsProducts.unshift(this.product.unit);
+					this.conversionsProducts.unshift(this.product.unitDefault);
 				} else {
 					this.addToCar();
 				}
+				this.addQuantity = !this.addQuantity;
 			} else {
 				this.addToCar();
 			}
 		},
 		eventAddQuantity() {
-			this.addQuantity = !this.addQuantity;
+			this.showViewProduct = false;
+			this.selectUnitCar();
 		},
 	},
 	created,
@@ -557,12 +558,13 @@ export default {
 		box-shadow: 0 2px 2px 0 rgba(31, 26, 26, 0.07);
 		border: 1px solid color(border);
 		border-radius: 5px;
-		height: 360px;
+		height: 375px;
 		margin: 3px auto !important;
 		width: 100%;
 	}
 	@media screen and (max-width: 600px) {
 		padding: 0 5px;
+		height: 380px;
 	}
 
 	&.small {
@@ -608,12 +610,11 @@ export default {
 	}
 
 	@media (max-width: 600px) {
-		top: 89%;
+		top: 3%;
 	}
 
 	@media (min-width: 600px) {
-		bottom: auto;
-		top: 99%;
+		top: 2%;
 	}
 }
 
@@ -677,19 +678,16 @@ export default {
 	flex-direction: column;
 	display: flex;
 	justify-content: center;
-	margin: 0 0;
 	padding: 1em 0;
 	text-align: center;
 
 	.product-content-img {
+		margin-top: 6px;
 		height: 190px;
 		width: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-	div {
-		margin: 0 10px;
 	}
 
 	@media (min-width: 600px) {
@@ -719,18 +717,13 @@ export default {
 	max-width: 100%;
 }
 
-.product-name {
-	width: 189px;
-}
-
 .product-name,
 .product-description {
 	color: color(dark);
 	font-size: size(small);
 	font-family: font(regular);
-	max-height: auto;
 	margin: 0 auto 8px;
-	// max-width: 150px;
+	width: 80%;
 	overflow: visible;
 	text-overflow: ellipsis;
 	text-transform: capitalize;
