@@ -263,12 +263,21 @@ function addToCar(unit, show) {
 		if (StockSoldOut) {
 			this.showNotStock = true;
 		}
+		const ecommerce =
+			JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+		const defaultIdPiceList = ecommerce.settings.salPriceListId;
+		const priceList = this.product.priceList[defaultIdPiceList];
+		const unitList = priceList && unit && priceList.units[unit.id];
 		if (unit) {
 			productSelected.unit = { ...unit, isSelected: false };
 			productSelected.priceDiscountOrigin =
-				this.product.originalPrice * (unit.quantity || 1);
+				unitList && unitList.price
+					? unitList.price
+					: this.product.originalPrice * (unit.quantity || 1);
 			productSelected.priceDiscount =
-				this.product.originalPrice * (unit.quantity || 1);
+				unitList && unitList.price
+					? unitList.price
+					: this.product.originalPrice * (unit.quantity || 1);
 		}
 		const { stock, stockWarehouse, stockComposite } = productSelected;
 		const finalStock = helper.isComposed(productSelected)
@@ -488,9 +497,7 @@ export default {
 			const productsSelected =
 				JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
 			const product = productsSelected.find(p => p.id === this.product.id);
-			if (product && product.quantity < 2) {
-				this.showAdd = false;
-			}
+			this.showAdd = !(product && product.quantity < 2);
 			this.product.quantity = this.quantityAddProduct;
 			this.$store.dispatch('removeProductToBuyCar', this.product);
 		},
