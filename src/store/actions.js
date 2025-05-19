@@ -46,8 +46,7 @@ function addProductToBuyCar(context, product) {
 		const { stock, stockWarehouse, stockComposite } = currentProduct;
 		const finalStock = helper.isComposed(currentProduct) ?
 			stockComposite : (stockWarehouse || stock);
-		console.log('finalStock', finalStock);
-		let quantity = currentProduct.quantity + newProduct.quantity;
+		let quantity = newProduct.quantity;
 		quantity = finalStock > quantity || allowOrderStockNegative ? quantity : finalStock;
 		productsSelected[index].quantity = quantity;
 

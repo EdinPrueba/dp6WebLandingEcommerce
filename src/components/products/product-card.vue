@@ -270,13 +270,25 @@ function addToCar(unit, show) {
 			productSelected.priceDiscount =
 				this.product.originalPrice * (unit.quantity || 1);
 		}
-		productSelected.quantity = this.quantityAddProduct;
+		const { stock, stockWarehouse, stockComposite } = productSelected;
+		const finalStock = helper.isComposed(productSelected)
+			? stockComposite
+			: stockWarehouse || stock;
+		const validate =
+			finalStock >= this.quantityAddProduct || this.$allowOrderStockNegative;
+		const quantity = validate ? this.quantityAddProduct : finalStock;
+		this.quantityAddProduct = quantity;
+		productSelected.quantity = quantity;
 		const unitDef = unit || productSelected.unit;
+		const message = validate
+			? 'agregado exitosamente'
+			: 'ya no cuenta con stock';
+		const color = validate ? 'success' : 'error';
 		this.showNotification(
 			`${this.product.name}(${
 				unitDef ? unitDef.name : this.product.unitDefault.name
-			}) agregado exitosamente`,
-			'success',
+			}) ${message}`,
+			`${color}`,
 			null,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
@@ -469,7 +481,7 @@ export default {
 			this.disabledAdd = !(
 				this.quantityAddProduct < this.product.stockWarehouse
 			);
-			if (this.quantityAddProduct < this.product.stockWarehouse) {
+			if (this.quantityAddProduct <= this.product.stockWarehouse) {
 				this.showNotStock = false;
 				this.showAdd = false;
 			}
@@ -508,6 +520,7 @@ export default {
 				this.product.conversions &&
 				typeof this.product.conversions === 'object'
 			) {
+				this.showViewProduct = false;
 				this.conversionsProducts = Object.keys(this.product.conversions).map(
 					key => ({
 						id: key,
@@ -521,11 +534,11 @@ export default {
 				}
 				this.addQuantity = !this.addQuantity;
 			} else {
+				this.addQuantity = !this.addQuantity;
 				this.addToCar();
 			}
 		},
 		eventAddQuantity() {
-			this.showViewProduct = false;
 			this.selectUnitCar();
 		},
 		closeViewProduct() {
