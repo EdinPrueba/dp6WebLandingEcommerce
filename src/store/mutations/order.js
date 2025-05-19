@@ -49,10 +49,9 @@ const orderMutation = {
 		const newPrice = h.getPriceByRange({
 			ranges,
 			quantity: products[index].quantity,
-			originalPrice: products[index].originalPrice
-				|| products[index].priceDiscountOrigin,
+			originalPrice: products[index].priceDiscountOrigin
+				|| products[index].originalPrice,
 		});
-
 		products[index].priceDiscount = newPrice;
 		Vue.set(state.order, 'products', [...products]);
 		localStorage.setItem('ecommerce::product-select', JSON.stringify([...products]));

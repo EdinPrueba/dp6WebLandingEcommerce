@@ -54,8 +54,8 @@ function addProductToBuyCar(context, product) {
 		const newPrice = helper.getPriceByRange({
 			ranges,
 			quantity: productsSelected[index].quantity,
-			originalPrice: productsSelected[index].originalPrice
-				|| productsSelected[index].priceDiscountOrigin,
+			originalPrice: productsSelected[index].priceDiscountOrigin
+				|| productsSelected[index].originalPrice,
 		});
 
 		productsSelected[index].priceDiscount = newPrice;
