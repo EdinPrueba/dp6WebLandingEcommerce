@@ -119,13 +119,11 @@
 							/>
 						</div>
 						<div class="product-description-wrapper">
-							<p
-								class="mb-1"
-								@click="goToProduct(product)"
-								:class="[indeterminate ? 'loading text-field' : 'product-name']"
-							>
-								{{ product.name }}
-							</p>
+							{{
+								product.name.length > 60
+									? product.name.slice(0, 60) + '...'
+									: product.name
+							}}
 							<!--span
 							v-if="product.description"
 							:class="[
