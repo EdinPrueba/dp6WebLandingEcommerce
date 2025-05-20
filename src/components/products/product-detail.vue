@@ -319,11 +319,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.mobile {
-	@media (max-width: 600px) {
-		display: none;
-	}
-}
 .product-detail-name {
 	color: color(black);
 	font-family: font(demi);
