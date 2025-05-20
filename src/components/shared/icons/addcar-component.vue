@@ -1,11 +1,31 @@
 <template>
-<div class="cart-continer">
-	<v-btn :style="activeStyle" class="btn-add-cart" depressed small type="button" @click="removeCarEvent"><span class="txt-icon-min"></span></v-btn>
-	<!-- <button :style="activeStyle" class="btn-add-cart" @click="removeCarEvent"> <span class="txt-icon-min"></span></button> -->
-	<v-btn :style="activeStyle" depressed small type="button" class="btn-add-cart" @click="addCarEvent"><span class="txt-icon-plus"> + </span></v-btn>
-	<!-- <button :style="activeStyle" class="btn-add-cart" @click="addCarEvent"> <span class="txt-icon-plus"> + </span></button> -->
-</div>
-	
+	<div class="cart-continer">
+		<!-- <v-btn
+			:style="activeStyle"
+			class="btn-add-cart"
+			depressed
+			small
+			type="button"
+			@click="removeCarEvent"
+			><span class="txt-icon-min"></span
+		></v-btn> -->
+		<!-- <button :style="activeStyle" class="btn-add-cart" @click="removeCarEvent"> <span class="txt-icon-min"></span></button> -->
+		<!-- <v-btn
+			:style="activeStyle"
+			depressed
+			small
+			type="button"
+			class="btn-add-cart"
+			@click="addCarEvent"
+			><span class="txt-icon-plus"> + </span></v-btn
+		> -->
+		<!-- <button :style="activeStyle" class="btn-add-cart" @click="addCarEvent"> <span class="txt-icon-plus"> + </span></button> -->
+
+		<v-btn color="primary" @click="addCarEvent">
+			Añadir al carrito
+			<v-icon class="ml-2" size="20" color="#ffff">shopping_cart</v-icon>
+		</v-btn>
+	</div>
 </template>
 <script>
 import { mapGetters } from 'vuex';
@@ -21,7 +41,9 @@ function removeCarEvent($event) {
 }
 
 function activeStyle() {
-	const bgColor = `background-color:${this.active ? this.globalColors.primary : 'white'};`;
+	const bgColor = `background-color:${
+		this.active ? this.globalColors.primary : 'white'
+	};`;
 	// const borderColor = `border:1px solid ${this.globalColors.primary};`;
 	const color = `color:${this.active ? 'white' : this.globalColors.primary};`;
 	return `${bgColor}${color}`;
@@ -30,9 +52,7 @@ function activeStyle() {
 export default {
 	name: 'addcar-component',
 	computed: {
-		...mapGetters([
-			'indeterminate',
-		]),
+		...mapGetters(['indeterminate']),
 		activeStyle,
 	},
 	methods: {
@@ -53,63 +73,61 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.btn-add-cart {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background-color: color(primary);
-		border-radius: 100% !important;
+.btn-add-cart {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: color(primary);
+	border-radius: 100% !important;
+	height: 32px !important;
+	margin: 8px;
+	min-width: 32px !important;
+
+	@media screen and (max-width: 600px) {
 		height: 32px !important;
-		margin: 8px;
 		min-width: 32px !important;
-
-		@media screen and (max-width: 600px) {
-			height: 32px !important;
-			min-width: 32px !important;
-		}
-		@media screen and (max-width: 400px) {
-			height: 28px !important;
-			min-width: 28px !important;
-		}
 	}
-	.txt-icon-plus{
-		display: flex;
-		height:100%;
-		width:100%;
-		justify-content: center;
-		align-items: center;
-		font-size: 24px;
-		font-weight: bold;
-		color: color(white);
-		@media screen and (max-width: 600px) {
-			font-size: 20px;
-		}
-		@media screen and (max-width: 400px) {
-			font-size: 18px;
-		}
+	@media screen and (max-width: 400px) {
+		height: 28px !important;
+		min-width: 28px !important;
 	}
-	.txt-icon-min{
-		background-color: color(white);
-		height:4px;
-		width:12px;
-		justify-content: center;
-		align-items: center;
-		font-weight: bold;
-		color: color(white);
-		@media screen and (max-width: 600px) {
-			height:4px;
-			width:11px;
-		}
-		@media screen and (max-width: 400px) {
-			height:3px;
-			width:10px;
-		}
-		
+}
+.txt-icon-plus {
+	display: flex;
+	height: 100%;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	font-size: 24px;
+	font-weight: bold;
+	color: color(white);
+	@media screen and (max-width: 600px) {
+		font-size: 20px;
 	}
-	.cart-continer {
-		align-items: center;
-		justify-content: center;
-		display: flex;
+	@media screen and (max-width: 400px) {
+		font-size: 18px;
 	}
+}
+.txt-icon-min {
+	background-color: color(white);
+	height: 4px;
+	width: 12px;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+	color: color(white);
+	@media screen and (max-width: 600px) {
+		height: 4px;
+		width: 11px;
+	}
+	@media screen and (max-width: 400px) {
+		height: 3px;
+		width: 10px;
+	}
+}
+.cart-continer {
+	align-items: center;
+	justify-content: center;
+	display: flex;
+}
 </style>
-

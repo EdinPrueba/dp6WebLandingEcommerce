@@ -1,5 +1,5 @@
 <template>
-  <header class="app-header">
+	<header class="app-header">
 		<div class="app-wrapper">
 			<div class="flex container-call-menu">
 				<call-menu
@@ -8,69 +8,61 @@
 					:menu="menu"
 					@change-menu="changeMenu"
 				/>
-			</div>		
+			</div>
 			<div class="flex container-header-logo">
 				<h1
 					:class="[
 						'app-header-logo',
 						{ 'hide-logo': isSearchMobile },
-						{ 'loading': indeterminate },
+						{ loading: indeterminate },
 					]"
 				>
 					<!-- <router-link to="/" class="link-logo" v-if="!indeterminate"> -->
-						<img
-							v-if="logo.urlImage"
-							:src="logo.urlImage"
-							alt="Logo de compañía"
-							class="logo-image"
-							@error="handleImageError"
-							@click="goToHome()"
-						/>
+					<img
+						v-if="logo.urlImage"
+						:src="logo.urlImage"
+						alt="Logo de compañía"
+						class="logo-image"
+						@error="handleImageError"
+						@click="goToHome()"
+					/>
 					<!-- </router-link> -->
 				</h1>
-				<div 
+				<div
 					class="container-search flex"
-					:class="isSearchMobile ? 'open' : null">
-					<app-search 
+					:class="isSearchMobile ? 'open' : null"
+				>
+					<app-search
 						image="/static/img/search.svg"
 						color="#4a4a4a"
-						@search="searchProduct"/>
-					<button-image 
-						:data="close" 
+						@search="searchProduct"
+					/>
+					<button-image
+						:data="close"
 						class="icon-close"
-						@click-image="toogleSearch"/>
+						@click-image="toogleSearch"
+					/>
 				</div>
 			</div>
 			<div
 				data-cy="loginBtn"
 				class="flex container-button-image align-center"
-				:class="{'opacity' : isSearchMobile}">
-				<button
-					class="icon-mobile"
-					@click="toogleSearch"
-				>
-					<SearchIcon v-if="!indeterminate"/>
+				:class="{ opacity: isSearchMobile }"
+			>
+				<button class="icon-mobile" @click="toogleSearch">
+					<SearchIcon v-if="!indeterminate" />
 				</button>
-				<UserSvg
-					class="icon-desktop"
-					@click="openModalLogin"
-				/>
-				<button 
-					class="icon-mobile" 
-					@click="goToFavorites">
-					<UserSvg
-						@click="openModalLogin"
-					/>
+				<UserSvg class="icon-desktop" @click="openModalLogin" />
+				<button class="icon-mobile" @click="goToFavorites">
+					<UserSvg @click="openModalLogin" />
 				</button>
-					<button 
-					class="icon-desktop" 
-					@click="goToFavorites">
-					<HeartComponent @click="goToFavorites"/>
+				<button class="icon-desktop" @click="goToFavorites">
+					<HeartComponent @click="goToFavorites" />
 				</button>
-				<CarComponent @click="goShopping" :count="getTotalItems"/>
+				<CarComponent @click="goShopping" :count="getTotalItems" />
 			</div>
 		</div>
-		<modal-login 
+		<modal-login
 			class="app-modal-login"
 			v-show="showLoginModal"
 			@close-modal="closeModal"
@@ -90,7 +82,9 @@ import SearchIcon from '@/components/shared/icons/search-component';
 import helper from '@/shared/helper';
 
 function mounted() {
-	const ls = this.getLocalStorage(`${process.env.STORAGE_USER_KEY}::product-select`);
+	const ls = this.getLocalStorage(
+		`${process.env.STORAGE_USER_KEY}::product-select`,
+	);
 	this.$store.dispatch('updateProductSelect', ls);
 }
 
@@ -124,7 +118,10 @@ function getData($event) {
 
 function searchProduct(value) {
 	const search = value.trim() ? value : null;
-	const filterId = this.getFilters.length > 0 ? this.getFilters[0].id : null;
+	const filterId =
+		this.getFilters && this.getFilters.length > 0
+			? this.getFilters[0].id
+			: null;
 	const id = search ? null : filterId;
 	if (!search || this.productParams.search !== search) {
 		this.$store.dispatch('START_PAGINATION');
@@ -150,12 +147,14 @@ function searchProduct(value) {
 }
 
 function updateFilter(id) {
-	const filters = this.getFilters.map((f) => {
-		const newFilter = { ...f };
-		newFilter.select = f.id === id;
-		return newFilter;
-	});
-	this.$store.dispatch('updateFilters', filters);
+	if (this.getFilters) {
+		const filters = this.getFilters.map(f => {
+			const newFilter = { ...f };
+			newFilter.select = f.id === id;
+			return newFilter;
+		});
+		this.$store.dispatch('updateFilters', filters);
+	}
 }
 
 function goShopping() {
@@ -228,7 +227,6 @@ export default {
 			'getTotalQuantityProducts',
 			'indeterminate',
 			'productParams',
-
 		]),
 		...mapState({
 			showLoginModal: state => state.openSignInModal,
@@ -274,170 +272,167 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.app-header {
-		background: color(white);
-		box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.11);box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.11);
-		display: flex;
-		height: inherit;
-		overflow: hidden;
+.app-header {
+	background: color(white);
+	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.11);
+	box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.11);
+	display: flex;
+	height: inherit;
+	overflow: hidden;
+	padding: 0px 6%;
+	position: sticky;
+	top: 0;
+	transition: all 0.2s linear 0s;
+	width: 100vw;
+	z-index: 5;
+
+	@media (min-width: 768px) {
+		height: 99px;
+		overflow: inherit;
 		padding: 0px 6%;
-		position: sticky;
-		top: 0;
-		transition: all .2s linear 0s;
-		width: 100vw;
-		z-index: 5;
-
-		@media (min-width: 768px) {
-			height: 99px;
-			overflow: inherit;
-			padding: 0px 6%;
-		}
 	}
+}
 
-	.app-wrapper {
-		align-items: center;
-		display: flex;
-		height: 75px;
-		position: relative;
-		width: 100%;
+.app-wrapper {
+	align-items: center;
+	display: flex;
+	height: 75px;
+	position: relative;
+	width: 100%;
 
-		@media (min-width: 768px) {
-			height: 95px;
-		}
+	@media (min-width: 768px) {
+		height: 95px;
 	}
+}
 
-	.flex {
-		display: flex;
-	}
+.flex {
+	display: flex;
+}
 
-	.container-call-menu {
-		align-items: center;
-		border-right: 1px solid color(border);
-		flex: 1 1 10%;
+.container-call-menu {
+	align-items: center;
+	border-right: 1px solid color(border);
+	flex: 1 1 10%;
+	justify-content: center;
+}
+
+.container-header-logo {
+	align-items: center;
+	flex: 1 0 40%;
+	height: inherit;
+	padding: 1.5rem 0;
+
+	@media (max-width: 764px) {
 		justify-content: center;
+		padding: 5px 1px;
+	}
+}
 
-		
+.container-button-image {
+	flex: 1 1 20%;
+	justify-content: flex-end;
+
+	& > button,
+	div {
+		margin-left: 20px;
 	}
 
-	.container-header-logo {
-		align-items: center;
-		flex: 1 0 40%;
-		height: inherit;
-		padding: 1.5rem 0;
+	@media (max-width: 764px) {
+		justify-content: space-between;
 
-		@media (max-width: 764px) {
-			justify-content: center;
-			padding: 5px 1px;
+		&.opacity {
+			opacity: 0;
 		}
 	}
+}
 
-	.container-button-image {
-		flex: 1 1 20%;
-		justify-content: flex-end;
-
-		& > button, div {
-			margin-left: 20px;
-		}
-
-		@media (max-width: 764px) {
-			justify-content: space-between;
-
-			&.opacity {
-				opacity: 0;
-			}
-		}
+.app-header-logo {
+	height: 100%;
+	margin: 0 1rem;
+	@media (max-width: 768px) {
+		flex-basis: 64%;
+		transform: translateX(0);
+		transition: transform 220ms ease-out;
 	}
+}
 
-	.app-header-logo {
-		height: 100%;
-		margin: 0 1rem;
-		@media (max-width: 768px) {
-			flex-basis: 64%;
-			transform: translateX(0);
-			transition: transform 220ms ease-out;
-		}
+.hide-logo {
+	@media (max-width: 768px) {
+		transform: translateX(-200%);
 	}
+}
 
-	.hide-logo {
+.icon-medium {
+	margin: 0 25px;
+}
 
-		@media (max-width: 768px) {
-			transform: translateX(-200%);
-		}
-	}
+.container-search {
+	align-items: center;
+	background: color(white);
+	flex-basis: 70%;
+	transition: 0.3s ease-in-out;
+	width: 100%;
+	z-index: 1;
 
-	.icon-medium {
-		margin: 0 25px;
-	}
-
-	.container-search {
-		align-items: center;
-		background: color(white);
-		flex-basis: 70%;
-		transition: .3s ease-in-out;
-		width: 100%;
-		z-index: 1;
-
-		@media (max-width: 764px) {
-			left: 110%;
-			position: absolute;
-			display: none;
-			&.open {
-				left: 0;
-				display: flex;
-			}
-		}
-	}
-
-	.icon-close {
-		display: none;
-
-		@media (max-width: 764px) {
-			display: block;
-			margin-left: 11px;
-		}
-	}
-
-	.icon-mobile {
-		display: none;
-
-		@media (max-width: 764px) {
-			align-items: center;
-			display: flex;
-			justify-content: center;
-			height: 25px;
-			margin-top: 5px;
-			width: auto;
-		}
-	}
-
-	.icon-desktop {
-		display: block;
-
-		@media (max-width: 764px) {
-			display: none;
-		}
-	}
-
-	.logo-image {
-		height: 67px;
-		object-fit: contain;
-		width: 145px;
-	}
-
-	.app-modal-login {
+	@media (max-width: 764px) {
+		left: 110%;
 		position: absolute;
-		right: calc(6% + 85px);
-		top: 70px;
-		z-index: 6;
-
-		@media (max-width: 764px) {
-			display: none !important;
+		display: none;
+		&.open {
+			left: 0;
+			display: flex;
 		}
 	}
+}
 
-	.align-center {
-		align-items: center;
+.icon-close {
+	display: none;
+
+	@media (max-width: 764px) {
+		display: block;
+		margin-left: 11px;
 	}
+}
+
+.icon-mobile {
+	display: none;
+
+	@media (max-width: 764px) {
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		height: 25px;
+		margin-top: 5px;
+		width: auto;
+	}
+}
+
+.icon-desktop {
+	display: block;
+
+	@media (max-width: 764px) {
+		display: none;
+	}
+}
+
+.logo-image {
+	height: 67px;
+	object-fit: contain;
+	width: 145px;
+}
+
+.app-modal-login {
+	position: absolute;
+	right: calc(6% + 85px);
+	top: 70px;
+	z-index: 6;
+
+	@media (max-width: 764px) {
+		display: none !important;
+	}
+}
+
+.align-center {
+	align-items: center;
+}
 </style>
-
-

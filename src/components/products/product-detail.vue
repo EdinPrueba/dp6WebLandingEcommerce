@@ -208,7 +208,6 @@ function addToCar() {
 		);
 		return;
 	}
-	console.log(this.data);
 	if (!this.noStock) {
 		this.$store.dispatch('addProductToBuyCar', this.data);
 		this.$emit('open-confirm-modal');
@@ -320,11 +319,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.mobile {
-	@media (max-width: 600px) {
-		display: none;
-	}
-}
 .product-detail-name {
 	color: color(black);
 	font-family: font(demi);

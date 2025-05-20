@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<section
-			v-if="products.length > 0"
+			v-if="products.length"
 			class="product-section transition-product-section"
 			data-cy="productsSection"
 		>
@@ -92,19 +92,17 @@ export default {
 }
 
 .product-section {
-	align-items: center;
 	display: grid;
-	flex-wrap: wrap;
-	grid-gap: 0;
-
-	margin: 20px 1em;
+	grid-gap: 1rem;
 	max-width: 1280px;
+
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 
 	@media (min-width: 600px) {
 		margin: 42px 1em;
-		grid-gap: 1rem;
-		grid-template-columns: repeat(auto-fill, minmax(214px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	}
+
 	@media (min-width: 1280px) {
 		margin: 42px auto;
 	}
@@ -114,7 +112,7 @@ export default {
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	margin: 0 30px 2rem;
+	margin: 30px 2rem;
 
 	button {
 		background-color: white;

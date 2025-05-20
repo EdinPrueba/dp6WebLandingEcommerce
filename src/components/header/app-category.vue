@@ -1,55 +1,70 @@
 <template>
 	<div
 		class="app-category"
-		:class="{ scrolling: scrolled, isBanner: bannerTopExist}"
+		:class="{ scrolling: scrolled, isBanner: bannerTopExist }"
 	>
 		<div class="app-category-user">
-			<div class="container-user" :style="`border-color: ${globalColors.primary}`">
-				<img :src="imageUser" :alt="imgUser.name" class="user-avatar">
+			<div
+				class="container-user"
+				:style="`border-color: ${globalColors.primary}`"
+			>
+				<img :src="imageUser" :alt="imgUser.name" class="user-avatar" />
 			</div>
 			<div v-if="token">
-				<p class="user-name">{{imgUser.name}} {{imgUser.lastname}}</p>
+				<p class="user-name">{{ imgUser.name }} {{ imgUser.lastname }}</p>
 			</div>
-			<div 
-				class="container-link-user" :style="`border-color: ${globalColors.base}`"
-				v-else>
-				<router-link 
-					:to="{ name: 'login'}"
+			<div
+				class="container-link-user"
+				:style="`border-color: ${globalColors.base}`"
+				v-else
+			>
+				<router-link
+					:to="{ name: 'login' }"
 					:style="`color: ${globalColors.primary}`"
-					class="link">Iniciar Sesión</router-link>
-				<router-link 
-					:to="{ name: 'register'}"
+					class="link"
+					>Iniciar Sesión</router-link
+				>
+				<router-link
+					:to="{ name: 'register' }"
 					:style="`color: ${globalColors.primary}`"
-					class="link">Crear cuenta</router-link>
+					class="link"
+					>Crear cuenta</router-link
+				>
 			</div>
 		</div>
 		<div class="menu-app-category">
 			<div class="menu-list-name-category">
-				<div 
-					v-for="(list, index) in categories" 
+				<div
+					v-for="(list, index) in categories"
 					:key="index"
 					class="name-category"
-					:class="{'select': list.select}"
+					:class="{ select: list.select }"
 				>
 					<div
 						class="list-name-category"
-						:style="`background-color:${list.select ? globalColors.secondary : 'white'};transition:all 200ms ease-in;`"
+						:style="
+							`background-color:${
+								list.select ? globalColors.secondary : 'white'
+							};transition:all 200ms ease-in;`
+						"
 					>
-						<item-menu 
-							:data="list" 
+						<item-menu
+							:data="list"
 							color-select="#ed0000"
 							@click-item="goToCategory(list)"
 							@hover-item="hoverCategory"
 						/>
 						<button class="btn-collapse" @click="clickCategory(list)">
-							<v-icon 
-								:class="{'rotate-icon': list.select}"
+							<v-icon
+								:class="{ 'rotate-icon': list.select }"
 								class="icon"
-								v-if="list.detail.length">keyboard_arrow_down</v-icon>
+								v-if="list.detail.length"
+								>keyboard_arrow_down</v-icon
+							>
 						</button>
 					</div>
 					<div v-if="list.detail && list.select" class="menu-mobile">
-						<v-treeview 
+						<v-treeview
 							:items="list.detail"
 							item-children="detail"
 							item-text="title"
@@ -64,11 +79,17 @@
 			</div>
 			<div
 				class="menu-list-item desktop"
-				:class="!selectCategory.details || selectCategory.details.length === 0 ? 'menu-list-item-data' : ''"
+				:class="
+					!selectCategory.details || selectCategory.details.length === 0
+						? 'menu-list-item-data'
+						: ''
+				"
 				v-if="selectCategory"
 			>
-				<template v-if="selectCategory.details && selectCategory.details.length > 0">
-					<v-treeview 
+				<template
+					v-if="selectCategory.details && selectCategory.details.length > 0"
+				>
+					<v-treeview
 						:items="selectCategory.detail"
 						item-children="detail"
 						open-all
@@ -77,7 +98,8 @@
 						activatable
 						@update:active="goToCategories"
 						return-object
-						v-if="load">
+						v-if="load"
+					>
 					</v-treeview>
 				</template>
 				<template v-else>
@@ -93,42 +115,47 @@
 					<button
 						class="menu-list-item-btn"
 						:style="
-							`border: 1px solid ${selectCategory.select ? globalColors.secondary : 'white'};
-							color: ${selectCategory.select ? globalColors.secondary : 'white'}`"
+							`border: 1px solid ${
+								selectCategory.select ? globalColors.secondary : 'white'
+							};
+							color: ${selectCategory.select ? globalColors.secondary : 'white'}`
+						"
 						type="button"
-						@click="goToCategory({ slug: selectCategory.slug, id: selectCategory.id })"
+						@click="
+							goToCategory({ slug: selectCategory.slug, id: selectCategory.id })
+						"
 					>
 						Ver productos
 					</button>
 				</template>
 			</div>
 			<div class="menu-list-banner">
-				<img :src="selectCategory.urlImage" alt="imagen de la categoria">
+				<img
+					v-if="showImage"
+					:src="selectCategory.urlImage"
+					alt="imagen de la categoria"
+					@error="handleImageError"
+				/>
 			</div>
 		</div>
 		<div class="container-option">
 			<div class="option-user" v-if="token">
 				<button class="option" @click="goTo('user-orders')">
-					<img 
-						:src="imageOrder.urlImage" 
-						:alt="imageOrder.name"
-						class="mr-8">
+					<img :src="imageOrder.urlImage" :alt="imageOrder.name" class="mr-8" />
 					<span>Mis órdenes</span>
 				</button>
 				<button class="option" @click="goTo('favorites')">
-					<img 
-						:src="imageFavorite.urlImage" 
+					<img
+						:src="imageFavorite.urlImage"
 						:alt="imageFavorite.name"
-						class="mr-8">
+						class="mr-8"
+					/>
 					<span>Mis Favoritos</span>
 				</button>
 			</div>
 			<div class="option-close">
 				<button class="option" v-if="token" @click="logout">
-					<img 
-						:src="imageClose.urlImage" 
-						:alt="imageClose.name"
-						class="mr-8">
+					<img :src="imageClose.urlImage" :alt="imageClose.name" class="mr-8" />
 					<span class="text-gray">Cerrar Sesión</span>
 				</button>
 			</div>
@@ -150,13 +177,13 @@ function created() {
 function clickCategory(item) {
 	this.load = false;
 	const windowWidth = window.innerWidth;
-	this.categories = this.categories.map((c) => {
+	this.categories = this.categories.map(c => {
 		const newCategory = { ...c };
 		if (c.id === item.id) {
 			newCategory.select = windowWidth >= 764 ? true : !c.select;
 		} else {
 			newCategory.select = false;
-			newCategory.detail = c.detail.map((l) => {
+			newCategory.detail = c.detail.map(l => {
 				const newSub = { ...l };
 				newSub.select = false;
 				return newSub;
@@ -192,7 +219,7 @@ function destroyed() {
 
 function clickSubCategory(item, index) {
 	if (this.categories[index].detail) {
-		this.categories[index].detail = this.categories[index].detail.map((c) => {
+		this.categories[index].detail = this.categories[index].detail.map(c => {
 			const newSubCategory = { ...c };
 			if (item.id === c.id) {
 				newSubCategory.select = !c.select;
@@ -205,7 +232,9 @@ function clickSubCategory(item, index) {
 }
 
 function imageUser() {
-	return this.imgUser.urlImage || this.imgUser.logo || process.env.DEFAULT_AVATAR;
+	return (
+		this.imgUser.urlImage || this.imgUser.logo || process.env.DEFAULT_AVATAR
+	);
 }
 
 function handleScroll() {
@@ -266,6 +295,7 @@ function data() {
 		scrolled: false,
 		load: true,
 		categories: {},
+		showImage: false,
 	};
 }
 
@@ -291,6 +321,9 @@ export default {
 	created,
 	destroyed,
 	methods: {
+		handleImageError() {
+			this.showImage = false;
+		},
 		clickCategory,
 		oneSelectCategory,
 		clickSubCategory,
@@ -309,308 +342,307 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.app-category {
-		background: color(white);
-		border-top: solid 1px color(border);
-		box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.07);
-		height: 460px;
-		position: absolute;
-		top: 99px;
-		z-index: 5;
-		width: 100%;
+.app-category {
+	background: color(white);
+	border-top: solid 1px color(border);
+	box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.07);
+	height: 460px;
+	position: absolute;
+	top: 99px;
+	z-index: 5;
+	width: 100%;
 
-		@media (min-width: 926px) {
-			max-width: 926px;
-		}
+	@media (min-width: 926px) {
+		max-width: 926px;
+	}
 
-		@media (max-width: 764px) {
-			height: 100vh;
-			max-height: none;
-			min-height: none;
-			overflow-y: scroll;
-			padding: 22px 8%;
-			position: fixed;
-			top: 0;
-			width: 85%;
+	@media (max-width: 764px) {
+		height: 100vh;
+		max-height: none;
+		min-height: none;
+		overflow-y: scroll;
+		padding: 22px 8%;
+		position: fixed;
+		top: 0;
+		width: 85%;
 
-			&.scrolling {
-				top: 0 !important;
-			}
-
-			&.isBanner {
-				top: 0 !important;
-			}
+		&.scrolling {
+			top: 0 !important;
 		}
 
 		&.isBanner {
-			top: 188px;
-		}
-		
-		&.scrolling {
-			position: fixed;
-			top: 99px;
+			top: 0 !important;
 		}
 	}
 
-	.menu-list-name-category {
-		border-right: 3px solid color(border);
-		// flex: 0 0 17%;
-		flex: 0 0 26%;
-		overflow-y: scroll;
-
-		@media (max-width: 764px) {
-			border: none;
-			// flex: 1 1 17%;
-			flex: 1 1 26%;
-			max-height: none;
-		}
+	&.isBanner {
+		top: 188px;
 	}
 
-	.menu-app-category {
-		display: flex;
-		height: 100%;
-		padding: 36px 34px;
-
-		@media (max-width: 764px) {
-			height: fit-content;
-			padding: 0px;
-		}
+	&.scrolling {
+		position: fixed;
+		top: 99px;
 	}
+}
 
-	.name-category {
-		cursor: pointer;
-		margin-bottom: 20px;
+.menu-list-name-category {
+	border-right: 3px solid color(border);
+	// flex: 0 0 17%;
+	flex: 0 0 26%;
+	overflow-y: scroll;
+
+	@media (max-width: 764px) {
+		border: none;
+		// flex: 1 1 17%;
+		flex: 1 1 26%;
+		max-height: none;
 	}
+}
 
-	.menu-list-item {
-		cursor: pointer;
-		display: flex;
-		// flex: 1 1 auto;
-		flex: 0 0 44%;
-		height: 100%;
-		overflow-y: scroll;
+.menu-app-category {
+	display: flex;
+	height: 100%;
+	padding: 36px 34px;
 
-		&.menu-list-item-data {
-			align-items: flex-start;
-			flex-direction: column;
-			flex-wrap: wrap;
-			justify-content: center;
-			padding-left: 60px;
-			text-align: left;
-		}
-
-		&-title {
-			font-family: font(bold);
-			font-size: 15px;
-		}
-
-		&-description {
-			color: #494949;
-			font-family: font(demi);
-			font-size: 12px;
-			min-height: 136px;
-			padding-bottom: 13px;
-			padding-top: 13px;
-		}
-
-		&-btn {
-			border-radius: 3px;
-			font-family: font(bold);
-			font-size: 15px;
-			max-width: max-content;
-			max-width: -moz-max-content;
-			padding: 5px 20px;
-		}
+	@media (max-width: 764px) {
+		height: fit-content;
+		padding: 0px;
 	}
+}
 
-	.desktop {
-	
-		@media (max-width: 764px) {
-			display: none;
-		}
-	}
+.name-category {
+	cursor: pointer;
+	margin-bottom: 20px;
+}
 
-	.container-user {
-		align-items: center;
-		border: 1px solid;
-		border-radius: 50%;
-		display: flex;
-		height: 53px;
+.menu-list-item {
+	cursor: pointer;
+	display: flex;
+	// flex: 1 1 auto;
+	flex: 0 0 44%;
+	height: 100%;
+	overflow-y: scroll;
+
+	&.menu-list-item-data {
+		align-items: flex-start;
+		flex-direction: column;
+		flex-wrap: wrap;
 		justify-content: center;
-		margin: 0 auto;
-		padding: 7px;
-		width: 53px;
-	}
-
-	.container-link-user {
-		border-bottom: 1px solid;
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 33px;
-		padding-bottom: 10px;
-
-		
-
-		.link {
-			font-family: font(demi);
-			font-size: size(small);
-			text-decoration: none;
-		}
-	}
-
-	.app-category-user, .btn-collapse, .menu-mobile {
-		display: block;
-
-		// @media (max-width: 764px) {
-		// 	display: block;
-		// }
-	}
-
-	.list-name-category {
-		border-radius: 3px;
-		display: flex;
-		justify-content: space-between;
-		padding: 2px 0 2px 5px;
-	}
-
-	.list-item-name {
-		color: color(base);
+		padding-left: 60px;
 		text-align: left;
-
-		&.bold {
-			color: color(black);
-			font-family: font(bold);
-		}
-
-		&:hover {
-			color: color(black);
-		}
-
-		@media (max-width: 764px) {
-			font-size: size(small);
-		}
 	}
 
-	.list-item-sub {
-		color: color(base);
-		display: block;
-
-		@media (max-width: 764px) {
-			font-size: size(small);
-		}
+	&-title {
+		font-family: font(bold);
+		font-size: 15px;
 	}
 
-	.menu-mobile {
-		margin: 8px 16px 0 42px;
+	&-description {
+		color: #494949;
+		font-family: font(demi);
+		font-size: 12px;
+		min-height: 136px;
+		padding-bottom: 13px;
+		padding-top: 13px;
 	}
 
-	.icon {
-		transform: rotateZ(0deg);
-		transition: none;
-
-		&.rotate-icon {
-			transform: rotateZ(180deg);
-		}
+	&-btn {
+		border-radius: 3px;
+		font-family: font(bold);
+		font-size: 15px;
+		max-width: max-content;
+		max-width: -moz-max-content;
+		padding: 5px 20px;
 	}
+}
+
+.desktop {
+	@media (max-width: 764px) {
+		display: none;
+	}
+}
+
+.container-user {
+	align-items: center;
+	border: 1px solid;
+	border-radius: 50%;
+	display: flex;
+	height: 53px;
+	justify-content: center;
+	margin: 0 auto;
+	padding: 7px;
+	width: 53px;
+}
+
+.container-link-user {
+	border-bottom: 1px solid;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 33px;
+	padding-bottom: 10px;
+
+	.link {
+		font-family: font(demi);
+		font-size: size(small);
+		text-decoration: none;
+	}
+}
+
+.app-category-user,
+.btn-collapse,
+.menu-mobile {
+	display: block;
+
+	// @media (max-width: 764px) {
+	// 	display: block;
+	// }
+}
+
+.list-name-category {
+	border-radius: 3px;
+	display: flex;
+	justify-content: space-between;
+	padding: 2px 0 2px 5px;
+}
+
+.list-item-name {
+	color: color(base);
+	text-align: left;
+
+	&.bold {
+		color: color(black);
+		font-family: font(bold);
+	}
+
+	&:hover {
+		color: color(black);
+	}
+
+	@media (max-width: 764px) {
+		font-size: size(small);
+	}
+}
+
+.list-item-sub {
+	color: color(base);
+	display: block;
+
+	@media (max-width: 764px) {
+		font-size: size(small);
+	}
+}
+
+.menu-mobile {
+	margin: 8px 16px 0 42px;
+}
+
+.icon {
+	transform: rotateZ(0deg);
+	transition: none;
+
+	&.rotate-icon {
+		transform: rotateZ(180deg);
+	}
+}
+
+.list-subcategory {
+	border-bottom: 1px solid map-get($colors, border);
+	padding: 3px 0;
+}
+
+.content-sub-subcategory {
+	display: flex;
+	flex-direction: column;
 
 	.list-subcategory {
-		border-bottom: 1px solid map-get($colors, border);
-		padding: 3px 0; 
+		&:last-child {
+			border-bottom: none;
+		}
 	}
+}
 
-	.content-sub-subcategory {
-		display: flex;
-		flex-direction: column;
-
-		.list-subcategory {
-			&:last-child {
+.menu-mobile {
+	.content-list-subcategory {
+		&:last-child {
+			.list-subcategory {
 				border-bottom: none;
 			}
 		}
 	}
+}
 
-	.menu-mobile {
-		.content-list-subcategory {
-			&:last-child {
-				.list-subcategory {
-				border-bottom: none;
-				}
-			}
-		}
-	}
+.container-option {
+	display: none;
+	height: 100px;
 
-	.container-option {
-		display: none;
-		height: 100px;
-
-		@media (max-width: 764px) {
-			display: block;
-			font-size: size(small);
-		}
-	}
-
-	.option-user {
-		align-items: center;
-		border-bottom: 1px solid map-get($colors, border);
-		display: flex;
-		height: 50px;
-		justify-content: space-between;
-		margin-bottom: 14px;
-	}
-
-	.user-name {
-		border-bottom: 1px solid color(border);
-		color: color(dark);
-		font-family: font(bold);
+	@media (max-width: 764px) {
+		display: block;
 		font-size: size(small);
-		padding: 5px;
-		text-align: center;
 	}
+}
 
-	.option {
-		align-items: center;
-		display: flex;
-	}
+.option-user {
+	align-items: center;
+	border-bottom: 1px solid map-get($colors, border);
+	display: flex;
+	height: 50px;
+	justify-content: space-between;
+	margin-bottom: 14px;
+}
 
-	.mr-8 {
-		margin-right: 8px;
-	}
+.user-name {
+	border-bottom: 1px solid color(border);
+	color: color(dark);
+	font-family: font(bold);
+	font-size: size(small);
+	padding: 5px;
+	text-align: center;
+}
 
-	.text-gray {
-		color: color(base);
-	}
+.option {
+	align-items: center;
+	display: flex;
+}
 
-	.user-avatar {
+.mr-8 {
+	margin-right: 8px;
+}
+
+.text-gray {
+	color: color(base);
+}
+
+.user-avatar {
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}
+
+.menu-list-banner {
+	// flex: 0 0 20%;
+	flex: 0 0 30%;
+	text-align: end;
+
+	img {
 		height: 100%;
 		object-fit: cover;
-		width: 100%;
+		// width: 202px;
+		max-width: 100%;
 	}
 
-	.menu-list-banner {
-		// flex: 0 0 20%;
-		flex: 0 0 30%;
-		text-align: end;
-
-		img {
-			height: 100%;
-			object-fit: cover;
-			// width: 202px;
-			max-width: 100%;
-		}
-		
-		@media (max-width: 764px) {
-			display: none;
-		}
+	@media (max-width: 764px) {
+		display: none;
 	}
+}
 
-	.category-description {
-		padding: 3rem;
+.category-description {
+	padding: 3rem;
 
-		button {
-			border-style: solid;
-			border-width: 1px;
-			font-family: font(bold);
-			padding: 0.75rem;
-		}
+	button {
+		border-style: solid;
+		border-width: 1px;
+		font-family: font(bold);
+		padding: 0.75rem;
 	}
+}
 </style>
