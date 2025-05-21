@@ -178,7 +178,7 @@ async function loadProduct() {
 				originalPrice = (1 - discount / 100) * el.price;
 			}
 
-			return { ...el, originalPrice };
+			return { ...el, originalPrice, unitDefault: el.unit };
 		});
 
 		this.listProducts = mappedProducts.map(

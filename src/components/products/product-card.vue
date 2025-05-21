@@ -120,7 +120,7 @@
 						</div>
 						<div class="product-description-wrapper">
 							{{
-								product.name.length > 60
+								product.name && product.name.length > 60
 									? product.name.slice(0, 60) + '...'
 									: product.name
 							}}
@@ -533,7 +533,9 @@ export default {
 					}),
 				);
 				if (this.conversionsProducts.length) {
-					this.conversionsProducts.unshift(this.product.unitDefault);
+					this.conversionsProducts.unshift(
+						this.product.unitDefault || this.product.unit,
+					);
 				} else {
 					this.addToCar();
 				}
