@@ -33,19 +33,28 @@
 			<section class="big">
 				<div v-if="stepOneAndTwo" class="mb-5">
 					<div @click="toogleCollapse" class="contend-title">
-						<div class="section-title" v-if="stepTwo">
-							<img :src="logo.section" alt="logo del método de pago" />
+						<div class="section-title">
+							<!-- <img :src="logo.section" alt="logo del método de pago" /> -->
 							<h2 class="payment-section-title">PRODUCTOS</h2>
 						</div>
-						<img
-							v-if="stepTwo"
-							height="16"
-							width="18"
-							:style="collapseStep"
-							:src="arrow.section"
-							alt="arrow"
-							class="arrow"
-						/>
+						<div class="actions">
+							<app-button
+								max-width="110px"
+								height="30px"
+								action="Limpiar carrito"
+								class="clean-cart"
+								:background="globalColors.secondary"
+								@click="cleanCart"
+							/>
+							<img
+								height="16"
+								width="18"
+								:style="collapseStep"
+								:src="arrow.section"
+								alt="arrow"
+								class="arrow"
+							/>
+						</div>
 					</div>
 					<div v-show="isCollapseProduct" class="section-collapse-step1">
 						<product-in-car
@@ -139,7 +148,7 @@ async function loadProductsQuery() {
 			'products/by-ids-public',
 			body,
 		);
-		this.productsBuys = response.data.map((product) => {
+		this.productsBuys = response.data.map(product => {
 			const newRow = { ...product };
 			this.addToCar(newRow.product || newRow);
 			return newRow;
@@ -273,7 +282,7 @@ export default {
 				(prod, index, array) => {
 					const totalQuantity = array
 						.filter(p => p.id === prod.id)
-						.reduce((sum, p) => sum + (p.quantity * (p.unit.quantity || 1)), 0);
+						.reduce((sum, p) => sum + p.quantity * (p.unit.quantity || 1), 0);
 					return totalQuantity > prod.stockWarehouse;
 				},
 			);
@@ -290,7 +299,7 @@ export default {
 			);
 
 			this.messageStock = Object.values(totals)
-				.map((product) => {
+				.map(product => {
 					const validate =
 						product.totalQuantity > product.stockWarehouse
 							? `El poducto ${product.name} excede el stock.`
@@ -312,6 +321,9 @@ export default {
 		toogleCollapse,
 		closeTransaction() {
 			this.isVisible = false;
+		},
+		cleanCart() {
+			this.$store.commit('DELETE_ALL_PRODUCT_BUY_CAR');
 		},
 	},
 	mounted,
@@ -406,6 +418,14 @@ export default {
 	}
 }
 
+.clean-cart {
+	width: 125px;
+
+	@media (max-width: 600px) {
+		width: 110px !important;
+	}
+}
+
 .summary {
 	margin-bottom: 30px;
 	padding: 30px 0;
@@ -439,6 +459,13 @@ export default {
 	align-items: center;
 	margin-bottom: 20px;
 }
+
+.actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
 .arrow {
 	transform: rotate(180deg);
 }
