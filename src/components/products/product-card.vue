@@ -297,6 +297,8 @@ function addToCar(unit, show) {
 			}) ${message}`,
 			`${color}`,
 			null,
+			false,
+			1500,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
 		// this.quantityAddProduct = 1;
@@ -495,9 +497,13 @@ export default {
 			const productsSelected =
 				JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
 			const product = productsSelected.find(p => p.id === this.product.id);
-			this.showAdd = !(product && product.quantity < 2);
+			const quantity = Math.max(product.quantity - this.quantityAddProduct, 0);
+			this.showAdd = quantity;
 			this.product.quantity = this.quantityAddProduct;
 			this.$store.dispatch('removeProductToBuyCar', this.product);
+			if (!quantity) {
+				this.addQuantity = true;
+			}
 		},
 		handleImageError(event) {
 			const target = event.target;
@@ -546,6 +552,7 @@ export default {
 			}
 		},
 		eventAddQuantity() {
+			this.quantityAddProduct = 1;
 			this.selectUnitCar();
 		},
 		closeViewProduct() {
