@@ -1,5 +1,8 @@
 async function created() {
-	this.loadDomians();
+	const domains = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`));
+	if (!domains) {
+		this.loadDomians();
+	}
 	await this.loadCommerceData();
 	this.loadResource();
 }
