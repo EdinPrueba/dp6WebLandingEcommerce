@@ -46,7 +46,7 @@ function addProductToBuyCar(context, product) {
 		const { stock, stockWarehouse, stockComposite } = currentProduct;
 		const finalStock = helper.isComposed(currentProduct) ?
 			stockComposite : (stockWarehouse || stock);
-		let quantity = currentProduct.quantity + newProduct.quantity;
+		let quantity = newProduct.quantity;
 		quantity = finalStock > quantity || allowOrderStockNegative ? quantity : finalStock;
 		productsSelected[index].quantity = quantity;
 
@@ -54,8 +54,8 @@ function addProductToBuyCar(context, product) {
 		const newPrice = helper.getPriceByRange({
 			ranges,
 			quantity: productsSelected[index].quantity,
-			originalPrice: productsSelected[index].originalPrice
-				|| productsSelected[index].priceDiscountOrigin,
+			originalPrice: productsSelected[index].priceDiscountOrigin
+				|| productsSelected[index].originalPrice,
 		});
 
 		productsSelected[index].priceDiscount = newPrice;
@@ -97,7 +97,7 @@ function removeProductToBuyCar(context, product) {
 			context.commit('UPDATE_PRODUCTS_SELECTED', productsSelected);
 			context.commit('UPDATE_ORDER_DETAILS_IF_EXIST', productsSelected);
 		}
-		if (quantity === 0) {
+		if (quantity === 0 || quantity < 0) {
 			const { id, unitSelected } = currentProduct;
 			context.commit('DELETE_PRODUCT_BUY_CAR', { id, unitSelected });
 		}

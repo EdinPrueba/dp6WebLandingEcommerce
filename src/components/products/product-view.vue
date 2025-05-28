@@ -83,7 +83,12 @@
 			v-else
 			:class="['slider-product-view-one-movil', { 'sold-out': noStock }]"
 		>
-			<img :src="data.urlImage" :alt="data.name" class="image-product-slider" />
+			<img
+				:src="data.urlImage"
+				:alt="data.name"
+				@error="handleImageError"
+				class="image-product-slider"
+			/>
 		</div>
 	</div>
 </template>
@@ -224,11 +229,6 @@ export default {
 		handleImageError(event) {
 			const target = event.target;
 			target.src = this.data.urlImage || this.fallbackImage;
-		},
-		validProductImage(image) {
-			return image.urlImage && image.urlImage.trim() !== ''
-				? image.urlImage
-				: this.fallbackImage;
 		},
 	},
 	props: {

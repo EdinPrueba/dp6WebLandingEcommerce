@@ -47,7 +47,7 @@ const asyncActions = {
 				originalPrice = (1 - (discount / 100)) * el.price;
 			}
 
-			return ({ ...el, originalPrice });
+			return ({ ...el, originalPrice, unitDefault: el.unit });
 		});
 
 		const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
@@ -283,6 +283,10 @@ const asyncActions = {
 		const url = `project/${codeProject}/domains?codeCompany=${codeCompany}`;
 		const { data: res } = await context.$httpAcl.get(url);
 		context.setLocalData(`${process.env.STORAGE_USER_KEY}::domains`, res.domains);
+		const domains = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`));
+		if (domains) {
+			window.location.reload();
+		}
 	},
 	MAKE_ORDER: async ({ dispatch, getters, commit }, { flagFinish, context }) => {
 		commit('SET_IS_TOOGLE_BTN', true);

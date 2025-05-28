@@ -4,6 +4,7 @@
 		<section v-if="stepOne" class="grid-areas">
 			<img
 				@click="goToProduct(product)"
+				@error="handleImageError"
 				:src="
 					product.urlImage ||
 						product.productImage ||
@@ -93,6 +94,7 @@
 				class="img-pro"
 				height="75"
 				width="80"
+				@error="handleImageError"
 				:src="
 					product.urlImage ||
 						product.productImage ||
@@ -236,6 +238,7 @@ function data() {
 		show: false,
 		opt: {},
 		maxQuantity: false,
+		fallbackImage: '/static/img/placeholder-product.png',
 	};
 }
 
@@ -283,6 +286,14 @@ export default {
 		showComments,
 		goToProduct,
 		inputQuantity,
+		handleImageError(event) {
+			const target = event.target;
+			target.src =
+				this.product.urlImage ||
+				this.product.productImage ||
+				this.product.imagePresentation ||
+				this.fallbackImage;
+		},
 	},
 	props: {
 		product: {

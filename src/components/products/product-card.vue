@@ -98,14 +98,32 @@
 								alt="imagen del product"
 							/>
 						</div>
+						<div v-if="!indeterminate">
+							<div class="bottom-position mt-2" v-if="addQuantity">
+								<addcar-component
+									:disabled-add="disabledAdd"
+									active
+									@add-car="eventAddQuantity"
+									:class="{ outstock: noStock }"
+								/>
+							</div>
+							<quantityButton
+								v-else
+								class="mt-3"
+								isEditNumber
+								:number="quantityAddProduct"
+								:product="product"
+								:max-quantity="maxQuantity"
+								@input="inputQuantity"
+								@click="clickQuantity"
+							/>
+						</div>
 						<div class="product-description-wrapper">
-							<p
-								class="mb-1"
-								@click="goToProduct(product)"
-								:class="[indeterminate ? 'loading text-field' : 'product-name']"
-							>
-								{{ product.name }}
-							</p>
+							{{
+								product.name && product.name.length > 60
+									? product.name.slice(0, 60) + '...'
+									: product.name
+							}}
 							<!--span
 							v-if="product.description"
 							:class="[
@@ -164,18 +182,9 @@
 					</section>
 				</div>
 			</div>
-			<div v-if="!indeterminate" class="bottom-position">
-				<addcar-component
-					:disabled-add="disabledAdd"
-					active
-					@add-car="selectUnitCar"
-					@remove-car="removeProductFromCar"
-					:class="{ outstock: noStock }"
-				/>
-			</div>
 		</div>
 		<div class="select-presentation" v-else>
-			<v-icon class="icon-close" @click="selectUnitCar">close</v-icon>
+			<v-icon class="icon-close" @click="closeViewProduct">close</v-icon>
 			<div class="content-conversions">
 				<span class="title">Seleccione la presentación que desea añadir:</span>
 				<div class="button-container">
@@ -183,9 +192,14 @@
 						v-for="item in conversionsProducts"
 						:key="item.id"
 						class="btn-conversions"
-						@click="addToCar(item)"
+						@click="addToCar(item, false)"
 					>
-						{{ item.name }}
+						{{ item.name }} - {{ getCurrencySymbol }}
+						{{
+							item.quantity
+								? item.quantity * product.originalPrice
+								: product.originalPrice | currencyFormat
+						}}
 					</v-btn>
 				</div>
 			</div>
@@ -196,6 +210,7 @@
 import { mapGetters } from 'vuex';
 import heartComponent from '@/components/shared/icons/heart-component';
 import addcarComponent from '@/components/shared/icons/addcar-component';
+import quantityButton from '@/components/shared/buttons/quantity-button';
 import { getDeeper } from '@/shared/lib';
 import TypeProduct from '@/shared/enums/typeProduct';
 import helper from '@/shared/helper';
@@ -212,7 +227,8 @@ function mounted() {
 	this.WholeSalePrice = this.getWholeSalePrice();
 }
 
-function addToCar(unit) {
+function addToCar(unit, show) {
+	this.showViewProduct = !show;
 	if (this.product.priceDiscount <= 0) {
 		this.showNotification(
 			'El producto no se puede agregar al carrito, porque su precio es 0.',
@@ -224,7 +240,7 @@ function addToCar(unit) {
 
 	if (!this.noStock) {
 		this.showAdd = true;
-		this.quantityAddProduct += 1;
+		// this.quantityAddProduct += 1;
 		const productSelected = this.product;
 		// const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
 		// productSelected.unitSelected = this.product.unitId;
@@ -235,7 +251,7 @@ function addToCar(unit) {
 		// const { units } = priceList;
 		// const rightRanges = units[productSelected.unitSelected];
 		// const { ranges } = rightRanges || priceList;
-		productSelected.unitSelected = unit ? unit.id : this.product.unitId;
+		productSelected.unitSelected = unit ? unit.id : this.product.unit.id;
 		productSelected.wholeSalePrice = this.WholeSalePrice || [];
 		productSelected.priceDiscountOrigin = this.product.priceDiscount || 0;
 		const StockSoldOut =
@@ -245,38 +261,48 @@ function addToCar(unit) {
 		if (StockSoldOut) {
 			this.showNotStock = true;
 		}
+		const ecommerce =
+			JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+		const defaultIdPiceList = ecommerce.settings.salPriceListId;
+		const priceList = this.product.priceList[defaultIdPiceList];
+		const unitList = priceList && unit && priceList.units[unit.id];
 		if (unit) {
 			productSelected.unit = { ...unit, isSelected: false };
 			productSelected.priceDiscountOrigin =
-				this.product.originalPrice * (unit.quantity || 1);
+				unitList && unitList.price
+					? unitList.price
+					: this.product.originalPrice * (unit.quantity || 1);
 			productSelected.priceDiscount =
-				this.product.originalPrice * (unit.quantity || 1);
+				unitList && unitList.price
+					? unitList.price
+					: this.product.originalPrice * (unit.quantity || 1);
 		}
+		const { stock, stockWarehouse, stockComposite } = productSelected;
+		const finalStock = helper.isComposed(productSelected)
+			? stockComposite
+			: stockWarehouse || stock;
+		const validate =
+			finalStock >= this.quantityAddProduct || this.$allowOrderStockNegative;
+		const quantity = validate ? this.quantityAddProduct : finalStock;
+		this.quantityAddProduct = quantity;
+		productSelected.quantity = quantity;
+		const unitDef = unit || productSelected.unit;
+		const message = validate
+			? 'agregado exitosamente'
+			: 'ya no cuenta con stock';
+		const color = validate ? 'success' : 'error';
 		this.showNotification(
 			`${this.product.name}(${
-				unit ? unit.name : this.product.unit.name
-			}) agregado exitosamente`,
-			'success',
+				unitDef ? unitDef.name : this.product.unitDefault.name
+			}) ${message}`,
+			`${color}`,
 			null,
+			false,
+			1500,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
+		// this.quantityAddProduct = 1;
 	}
-}
-
-function removeProductFromCar() {
-	this.quantityAddProduct -= 1;
-	this.disabledAdd = !(this.quantityAddProduct < this.product.stockWarehouse);
-	if (this.quantityAddProduct < this.product.stockWarehouse) {
-		this.showNotStock = false;
-		this.showAdd = false;
-	}
-	const productsSelected =
-		JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
-	const product = productsSelected.find(p => p.id === this.product.id);
-	if (product && product.quantity < 2) {
-		this.showAdd = false;
-	}
-	this.$store.dispatch('removeProductToBuyCar', this.product);
 }
 
 function productFavo() {
@@ -396,6 +422,7 @@ function getWholeSalePrice() {
 
 function data() {
 	return {
+		addQuantity: true,
 		disabledAdd: false,
 		x: 0,
 		y: 0,
@@ -403,7 +430,8 @@ function data() {
 		elHeight: 0,
 		mouseOnCard: false,
 		WholeSalePrice: null,
-		quantityAddProduct: 0,
+		quantityAddProduct: 1,
+		maxQuantity: false,
 		showAdd: false,
 		showNotStock: false,
 		fallbackImage: '/static/img/placeholder-product.png',
@@ -417,6 +445,7 @@ export default {
 	components: {
 		heartComponent,
 		addcarComponent,
+		quantityButton,
 	},
 	computed: {
 		...mapGetters([
@@ -444,9 +473,38 @@ export default {
 		onCard,
 		productFavo,
 		addToCar,
-		removeProductFromCar,
 		getWholeSalePrice,
 		goToCategories,
+		inputQuantity(value) {
+			this.quantityAddProduct = Number(value);
+		},
+		clickQuantity(val) {
+			if (val === 'more') {
+				this.quantityAddProduct += 1;
+				this.addToCar();
+			} else {
+				this.removeProductFromCar();
+			}
+		},
+		removeProductFromCar() {
+			this.disabledAdd = !(
+				this.quantityAddProduct < this.product.stockWarehouse
+			);
+			if (this.quantityAddProduct <= this.product.stockWarehouse) {
+				this.showNotStock = false;
+				this.showAdd = false;
+			}
+			const productsSelected =
+				JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
+			const product = productsSelected.find(p => p.id === this.product.id);
+			const quantity = Math.max(product.quantity - this.quantityAddProduct, 0);
+			this.showAdd = quantity;
+			this.product.quantity = this.quantityAddProduct;
+			this.$store.dispatch('removeProductToBuyCar', this.product);
+			if (!quantity) {
+				this.addQuantity = true;
+			}
+		},
 		handleImageError(event) {
 			const target = event.target;
 			target.src = this.fallbackImage;
@@ -473,22 +531,32 @@ export default {
 				this.product.conversions &&
 				typeof this.product.conversions === 'object'
 			) {
+				this.showViewProduct = false;
 				this.conversionsProducts = Object.keys(this.product.conversions).map(
 					key => ({
 						id: key,
 						...this.product.conversions[key],
 					}),
 				);
-
 				if (this.conversionsProducts.length) {
-					this.showViewProduct = !this.showViewProduct;
-					this.conversionsProducts.unshift(this.product.unit);
+					this.conversionsProducts.unshift(
+						this.product.unitDefault || this.product.unit,
+					);
 				} else {
 					this.addToCar();
 				}
+				this.addQuantity = !this.addQuantity;
 			} else {
+				this.addQuantity = !this.addQuantity;
 				this.addToCar();
 			}
+		},
+		eventAddQuantity() {
+			this.quantityAddProduct = 1;
+			this.selectUnitCar();
+		},
+		closeViewProduct() {
+			this.showViewProduct = true;
 		},
 	},
 	created,
@@ -515,39 +583,39 @@ export default {
 	height: auto;
 	transform: perspective(0px) rotateY(deg) rotateX(0deg) scale3d(0, 0, 0);
 	transition: all 120ms ease;
+	width: 20vh;
+	margin: 3px auto;
 	@media (min-width: 600px) {
 		box-shadow: 0 2px 2px 0 rgba(31, 26, 26, 0.07);
 		border: 1px solid color(border);
 		border-radius: 5px;
-		height: 360px;
-		margin: 3px auto;
-		max-width: 250px;
+		height: 375px;
+		margin: 3px auto !important;
 		width: 100%;
 	}
 	@media screen and (max-width: 600px) {
 		padding: 0 5px;
+		height: 380px;
 	}
 
 	&.small {
 		min-height: 319px;
-		max-width: 179px;
-	}
-
-	&.small {
-		min-height: 319px;
-		max-width: 179px;
+		width: 100%;
+		max-width: none;
 	}
 }
 .bottom-position {
 	width: 50%;
-	position: absolute;
 	bottom: 3px;
 	right: 0;
 	@media (min-width: 600px) {
 		width: 100%;
-		position: absolute;
 		bottom: 3px;
 		right: 0;
+	}
+
+	@media (max-width: 600px) {
+		width: 0;
 	}
 }
 
@@ -572,9 +640,12 @@ export default {
 		justify-content: flex-end;
 	}
 
+	@media (max-width: 600px) {
+		top: 3%;
+	}
+
 	@media (min-width: 600px) {
-		bottom: auto;
-		top: 156px;
+		top: 2%;
 	}
 }
 
@@ -635,21 +706,19 @@ export default {
 
 .product-content {
 	align-items: center;
+	flex-direction: column;
 	display: flex;
 	justify-content: center;
-	margin: 0 0;
 	padding: 1em 0;
 	text-align: center;
 
 	.product-content-img {
+		margin-top: 6px;
 		height: 190px;
 		width: 100%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-	div {
-		margin: 0 10px;
 	}
 
 	@media (min-width: 600px) {
@@ -668,7 +737,7 @@ export default {
 .product-description-wrapper {
 	display: flex;
 	flex-direction: column;
-	width: 100%;
+	width: 107%;
 	padding: 1em 0 0;
 }
 
@@ -679,18 +748,13 @@ export default {
 	max-width: 100%;
 }
 
-.product-name {
-	width: 189px;
-}
-
 .product-name,
 .product-description {
 	color: color(dark);
 	font-size: size(small);
 	font-family: font(regular);
-	max-height: auto;
 	margin: 0 auto 8px;
-	// max-width: 150px;
+	width: 80%;
 	overflow: visible;
 	text-overflow: ellipsis;
 	text-transform: capitalize;
@@ -782,14 +846,16 @@ export default {
 			font-size: 19px;
 			background-color: #acacac;
 			left: 10%;
-			top: 20%;
+			top: 30%;
 			width: 80%;
 			height: 35px;
 			z-index: 2;
 		}
 
 		@media screen and (max-width: 600px) {
-			height: 75%;
+			top: 30%;
+			width: 75%;
+			left: 17%;
 			font-size: 2vw;
 			border-radius: 10px;
 		}
@@ -853,7 +919,12 @@ export default {
 	position: absolute;
 
 	@media (min-width: 1024px) {
-		bottom: 95px;
+		bottom: 41%;
+	}
+
+	@media (max-width: 600px) {
+		bottom: auto;
+		top: 52%;
 	}
 }
 .show-agot {
@@ -867,7 +938,12 @@ export default {
 	position: absolute;
 
 	@media (min-width: 1024px) {
-		bottom: 125px;
+		bottom: 50%;
+	}
+
+	@media (max-width: 600px) {
+		bottom: auto;
+		top: 44%;
 	}
 }
 

@@ -28,6 +28,8 @@
 <script>
 import { mapGetters } from 'vuex';
 import sectionLinks from '@/components/footer/section-links';
+import store from '@/store';
+import { getDeeper } from '@/shared/lib';
 
 function helperCenter() {
 	if (this.getCommerceData && this.getCommerceData.helperCenter) {
@@ -72,6 +74,13 @@ export default {
 	computed: {
 		...mapGetters(['getCommerceData']),
 		helperCenter,
+		isPeru() {
+			const country = this.getLocalStorage('ecommerce::country');
+			return (
+				getDeeper('company.country.countryCode')(store.getters.user) ===
+					'PER' || country === 'PER'
+			);
+		},
 	},
 	methods: {
 		getSocial(code) {

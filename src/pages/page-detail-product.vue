@@ -400,7 +400,10 @@ function clickQuantity(value) {
 		num = value === 'more' ? (num += 1) : (num -= 1);
 	}
 	const validQuantity = this.checkValidQuantity(num);
-	this.quantityStock = parseInt(this.unitProductValid.quantity * num, 10);
+	this.quantityStock = parseInt(
+		(this.unitProductValid.quantity || 1) * num,
+		10,
+	);
 	if (this.quantityStock > this.product.stockWarehouse) {
 		this.showNotification(
 			`El producto ${this.product.name} no cuenta con más stock en la presentación ${this.unitProductValid.name}.`,

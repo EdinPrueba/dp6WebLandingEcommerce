@@ -49,10 +49,9 @@ const orderMutation = {
 		const newPrice = h.getPriceByRange({
 			ranges,
 			quantity: products[index].quantity,
-			originalPrice: products[index].originalPrice
-				|| products[index].priceDiscountOrigin,
+			originalPrice: products[index].priceDiscountOrigin
+				|| products[index].originalPrice,
 		});
-
 		products[index].priceDiscount = newPrice;
 		Vue.set(state.order, 'products', [...products]);
 		localStorage.setItem('ecommerce::product-select', JSON.stringify([...products]));
@@ -65,6 +64,12 @@ const orderMutation = {
 		localStorage.removeItem('ids-products');
 		localStorage.setItem('ecommerce::product-select', JSON.stringify([...newProducts]));
 		orderMutation.UPDATE_ORDER_DETAILS_IF_EXIST(state, newProducts);
+	},
+	DELETE_ALL_PRODUCT_BUY_CAR(state) {
+		Vue.set(state.order, 'products', []);
+		localStorage.removeItem('ids-products');
+		localStorage.setItem('ecommerce::product-select', JSON.stringify([]));
+		orderMutation.UPDATE_ORDER_DETAILS_IF_EXIST(state, []);
 	},
 	SET_SHIPPING_COST(state, price) {
 		Vue.set(state.order.shippingCost, 'price', price);
