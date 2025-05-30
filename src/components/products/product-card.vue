@@ -194,7 +194,13 @@
 						class="btn-conversions"
 						@click="addToCar(item, false)"
 					>
-						{{ item.code }} - {{ getCurrencySymbol }}
+						{{
+							item.name && item.name.length > 9
+								? item.name.slice(0, 9)
+								: item.name
+						}}
+						- {{ getCurrencySymbol }}
+
 						{{
 							item.price ? item.price : product.priceDiscount | currencyFormat
 						}}
@@ -979,7 +985,7 @@ export default {
 	border-radius: 10px;
 	font-family: 'Roboto', sans-serif;
 	font-weight: bold;
-	padding: 10px 20px;
+	padding: 5px 10px;
 	text-transform: uppercase;
 	transition: background-color 0.3s ease;
 	border: 1px solid red;
