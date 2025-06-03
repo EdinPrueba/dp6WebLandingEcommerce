@@ -194,11 +194,15 @@
 						class="btn-conversions"
 						@click="addToCar(item, false)"
 					>
-						{{ item.name }} - {{ getCurrencySymbol }}
 						{{
-							item.quantity
-								? item.quantity * product.originalPrice
-								: product.originalPrice | currencyFormat
+							item.name && item.name.length > 9
+								? item.name.slice(0, 9)
+								: item.name
+						}}
+						- {{ getCurrencySymbol }}
+
+						{{
+							item.price ? item.price : product.priceDiscount | currencyFormat
 						}}
 					</v-btn>
 				</div>
@@ -271,11 +275,11 @@ function addToCar(unit, show) {
 			productSelected.priceDiscountOrigin =
 				unitList && unitList.price
 					? unitList.price
-					: this.product.originalPrice * (unit.quantity || 1);
+					: this.product.priceDiscount * (unit.quantity || 1);
 			productSelected.priceDiscount =
 				unitList && unitList.price
 					? unitList.price
-					: this.product.originalPrice * (unit.quantity || 1);
+					: this.product.priceDiscount * (unit.quantity || 1);
 		}
 		const { stock, stockWarehouse, stockComposite } = productSelected;
 		const finalStock = helper.isComposed(productSelected)
@@ -531,10 +535,19 @@ export default {
 				this.product.conversions &&
 				typeof this.product.conversions === 'object'
 			) {
+				const { priceList } = this.product;
+				const ecommerce =
+					JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+				const defaultIdPiceList = ecommerce.settings.salPriceListId;
+				const priceListUnits =
+					priceList && priceList[defaultIdPiceList]
+						? priceList[defaultIdPiceList].units
+						: null;
 				this.showViewProduct = false;
 				this.conversionsProducts = Object.keys(this.product.conversions).map(
 					key => ({
 						id: key,
+						...priceListUnits[key],
 						...this.product.conversions[key],
 					}),
 				);
@@ -972,7 +985,7 @@ export default {
 	border-radius: 10px;
 	font-family: 'Roboto', sans-serif;
 	font-weight: bold;
-	padding: 10px 20px;
+	padding: 5px 10px;
 	text-transform: uppercase;
 	transition: background-color 0.3s ease;
 	border: 1px solid red;
