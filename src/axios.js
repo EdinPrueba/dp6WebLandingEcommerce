@@ -2,7 +2,8 @@ import axios from 'axios';
 import helper from '@/shared/helper';
 
 const aclInstance = axios.create({
-	baseURL: process.env.ACL_URL,
+	// baseURL: process.env.ACL_URL,
+	baseURL: 'https://acl.casamarketapp.com/api',
 });
 
 const productsUrl = helper.getKeyStorage('PRODUCTS_URL') || '';
