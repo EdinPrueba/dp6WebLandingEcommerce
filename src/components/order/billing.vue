@@ -3,7 +3,7 @@
 		<section
 			@click="toogleCollapse"
 			class="billing-header-content"
-			v-if="ecommerceLocal.settings.enablePushNotification"
+			v-if="ecommerceLocal.settings.flagBilling"
 		>
 			<div class="billin-header">
 				<img src="/static/icons/tax.svg" alt="ícono de impuestos" />
