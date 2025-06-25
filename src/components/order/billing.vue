@@ -1,67 +1,85 @@
 <template>
-<div>
-	<section @click="toogleCollapse" class="billing-header-content">
-		<div class="billin-header">
-			<img src="/static/icons/tax.svg" alt="ícono de impuestos">
-			<h2 class="billing-section-title">Facturación</h2>
-		</div>
-		<img height="16" width="18" :style="collapseStep" :src="arrow.section" alt="arrow" class="arrow"/>
-	</section>
-	<div v-show="collapseSection">
-		<div class="billing-switch">
-			<v-switch
-				hide-details
-				:label="labelByCountry"
-				class="billing-style"
-				:value="getFlagBill"
-				:input-value="getFlagBill"
-				@change="changeBillSelection"
-			></v-switch>
-		</div>	
-		<form class="billing-form" v-if="getFlagBill">
-			<div class="document-type-container">
-				<app-select
-					v-if="isEcuador"
-					item-text="name"
-					item-value="code"
-					placeholder="Tipo de documento"
-					class="mx-2 my-1 select-field"
-					:items="typeDocuments"
-					v-model="billing.documentType"
-				>
-				</app-select>
+	<div>
+		<section
+			@click="toogleCollapse"
+			class="billing-header-content"
+			v-if="ecommerceLocal.settings.flagBilling"
+		>
+			<div class="billin-header">
+				<img src="/static/icons/tax.svg" alt="ícono de impuestos" />
+				<h2 class="billing-section-title">Facturación</h2>
 			</div>
-			<app-input
-				placeholder="Número de Documento"
-				class="mx-2 my-1 ruc-field"
-				v-model="billing.ruc"
-				@input="checkingFalgValidDocumentNumber"
-				@blur="onBlur"
-			>
-				<span
-					v-if="$v.flagValidDocumentNumber.$invalid && $v.billing.ruc.required"
-				>Documento {{rucWordByCountry}}</span>
-				<span v-if="$v.billing.ruc.$invalid">Documento requerido</span>
-			</app-input>
-			<app-input
-				:placeholder="rzSocialLabel"
-				class="mx-2 my-1 rzSocial-field"
-				v-model="billing.rzSocial"
-				@input="validateForm"
-			>
-				<span v-if="$v.billing.rzSocial.$invalid">La razón social es requerida</span>
-			</app-input>
-			<app-input
-				placeholder="Dirección de domicilio fiscal"
-				class="mx-2 my-1 address-field"
-				v-model="billing.address"
-				@input="validateForm"
-			>
-				<span v-if="$v.billing.address.$invalid">El domicilio fiscal es requerido</span>
-			</app-input>
-		</form>
+			<img
+				height="16"
+				width="18"
+				:style="collapseStep"
+				:src="arrow.section"
+				alt="arrow"
+				class="arrow"
+			/>
+		</section>
+		<div v-show="collapseSection">
+			<div class="billing-switch">
+				<v-switch
+					hide-details
+					:label="labelByCountry"
+					class="billing-style"
+					:value="getFlagBill"
+					:input-value="getFlagBill"
+					@change="changeBillSelection"
+				></v-switch>
+			</div>
+			<form class="billing-form" v-if="getFlagBill">
+				<div class="document-type-container">
+					<app-select
+						v-if="isEcuador"
+						item-text="name"
+						item-value="code"
+						placeholder="Tipo de documento"
+						class="mx-2 my-1 select-field"
+						:items="typeDocuments"
+						v-model="billing.documentType"
+					>
+					</app-select>
+				</div>
+				<app-input
+					placeholder="Número de Documento"
+					class="mx-2 my-1 ruc-field"
+					v-model="billing.ruc"
+					@input="checkingFalgValidDocumentNumber"
+					@blur="onBlur"
+				>
+					<span
+						v-if="
+							$v.flagValidDocumentNumber.$invalid && $v.billing.ruc.required
+						"
+						>Documento {{ rucWordByCountry }}</span
+					>
+					<span v-if="$v.billing.ruc.$invalid">Documento requerido</span>
+				</app-input>
+				<app-input
+					:placeholder="rzSocialLabel"
+					class="mx-2 my-1 rzSocial-field"
+					v-model="billing.rzSocial"
+					@input="validateForm"
+				>
+					<span v-if="$v.billing.rzSocial.$invalid"
+						>La razón social es requerida</span
+					>
+				</app-input>
+				<app-input
+					placeholder="Dirección de domicilio fiscal"
+					class="mx-2 my-1 address-field"
+					v-model="billing.address"
+					@input="validateForm"
+				>
+					<span v-if="$v.billing.address.$invalid"
+						>El domicilio fiscal es requerido</span
+					>
+				</app-input>
+			</form>
+		</div>
 	</div>
-</div>
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators';
@@ -70,6 +88,7 @@ import appInput from '@/components/shared/inputs/app-input';
 import appSelect from '@/components/shared/inputs/app-select';
 
 function mounted() {
+	this.ecommerceLocal = this.getLocalStorage('ecommerce::ecommerce-data');
 	if (this.getOrderInfo && this.getOrderInfo.dataBill) {
 		const { address, ruc, rzSocial } = this.getOrderInfo.dataBill;
 		this.billing = { address, ruc, rzSocial };
@@ -172,7 +191,9 @@ function toogleCollapse() {
 }
 
 function collapseStep() {
-	return `transform: ${this.collapseSection ? 'rotate(0deg)' : 'rotate(180deg)'};`;
+	return `transform: ${
+		this.collapseSection ? 'rotate(0deg)' : 'rotate(180deg)'
+	};`;
 }
 
 function data() {
@@ -192,6 +213,9 @@ function data() {
 			{ name: 'RUC', code: 'ruc' },
 		],
 		collapseSection: false,
+		ecommerceLocal: {
+			settings: {},
+		},
 	};
 }
 
@@ -202,11 +226,7 @@ export default {
 		appSelect,
 	},
 	computed: {
-		...mapGetters([
-			'getFlagBill',
-			'getOrderInfo',
-			'getCommerceData',
-		]),
+		...mapGetters(['getFlagBill', 'getOrderInfo', 'getCommerceData']),
 		flagBillingValidate,
 		labelByCountry,
 		rucWordByCountry,
@@ -231,69 +251,68 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.billing-switch {
-		margin-bottom: 30px;
-	}
-	
-	.billing-form {
-		align-items: center;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-	}
+.billing-switch {
+	margin-bottom: 30px;
+}
 
-	.rzSocial-field,
-	.ruc-field {
-		flex: 1 1 40%;
-	}
+.billing-form {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
 
-	.address-field {
+.rzSocial-field,
+.ruc-field {
+	flex: 1 1 40%;
+}
+
+.address-field {
+	flex: 1 1 100%;
+}
+
+.billin-header {
+	color: color(dark);
+	display: flex;
+	font-size: size(medium);
+}
+
+.billing-section-title {
+	font-family: font(bold);
+	font-size: size(medium);
+	margin-left: 20px;
+	text-transform: uppercase;
+}
+
+.billing-text-regular {
+	font-family: font(regular);
+}
+
+.billing-text-highlight {
+	font-family: font(medium);
+}
+
+.billing-header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 40px;
+}
+
+.billing-switch {
+	margin-bottom: 30px;
+}
+
+.document-type-container {
+	display: flex;
+	flex: 0 1 100%;
+
+	.select-field {
 		flex: 1 1 100%;
-	}
 
-	.billin-header {
-		color: color(dark);
-		display: flex;
-		font-size: size(medium);
-	}
-
-	.billing-section-title {
-		font-family: font(bold);
-		font-size: size(medium);
-		margin-left: 20px;
-		text-transform: uppercase;
-	}
-
-	.billing-text-regular {
-		font-family: font(regular);
-	}
-
-	.billing-text-highlight {
-		font-family: font(medium);
-	}
-
-	.billing-header-content {
-		display: flex;
-		justify-content:space-between;
-		align-items: center;
-		margin-bottom: 40px;
-	}
-
-	.billing-switch {
-		margin-bottom: 30px;
-	}
-
-	.document-type-container {
-		display: flex;
-		flex: 0 1 100%;
-
-		.select-field {
-			flex: 1 1 100%;
-
-			@media (min-width: 768px) {
-				flex: 0 0 30%;
-			}
+		@media (min-width: 768px) {
+			flex: 0 0 30%;
 		}
 	}
+}
 </style>
-
