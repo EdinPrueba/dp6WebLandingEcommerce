@@ -117,7 +117,7 @@ function addToCar() {
 }
 
 function noStock() {
-	return helper.stockGreaterThanCero(this.product);
+	return helper.noStock(this.product);
 }
 
 function mounted() {
@@ -380,6 +380,7 @@ function newRoute() {
 }
 
 function clickQuantity(value) {
+	console.log('clickQuantity', value);
 	if (this.product.priceDiscount <= 0) {
 		this.showNotification(
 			'El producto no se puede agregar al carrito, porque su precio es 0.',
@@ -397,11 +398,12 @@ function clickQuantity(value) {
 		num = value === 'more' ? (num += 1) : (num -= 1);
 	}
 	const validQuantity = this.checkValidQuantity(num);
+	console.log({ validQuantity });
 	this.quantityStock = parseInt(
 		(this.unitProductValid.quantity || 1) * num,
 		10,
 	);
-	if (this.quantityStock > this.product.stockWarehouse) {
+	if (this.quantityStock > helper.stockProductByType(this.product)) {
 		this.showNotification(
 			`El producto ${this.product.name} no cuenta con más stock en la presentación ${this.unitProductValid.name}.`,
 			'warning',
@@ -451,11 +453,13 @@ function checkValidQuantity(quantity) {
 	if (this.productInstance.isService || this.$allowOrderStockNegative) {
 		return true;
 	}
-	const { stock } = this.productInstance;
+	const stockByProduct = helper.stockProductByType(this.product);
+	// const { stock } = this.productInstance;
 	const quantityCalc =
 		this.productInstance.unit.quantity * quantity || quantity;
-	this.exceedQuantity = !(stock >= quantityCalc);
-	return stock >= quantityCalc;
+	this.exceedQuantity = !(stockByProduct >= quantityCalc);
+	console.log({ quantityCalc, stockByProduct });
+	return stockByProduct >= quantityCalc;
 }
 
 async function openDialog() {
@@ -487,18 +491,14 @@ function selectedUnit(unit) {
 	};
 	this.unitProductValid = unit || unitDefault;
 	this.exceedQuantity = this.quantityStock > this.product.stockWarehouse;
-	if (
-		this.quantityStock > this.product.stockWarehouse &&
-		!this.$allowOrderStockNegative
-	) {
+	if (this.noStock) {
 		// const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
 		// const newProductdetail = { ...this.product };
 		// this.$set(newProductdetail, 'quantity', validQuantity);
 		// this.product = { ...newProductdetail };
 		// this.productInstance.updateQuantity(validQuantity);
 		this.showNotification(
-			`El producto ${this.product.name}
-		no cuenta con más stock en la presentación ${unit.name}`,
+			`El producto ${this.product.name} no cuenta con más stock en la presentación ${unit.name}`,
 			'warning',
 		);
 	} else {

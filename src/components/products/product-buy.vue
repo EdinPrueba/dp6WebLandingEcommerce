@@ -1,5 +1,5 @@
 <template>
-  <div class="product-buy">
+	<div class="product-buy">
 		<!-- <div class="container-btn-open" v-if="false">
 			<p class="warehouse-null" v-if="openWarehouse">No hay tiendas disponibles</p>
 			<button
@@ -13,10 +13,7 @@
 		</div> -->
 		<div class="container-buttons">
 			<quantityButton
-				:class="[
-					'continer-quantity-button',
-					{ 'loading': isLoading },
-				]"
+				:class="['continer-quantity-button', { loading: isLoading }]"
 				@click="clickQuantity"
 				:number="number"
 			/>
@@ -24,9 +21,7 @@
 				active
 				button-title="¡LO QUIERO!"
 				:disabled-order="disabledOrder || disabledBuy"
-				:class="[
-					isLoading ? 'loading' : 'btn',
-				]"
+				:class="[isLoading ? 'loading' : 'btn']"
 				@click="$emit('add-to-car')"
 			>
 				<div>
@@ -64,9 +59,7 @@ export default {
 		imageCheck,
 	},
 	computed: {
-		...mapGetters('loading', [
-			'isLoading',
-		]),
+		...mapGetters('loading', ['isLoading']),
 		productTypeService,
 	},
 	methods: {
@@ -91,55 +84,55 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-	.product-buy {
-		.btn {
-			width: 197px;
-		}
-
-		.image-btn {
-			margin-right: 12px;
-		}
-
-		.btn-stores {
-			border-bottom: 1px solid color(dark);
-			font-size: size(small);
-			margin-bottom: 18px;
-
-			@media screen and (max-width: 996px) {
-				margin-bottom: 0px;
-			}
-		}
-
-		.container-buttons {
-			display: flex;
-
-			@media screen and (max-width: 996px) {
-				justify-content: center;
-				padding: 0 5%;
-			}
-		}
-
-		.continer-quantity-button {
-			margin-right: 17px;
-		}
+.product-buy {
+	.btn {
+		width: 197px;
 	}
 
-	.container-btn-open{
+	.image-btn {
+		margin-right: 12px;
+	}
+
+	.btn-stores {
+		border-bottom: 1px solid color(dark);
+		font-size: size(small);
+		margin-bottom: 18px;
+
 		@media screen and (max-width: 996px) {
-			border: 1px solid color(border);
-			padding: 15px;
-			margin-bottom: 33px;
-			text-align: center;
+			margin-bottom: 0px;
 		}
 	}
 
-	.stores {
-		margin-bottom: 10px;
+	.container-buttons {
+		display: flex;
+
+		@media screen and (max-width: 996px) {
+			justify-content: center;
+			padding: 0 5%;
+		}
 	}
 
-	.warehouse-null {
-		color: #acaaaa;
-		font-family: font(regular);
-		font-size: 12px;
+	.continer-quantity-button {
+		margin-right: 17px;
 	}
+}
+
+.container-btn-open {
+	@media screen and (max-width: 996px) {
+		border: 1px solid color(border);
+		padding: 15px;
+		margin-bottom: 33px;
+		text-align: center;
+	}
+}
+
+.stores {
+	margin-bottom: 10px;
+}
+
+.warehouse-null {
+	color: #acaaaa;
+	font-family: font(regular);
+	font-size: 12px;
+}
 </style>

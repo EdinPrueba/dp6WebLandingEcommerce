@@ -219,6 +219,8 @@ import { getDeeper } from '@/shared/lib';
 import TypeProduct from '@/shared/enums/typeProduct';
 import helper from '@/shared/helper';
 
+const { stockProductByType } = helper;
+
 function created() {
 	const productsSelected =
 		JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
@@ -259,8 +261,9 @@ function addToCar(unit, show) {
 		productSelected.wholeSalePrice = this.WholeSalePrice || [];
 		productSelected.priceDiscountOrigin = this.product.priceDiscount || 0;
 		const StockSoldOut =
-			this.quantityAddProduct >= productSelected.stockWarehouse &&
-			!this.$allowOrderStockNegative;
+			this.quantityAddProduct >= stockProductByType(productSelected);
+		// this.quantityAddProduct >= productSelected.stockWarehouse &&
+		// !this.$allowOrderStockNegative;
 		this.disabledAdd = StockSoldOut;
 		if (StockSoldOut) {
 			this.showNotStock = true;

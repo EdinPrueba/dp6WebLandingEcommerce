@@ -133,12 +133,7 @@
 				Total: {{ getCurrencySymbol }}. {{ product.total | currencyFormat }}
 			</h3>
 		</div>
-		<v-flex
-			xs12
-			sm8
-			md8
-			v-if="!$allowOrderStockNegative && product.stockWarehouse === 0"
-		>
+		<v-flex xs12 sm8 md8 v-if="noStock">
 			<p :style="`color: red;`" class="product-title">
 				Este producto no cuenta con sotck
 			</p>
@@ -155,6 +150,7 @@ import commentsComponent from '@/components/shared/icons/comments-component';
 import textArea from '@/components/shared/inputs/text-area';
 import trashComponent from '@/components/shared/icons/trash-component';
 import quantityButton from '@/components/shared/buttons/quantity-button';
+import helper from '@/shared/helper';
 import { mapGetters } from 'vuex';
 
 function goToProduct({ slug, id }) {
@@ -199,10 +195,7 @@ function clickQuantity(val) {
 		}
 	}
 	this.product.priceDiscount = this.product.priceDiscountOrigin;
-	if (
-		this.quantityStock > this.product.stockWarehouse &&
-		!this.$allowOrderStockNegative
-	) {
+	if (helper.stockProductByType(this.product) < this.quantityStock) {
 		this.showNotification(
 			`El producto ${this.product.name} no cuenta con más stock en la presentación: ${unit.name}.`,
 			'warning',
@@ -253,6 +246,9 @@ export default {
 	computed: {
 		...mapGetters(['getCurrencySymbol', 'stockAvaible', 'getWholeSalePrice']),
 		stepOne,
+		noStock() {
+			return helper.noStock(this.product);
+		},
 	},
 	data,
 	mounted,
