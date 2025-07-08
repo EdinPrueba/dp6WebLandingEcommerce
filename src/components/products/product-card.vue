@@ -194,11 +194,15 @@
 						class="btn-conversions"
 						@click="addToCar(item, false)"
 					>
-						{{ item.name }} - {{ getCurrencySymbol }}
 						{{
-							item.quantity
-								? item.quantity * product.originalPrice
-								: product.originalPrice | currencyFormat
+							item.name && item.name.length > 9
+								? item.name.slice(0, 9)
+								: item.name
+						}}
+						- {{ getCurrencySymbol }}
+
+						{{
+							item.price ? item.price : product.priceDiscount | currencyFormat
 						}}
 					</v-btn>
 				</div>
@@ -271,11 +275,11 @@ function addToCar(unit, show) {
 			productSelected.priceDiscountOrigin =
 				unitList && unitList.price
 					? unitList.price
-					: this.product.originalPrice * (unit.quantity || 1);
+					: this.product.priceDiscount * (unit.quantity || 1);
 			productSelected.priceDiscount =
 				unitList && unitList.price
 					? unitList.price
-					: this.product.originalPrice * (unit.quantity || 1);
+					: this.product.priceDiscount * (unit.quantity || 1);
 		}
 		const { stock, stockWarehouse, stockComposite } = productSelected;
 		const finalStock = helper.isComposed(productSelected)
@@ -297,6 +301,8 @@ function addToCar(unit, show) {
 			}) ${message}`,
 			`${color}`,
 			null,
+			false,
+			1500,
 		);
 		this.$store.dispatch('addProductToBuyCar', productSelected);
 		// this.quantityAddProduct = 1;
@@ -495,9 +501,13 @@ export default {
 			const productsSelected =
 				JSON.parse(localStorage.getItem('ecommerce::product-select')) || [];
 			const product = productsSelected.find(p => p.id === this.product.id);
-			this.showAdd = !(product && product.quantity < 2);
+			const quantity = Math.max(product.quantity - this.quantityAddProduct, 0);
+			this.showAdd = quantity;
 			this.product.quantity = this.quantityAddProduct;
 			this.$store.dispatch('removeProductToBuyCar', this.product);
+			if (!quantity) {
+				this.addQuantity = true;
+			}
 		},
 		handleImageError(event) {
 			const target = event.target;
@@ -525,10 +535,19 @@ export default {
 				this.product.conversions &&
 				typeof this.product.conversions === 'object'
 			) {
+				const { priceList } = this.product;
+				const ecommerce =
+					JSON.parse(localStorage.getItem('ecommerce::ecommerce-data')) || null;
+				const defaultIdPiceList = ecommerce.settings.salPriceListId;
+				const priceListUnits =
+					priceList && priceList[defaultIdPiceList]
+						? priceList[defaultIdPiceList].units
+						: null;
 				this.showViewProduct = false;
 				this.conversionsProducts = Object.keys(this.product.conversions).map(
 					key => ({
 						id: key,
+						...priceListUnits[key],
 						...this.product.conversions[key],
 					}),
 				);
@@ -546,6 +565,7 @@ export default {
 			}
 		},
 		eventAddQuantity() {
+			this.quantityAddProduct = 1;
 			this.selectUnitCar();
 		},
 		closeViewProduct() {
@@ -965,7 +985,7 @@ export default {
 	border-radius: 10px;
 	font-family: 'Roboto', sans-serif;
 	font-weight: bold;
-	padding: 10px 20px;
+	padding: 5px 10px;
 	text-transform: uppercase;
 	transition: background-color 0.3s ease;
 	border: 1px solid red;

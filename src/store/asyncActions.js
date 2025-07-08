@@ -278,14 +278,14 @@ const asyncActions = {
 		pageTitle[0].innerHTML = title;
 	},
 	LOAD_DOMAINS: async (store, { context }) => {
-		try {
-			const codeCompany = process.env.ACL_COMPANY_CODE;
-			const codeProject = process.env.CODE_PROJECT;
-			const url = `project/${codeProject}/domains?codeCompany=${codeCompany}`;
-			const { data: res } = await context.$httpAcl.get(url);
-			context.setLocalData(`${process.env.STORAGE_USER_KEY}::domains`, res.domains);
-		} catch (error) {
-			console.log(error);
+		const codeCompany = process.env.ACL_COMPANY_CODE;
+		const codeProject = process.env.CODE_PROJECT;
+		const url = `project/${codeProject}/domains?codeCompany=${codeCompany}`;
+		const { data: res } = await context.$httpAcl.get(url);
+		context.setLocalData(`${process.env.STORAGE_USER_KEY}::domains`, res.domains);
+		const domains = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`));
+		if (domains) {
+			window.location.reload();
 		}
 	},
 	MAKE_ORDER: async ({ dispatch, getters, commit }, { flagFinish, context }) => {

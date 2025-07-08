@@ -4,15 +4,27 @@
 			v-bind="$attrs"
 			v-on="$listeners"
 			class="app-button"
-			:class="{ 'thin': thin, 'active' : active}"
-			:style="`background-color: ${active ? background : 'transparent'}; text-align: ${!img ? 'center' : 'left'} ; color: ${active ? color : border}; border: ${border ? `1px solid ${border}` : null}; max-width: ${maxWidth}`"
+			:class="{ thin: thin, active: active }"
+			:style="
+				`background-color: ${
+					active ? background : 'transparent'
+				}; text-align: ${!img ? 'center' : 'left'} ; color: ${
+					active ? color : border
+				}; border: ${
+					border ? `1px solid ${border}` : null
+				}; max-width: ${maxWidth}; height: ${height}`
+			"
 		>
-		<v-progress-circular
-			v-if="spinner"
-			indeterminate
-			color="white"
+			<v-progress-circular
+				v-if="spinner"
+				indeterminate
+				color="white"
 			></v-progress-circular>
-			<span class="span-img" :style="`border-color: ${imgBorderColor}`" v-if="img">
+			<span
+				class="span-img"
+				:style="`border-color: ${imgBorderColor}`"
+				v-if="img"
+			>
 				<img
 					v-if="img"
 					:height="imgHeight"
@@ -60,51 +72,54 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		height: {
+			type: String,
+			default: '39.5px',
+		},
 	},
 };
 </script>
 
 <style lang="scss" scoped>
-	.spinner{
-		width: 20px;
-		height: 20px;
-		background-color: red;
-	}
-	.app-button {
-		border-radius: 7px;
-		font-family: font(bold);
-		height: 39.5px;
-		letter-spacing: 0;
-		max-width: 175px;
-		width: 100%;
+.spinner {
+	width: 20px;
+	height: 20px;
+	background-color: red;
+}
+.app-button {
+	border-radius: 7px;
+	font-family: font(bold);
+	letter-spacing: 0;
+	max-width: 175px;
+	width: 100%;
 
-		@media (min-width: 764px) {
-			max-width: 182px;
-		}
-
-		.span-img {
-			border-right-style: solid;
-			border-right-width: 1px;
-			display: inline-block;
-			height: 31px;
-			line-height: 31px;
-			margin-right: 11px;
-			padding: 3px 0px;
-			text-align: center;
-			vertical-align: middle;
-			width: 41px;
-		}
-
-		&.thin {
-			height: 24px;
-			font-family: font(demi);
-			font-size: size(small);
-			width: 170px;
-		}
+	@media (min-width: 764px) {
+		max-width: 182px;
 	}
 
-	[disabled] {
-		opacity: 0.3;
-		cursor: not-allowed;
+	.span-img {
+		border-right-style: solid;
+		border-right-width: 1px;
+		display: inline-block;
+		height: 31px;
+		line-height: 31px;
+		margin-right: 11px;
+		padding: 3px 0px;
+		text-align: center;
+		vertical-align: middle;
+		width: 41px;
 	}
+
+	&.thin {
+		height: 24px;
+		font-family: font(demi);
+		font-size: size(small);
+		width: 170px;
+	}
+}
+
+[disabled] {
+	opacity: 0.3;
+	cursor: not-allowed;
+}
 </style>
