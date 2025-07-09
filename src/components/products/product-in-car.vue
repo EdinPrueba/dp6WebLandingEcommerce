@@ -52,7 +52,7 @@
 				</p>
 				<p class="product-price" v-else>{{getCurrencySymbol}} {{ product.priceDiscount | currencyFormat }}</p> -->
 				<p class="product-price">
-					{{ getCurrencySymbol }} {{ product.priceDiscount | currencyFormat }}
+					{{ getCurrencySymbol }} {{ getUnitPrice | currencyFormat }}
 				</p>
 			</div>
 			<div class="quantity">
@@ -84,7 +84,7 @@
 				</p>	
 				<p class="product-total" v-else>{{getCurrencySymbol}} {{product.total | currencyFormat}}</p> -->
 				<p class="product-total">
-					{{ getCurrencySymbol }} {{ product.total | currencyFormat }}
+					{{ getCurrencySymbol }} {{ getTotal | currencyFormat }}
 				</p>
 			</div>
 		</section>
@@ -253,6 +253,30 @@ export default {
 	computed: {
 		...mapGetters(['getCurrencySymbol', 'stockAvaible', 'getWholeSalePrice']),
 		stepOne,
+		getUnitPrice() {
+			const priceList = this.product.priceList
+				? Object.values(this.product.priceList)
+				: null;
+			if (priceList && priceList[0].ranges.length) {
+				const range = priceList[0].ranges.find(
+					r => this.product.quantity >= r.from && this.product.quantity <= r.to,
+				);
+				return range ? range.price : this.product.priceDiscount;
+			}
+			return Number(this.product.quantity) * Number(this.product.priceDiscount);
+		},
+		getTotal() {
+			const priceList = this.product.priceList
+				? Object.values(this.product.priceList)
+				: null;
+			if (priceList && priceList[0].ranges.length) {
+				const range = priceList[0].ranges.find(
+					r => this.product.quantity >= r.from && this.product.quantity <= r.to,
+				);
+				return range ? range.price : this.product.total;
+			}
+			return this.product.total;
+		},
 	},
 	data,
 	mounted,

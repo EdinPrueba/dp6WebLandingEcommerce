@@ -85,7 +85,6 @@
 					{{ wholeSalePrice[0].price | currencyFormat }}
 				</small>
 			</div>
-
 			<span
 				v-if="data.price"
 				:class="[
@@ -125,9 +124,11 @@
 			:open-warehouse="openWarehouse"
 			:number="data.quantity"
 			:product="data"
+			:unit="unit"
 			@click="clickQuantity"
 			@add-to-car="addToCar"
 			@open-dialog="$emit('open-dialog')"
+			@update-number="$emit('update-number', $event)"
 		/>
 		<cart-bottom
 			:exceed-quantity="exceedQuantity"
@@ -314,6 +315,10 @@ export default {
 		exceedQuantity: {
 			type: Boolean,
 			default: false,
+		},
+		unit: {
+			default: () => {},
+			type: Object,
 		},
 	},
 };
