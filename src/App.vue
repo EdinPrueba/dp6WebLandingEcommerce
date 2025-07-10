@@ -1029,4 +1029,5 @@ input.app-input::-webkit-input-placeholder {
 		bottom: -10px;
 	}
 }
+
 </style>
