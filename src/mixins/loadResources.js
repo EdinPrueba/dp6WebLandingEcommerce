@@ -1,16 +1,25 @@
+function getDomainsFromStorage() {
+	const item = localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`);
+	return item ? JSON.parse(item) : null;
+}
+
 async function created() {
-	const domains = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`));
+	let domains = getDomainsFromStorage();
 	if (!domains) {
-		this.loadDomians();
+		await this.loadDomians();
+		domains = getDomainsFromStorage();
+
+		if (domains) {
+			window.location.reload();
+			return;
+		}
 	}
 	await this.loadCommerceData();
-	this.loadResource();
+	await this.loadResource();
 }
 
 async function loadCommerceData() {
-	const requests = [
-		this.$store.dispatch('LOAD_COMMERCE_INFO', this),
-	];
+	const requests = [this.$store.dispatch('LOAD_COMMERCE_INFO', this)];
 	await Promise.all(requests);
 }
 

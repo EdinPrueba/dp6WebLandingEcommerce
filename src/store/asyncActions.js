@@ -283,10 +283,7 @@ const asyncActions = {
 		const url = `project/${codeProject}/domains?codeCompany=${codeCompany}`;
 		const { data: res } = await context.$httpAcl.get(url);
 		context.setLocalData(`${process.env.STORAGE_USER_KEY}::domains`, res.domains);
-		const domains = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`));
-		if (domains) {
-			window.location.reload();
-		}
+		// console.log('Los dominios han sido cargados en el localStorage. Los dominios cargados son', res.domains);
 	},
 	MAKE_ORDER: async ({ dispatch, getters, commit }, { flagFinish, context }) => {
 		commit('SET_IS_TOOGLE_BTN', true);
