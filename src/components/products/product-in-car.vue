@@ -35,7 +35,7 @@
 				>
 					Disponibilidad:
 					<span class="product-price">
-						{{ stockAvaible }}
+						{{ stockAvaible === Infinity ? 'Ilimitado' : stockAvaible }}
 					</span>
 				</p>
 			</div>
@@ -175,16 +175,12 @@ function clickQuantity(val) {
 	let { quantity } = this.product;
 	const { unit } = this.product;
 	if (val) {
-		this.opt = {
-			more: 1,
-			less: -1,
-		};
-		quantity += this.opt[val];
+		quantity += val === 'more' ? 1 : -1;
 		quantity = quantity < 1 ? 1 : quantity;
 	}
 	this.quantityStock = parseInt(unit.quantity * quantity, 10);
 	if (this.showUnity) {
-		if (quantity >= this.stockAvaible && !this.$allowOrderStockNegative) {
+		if (helper.stockProductByType(this.product) < quantity) {
 			this.maxQuantity = true;
 			this.showNotification(
 				'No cuenta con la disponibilidad de stock del producto',
@@ -265,6 +261,9 @@ export default {
 				this.product.productImage ||
 				this.product.imagePresentation ||
 				this.fallbackImage;
+		},
+		stockProductByType() {
+			return helper.stockProductByType(this.product);
 		},
 	},
 	props: {

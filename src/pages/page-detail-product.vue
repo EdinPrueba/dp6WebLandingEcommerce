@@ -86,7 +86,7 @@ import warehousesModal from '@/components/products/warehouses-modal';
 import productPublicity from '@/components/products/product-publicity';
 import appModal from '@/components/shared/modal/app-modal';
 import helper from '@/shared/helper';
-import { setNewProperty, map } from '@/shared/lib';
+// import { setNewProperty, map } from '@/shared/lib';
 
 async function created() {
 	this.$loading(true);
@@ -140,24 +140,14 @@ async function loadProduct() {
 	try {
 		const { data: response } = await this.isLoggedUser();
 		this.product = response;
-		let conversionsFormatted = [];
-		const { conversions } = this.product;
 		if (this.showUnity) {
-			if (conversions) {
-				conversionsFormatted = map(
-					k => setNewProperty('id', Number(k))(conversions[k]),
-					Object.keys(conversions),
-				);
-			}
-			this.stockAvaible =
-				conversionsFormatted && conversionsFormatted[0]
-					? parseInt(
-							this.product.stockWarehouse / conversionsFormatted[0].quantity,
-							10,
-					  )
-					: 0;
-			// this.stockAvaible = parseInt(this.product.stock / conversionsFormatted[0]
-			// 	? conversionsFormatted[0].quantity : 0, 10);
+			const { conversions } = this.product;
+			const stock = helper.stockProductByType(this.product);
+			const firstConversion = Object.keys(conversions || {})[0];
+			const stockAvaible = firstConversion
+				? parseInt(stock / firstConversion.quantity, 10)
+				: stock;
+			this.stockAvaible = stockAvaible;
 			this.$store.dispatch('setStock', this.stockAvaible);
 		}
 		this.updatePageTitle(this.product.name.toUpperCase());
@@ -181,7 +171,8 @@ async function loadProduct() {
 
 async function loadData(id) {
 	this.$store.dispatch('LOAD_RELATED_PRODUCTS', { context: this, id });
-	if (this.getCommerceData.settings.flagGrouper !== 2) {
+	const commerceData = this.getCommerceData || {};
+	if (commerceData.settings && commerceData.settings.flagGrouper !== 2) {
 		const requests = [
 			this.$httpProductsPublic.get(`products-public/${id}/children`),
 		];
@@ -380,7 +371,6 @@ function newRoute() {
 }
 
 function clickQuantity(value) {
-	console.log('clickQuantity', value);
 	if (this.product.priceDiscount <= 0) {
 		this.showNotification(
 			'El producto no se puede agregar al carrito, porque su precio es 0.',
@@ -398,7 +388,6 @@ function clickQuantity(value) {
 		num = value === 'more' ? (num += 1) : (num -= 1);
 	}
 	const validQuantity = this.checkValidQuantity(num);
-	console.log({ validQuantity });
 	this.quantityStock = parseInt(
 		(this.unitProductValid.quantity || 1) * num,
 		10,
@@ -418,20 +407,6 @@ function clickQuantity(value) {
 		this.showNotification(`Cantidad: ${num} no disponible`, 'primary');
 	}
 }
-
-// function getProductPrice() {
-// 	const { priceList, unitId, quantity } = this.product;
-// 	const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
-// 	const priceListId = this.getCommerceData.settings.salPriceListId;
-// 	const commercePriceListId = user && user.salPriceListId ? user.salPriceListId : null;
-// 	this.priceListIdSelected = commercePriceListId || priceListId;
-// 	const priceListSelected = priceList[this.priceListIdSelected];
-// 	const unitSelected = priceListSelected.units ? priceList.units[unitId] : null;
-// 	const listRanges = priceListSelected.ranges || [];
-// 	const listRangeApply = listRanges.find(lr => quantity >= lr.from && quantity <= lr.to);
-// 	console.log(this.product, unitSelected, listRangeApply);
-// 	return 0;
-// }
 
 function inputQuantity(num) {
 	const newProductdetail = { ...this.product };
@@ -458,7 +433,6 @@ function checkValidQuantity(quantity) {
 	const quantityCalc =
 		this.productInstance.unit.quantity * quantity || quantity;
 	this.exceedQuantity = !(stockByProduct >= quantityCalc);
-	console.log({ quantityCalc, stockByProduct });
 	return stockByProduct >= quantityCalc;
 }
 
