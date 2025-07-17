@@ -536,7 +536,8 @@ export default {
 		selectUnitCar() {
 			if (
 				this.product.conversions &&
-				typeof this.product.conversions === 'object'
+				typeof this.product.conversions === 'object' &&
+				this.$flagShowBaseUnit !== 2
 			) {
 				const { priceList } = this.product;
 				const ecommerce =
