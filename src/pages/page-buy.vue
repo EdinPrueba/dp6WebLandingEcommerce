@@ -107,6 +107,7 @@ import appButton from '@/components/shared/buttons/app-button';
 import productInCar from '@/components/products/product-in-car';
 import summaryOrder from '@/components/order/summary-order';
 import summaryInPayment from '@/components/order/summary-in-payment';
+import helper from '@/shared/helper';
 
 function created() {
 	const ecommerceLocal = this.getLocalStorage('ecommerce::ecommerce-data');
@@ -275,7 +276,7 @@ export default {
 		transactionId,
 		collapseStep,
 		allStock() {
-			return this.getProductToBuy.every(prod => prod.stockWarehouse);
+			return !this.getProductToBuy.some(helper.noStock);
 		},
 		validateStock() {
 			const exceededStockProducts = this.getProductToBuy.filter(
@@ -283,7 +284,7 @@ export default {
 					const totalQuantity = array
 						.filter(p => p.id === prod.id)
 						.reduce((sum, p) => sum + p.quantity * (p.unit.quantity || 1), 0);
-					return totalQuantity > prod.stockWarehouse;
+					return totalQuantity > helper.stockProductByType(prod);
 				},
 			);
 
@@ -301,7 +302,7 @@ export default {
 			this.messageStock = Object.values(totals)
 				.map(product => {
 					const validate =
-						product.totalQuantity > product.stockWarehouse
+						product.totalQuantity > helper.stockProductByType(product)
 							? `El poducto ${product.name} excede el stock.`
 							: null;
 					return validate;

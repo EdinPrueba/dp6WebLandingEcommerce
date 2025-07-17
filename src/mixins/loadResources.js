@@ -36,10 +36,10 @@ export default {
 	created,
 	methods: {
 		async loadDomians() {
-			const requests = [
-				this.$store.dispatch('LOAD_DOMAINS', { context: this }),
-			];
-			await Promise.all(requests);
+			await this.$store.dispatch('LOAD_DOMAINS', { context: this });
+			// const requests = [
+			// ];
+			// await Promise.all(requests);
 		},
 		loadCommerceData,
 		loadResource,

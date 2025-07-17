@@ -108,7 +108,10 @@
 		/>
 		<v-flex mt-3 text-xs-center class="content-dis" v-if="showUnity">
 			<h4 :style="`color:${globalColors.title}`">
-				Disponibilidad: <span class="number-dispon">{{ stockAvaible }}</span>
+				Disponibilidad:
+				<span class="number-dispon">{{
+					stockAvaible === Infinity ? 'Ilimitado' : stockAvaible
+				}}</span>
 			</h4>
 		</v-flex>
 		<product-childrens

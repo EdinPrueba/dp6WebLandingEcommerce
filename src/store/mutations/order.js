@@ -30,18 +30,15 @@ const orderMutation = {
 		Vue.set(state.order, 'products', [...details]);
 	},
 	UPDATE_PRODUCTS_TO_BUY(state, { product, context }) {
-		const allowOrderStockNegative = Vue.prototype.$allowOrderStockNegative;
 		const { id, quantity, unitSelected } = product;
 		const { products } = state.order;
 		const index = products.findIndex((p) => {
 			const productId = p.productId || p.id;
 			return productId === id && p.unitSelected === unitSelected;
 		});
-		const { stockWarehouse, typeInfo } = products[index];
-		products[index].quantity = quantity > stockWarehouse ? stockWarehouse : quantity;
-		if (typeInfo.code === 'servicios' || allowOrderStockNegative) {
-			products[index].quantity = quantity;
-		} else if (quantity > stockWarehouse) {
+		const stockProd = h.stockProductByType(products[index]);
+		products[index].quantity = quantity > stockProd ? stockProd : quantity;
+		if (quantity > stockProd) {
 			context.showNotification(`Cantidad: ${quantity} no disponible`, 'primary');
 		}
 
