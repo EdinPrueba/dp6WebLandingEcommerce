@@ -35,7 +35,7 @@
 				>
 					Disponibilidad:
 					<span class="product-price">
-						{{ stockAvaible }}
+						{{ stockAvaible === Infinity ? 'Ilimitado' : stockAvaible }}
 					</span>
 				</p>
 			</div>
@@ -133,12 +133,7 @@
 				Total: {{ getCurrencySymbol }}. {{ product.total | currencyFormat }}
 			</h3>
 		</div>
-		<v-flex
-			xs12
-			sm8
-			md8
-			v-if="!$allowOrderStockNegative && product.stockWarehouse === 0"
-		>
+		<v-flex xs12 sm8 md8 v-if="noStock">
 			<p :style="`color: red;`" class="product-title">
 				Este producto no cuenta con sotck
 			</p>
@@ -155,6 +150,7 @@ import commentsComponent from '@/components/shared/icons/comments-component';
 import textArea from '@/components/shared/inputs/text-area';
 import trashComponent from '@/components/shared/icons/trash-component';
 import quantityButton from '@/components/shared/buttons/quantity-button';
+import helper from '@/shared/helper';
 import { mapGetters } from 'vuex';
 
 function goToProduct({ slug, id }) {
@@ -179,16 +175,12 @@ function clickQuantity(val) {
 	let { quantity } = this.product;
 	const { unit } = this.product;
 	if (val) {
-		this.opt = {
-			more: 1,
-			less: -1,
-		};
-		quantity += this.opt[val];
+		quantity += val === 'more' ? 1 : -1;
 		quantity = quantity < 1 ? 1 : quantity;
 	}
 	this.quantityStock = parseInt(unit.quantity * quantity, 10);
 	if (this.showUnity) {
-		if (quantity >= this.stockAvaible && !this.$allowOrderStockNegative) {
+		if (helper.stockProductByType(this.product) < quantity) {
 			this.maxQuantity = true;
 			this.showNotification(
 				'No cuenta con la disponibilidad de stock del producto',
@@ -199,10 +191,7 @@ function clickQuantity(val) {
 		}
 	}
 	this.product.priceDiscount = this.product.priceDiscountOrigin;
-	if (
-		this.quantityStock > this.product.stockWarehouse &&
-		!this.$allowOrderStockNegative
-	) {
+	if (helper.stockProductByType(this.product) < this.quantityStock) {
 		this.showNotification(
 			`El producto ${this.product.name} no cuenta con más stock en la presentación: ${unit.name}.`,
 			'warning',
@@ -253,6 +242,9 @@ export default {
 	computed: {
 		...mapGetters(['getCurrencySymbol', 'stockAvaible', 'getWholeSalePrice']),
 		stepOne,
+		noStock() {
+			return helper.noStock(this.product);
+		},
 		getUnitPrice() {
 			const priceList = this.product.priceList
 				? Object.values(this.product.priceList)
@@ -293,6 +285,9 @@ export default {
 				this.product.productImage ||
 				this.product.imagePresentation ||
 				this.fallbackImage;
+		},
+		stockProductByType() {
+			return helper.stockProductByType(this.product);
 		},
 	},
 	props: {

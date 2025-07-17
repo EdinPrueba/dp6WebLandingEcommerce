@@ -1,10 +1,10 @@
 async function created() {
 	const domains = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`));
 	if (!domains) {
-		this.loadDomians();
+		await this.loadDomians();
 	}
 	await this.loadCommerceData();
-	this.loadResource();
+	await this.loadResource();
 }
 
 async function loadCommerceData() {
@@ -27,10 +27,10 @@ export default {
 	created,
 	methods: {
 		async loadDomians() {
-			const requests = [
-				this.$store.dispatch('LOAD_DOMAINS', { context: this }),
-			];
-			await Promise.all(requests);
+			await this.$store.dispatch('LOAD_DOMAINS', { context: this });
+			// const requests = [
+			// ];
+			// await Promise.all(requests);
 		},
 		loadCommerceData,
 		loadResource,
