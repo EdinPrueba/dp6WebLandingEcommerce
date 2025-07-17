@@ -2,11 +2,10 @@ import axios from 'axios';
 import helper from '@/shared/helper';
 
 const aclInstance = axios.create({
-	// baseURL: process.env.ACL_URL,
 	baseURL: 'https://acl.casamarketapp.com/api',
 });
 
-const productsUrl = helper.getKeyStorage('PRODUCTS_URL') || '';
+const productsUrl = helper.getDomainDynamic('PRODUCTS_URL') || '';
 const productsInstance = axios.create({
 	baseURL: productsUrl.endPoint,
 });
@@ -18,7 +17,7 @@ const productsPublicInstance = axios.create({
 	},
 });
 
-const salesUrl = helper.getKeyStorage('SALES_URL') || '';
+const salesUrl = helper.getDomainDynamic('SALES_URL') || '';
 const salesInstance = axios.create({
 	baseURL: salesUrl.endPoint,
 });
@@ -50,7 +49,7 @@ const http2Instance = axios.create({
 	baseURL: process.env.SALES_URL_HTTP2,
 });
 
-const productsReadUrl = helper.getKeyStorage('PRODUCTS_REPORT') || '';
+const productsReadUrl = helper.getDomainDynamic('PRODUCTS_REPORT') || '';
 const productsReadReportPublic = axios.create({
 	baseURL: productsReadUrl.endPoint,
 	headers: {
@@ -58,7 +57,7 @@ const productsReadReportPublic = axios.create({
 	},
 });
 
-const salesReadUrl = helper.getKeyStorage('SALES_REPORT') || '';
+const salesReadUrl = helper.getDomainDynamic('SALES_REPORT') || '';
 const saleReadReportPublic = axios.create({
 	baseURL: salesReadUrl.endPoint,
 	headers: {
