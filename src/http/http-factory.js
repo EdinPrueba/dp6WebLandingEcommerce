@@ -1,50 +1,46 @@
+/* eslint-disable no-param-reassign */
 import axios from 'axios';
 import helper from '@/shared/helper';
-import {
-	httpRequestInterceptor,
-	httpResponseInterceptor,
-	httpResponseSuccessInterceptor,
-} from './interceptors';
 
 /**
- * Aplica interceptores estándar a una instancia de Axios
+ * Crea una instancia Axios con baseURL fija
  */
-function applyInterceptors(instance) {
-	instance.interceptors.request.use(httpRequestInterceptor);
+export function createFixedAxios(baseURL, interceptors, headers = {}) {
+	const instance = axios.create({ baseURL, headers });
+
+	instance.interceptors.request.use(interceptors.httpRequestInterceptor);
 	instance.interceptors.response.use(
-		httpResponseSuccessInterceptor,
-		httpResponseInterceptor
+		interceptors.httpResponseSuccessInterceptor,
+		interceptors.httpResponseInterceptor
 	);
 	return instance;
 }
 
 /**
- * Crea una instancia Axios simple con una baseURL fija
- */
-export function createFixedAxios(baseURL, headers = {}) {
-	const instance = axios.create({ baseURL, headers });
-	return applyInterceptors(instance);
-}
-
-/**
  * Crea una instancia Axios con baseURL obtenida dinámicamente (por ejemplo, desde localStorage)
  */
-export function createDynamicAxios(storageKey, headers = {}) {
-	const instance = axios.create({});
+export function createDynamicAxios(storageKey, interceptors, headers = {}) {
+	const instance = axios.create();
 
-	// Interceptor para setear dinámicamente la baseURL antes de cada request
 	instance.interceptors.request.use((config) => {
-		const newConfig = { ...config };
 		const storageValue = helper.getDomainDynamic(storageKey);
+
 		if (storageValue && storageValue.endPoint) {
-			newConfig.baseURL = storageValue.endPoint;
+			config.baseURL = storageValue.endPoint;
 		}
-		newConfig.headers = {
-			...newConfig.headers,
+
+		config.headers = {
+			...config.headers,
 			...headers,
 		};
+
 		return config;
 	});
 
-	return applyInterceptors(instance);
+	instance.interceptors.request.use(interceptors.httpRequestInterceptor);
+	instance.interceptors.response.use(
+		interceptors.httpResponseSuccessInterceptor,
+		interceptors.httpResponseInterceptor
+	);
+	return instance;
 }

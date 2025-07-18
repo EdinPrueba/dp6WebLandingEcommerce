@@ -8,13 +8,12 @@ import VueAuthenticate from 'vue-authenticate';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import 'normalize.css';
-import updateFromLocalStorage from '@/mixins/updateFromLocalStorage';
 import loadResources from '@/mixins/loadResources';
 import App from './App';
 import registerVuetify from './vuetify';
 import './assets/css/swiper.css';
 
-import setupHttpClients from './http/setup-http-clients';
+import VueHttp from './http/plugin';
 import vueRouter from './router';
 import globalMixin from './mixins/global';
 import registerFilters from './filters/global';
@@ -27,10 +26,13 @@ window.onload = () => {
 	store.dispatch('toggleLoading', false);
 };
 registerMap(Vue);
+
+// PLUGINS
 Vue.use(VueAxios, axios);
 Vue.use(VueTheMask);
 Vue.use(Vuelidate);
 Vue.use(VueSimpleSVG);
+Vue.use(VueHttp, { store });
 Vue.use(VueAuthenticate, {
 	baseUrl: process.env.ACL_URL,
 	providers: {
@@ -52,19 +54,20 @@ Vue.use(VueAnalytics, {
 });
 Vue.use(VueAwesomeSwiper);
 
-const router = vueRouter(Vue);
+
 registerFilters(Vue);
 registerVuetify(Vue);
+
 Vue.prototype.$bus = new Vue();
 Vue.prototype.$imageUrl = process.env.S3_IMAGES_URL;
 Vue.prototype.$clientId = process.env.CLIENT_ID;
 Vue.config.productionTip = false;
-Vue.mixin(globalMixin);
 
+Vue.mixin(globalMixin);
+const router = vueRouter(Vue);
 /* eslint-disable no-new */
 new Vue({
 	async created() {
-		await setupHttpClients(Vue);
 		this.$bus.$on('LOAD_COMMERCE_INFO', (commerceData) => {
 			Vue.prototype.$commerceData = commerceData;
 			Vue.prototype.$allowOrderStockNegative = commerceData.company.settings.allowOrderStockNegative;
@@ -72,7 +75,7 @@ new Vue({
 		});
 	},
 	el: '#app',
-	mixins: [updateFromLocalStorage, loadResources],
+	mixins: [loadResources],
 	router,
 	render: h => h(App),
 	store,

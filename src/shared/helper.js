@@ -85,9 +85,8 @@ function generateBlob(data, contentType = 'application/pdf') {
 }
 
 function getLocalData(key) {
-	return JSON.parse(
-		localStorage.getItem(`${process.env.STORAGE_USER_KEY}::${key}`),
-	);
+	const item = localStorage.getItem(`${process.env.STORAGE_USER_KEY}::${key}`);
+	return item ? JSON.parse(item) : null;
 }
 
 function getLocalStorage() {
