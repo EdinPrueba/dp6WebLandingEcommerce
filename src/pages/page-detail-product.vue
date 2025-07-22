@@ -33,6 +33,7 @@
 				:stock-avaible="stockAvaible"
 				:wholeSalePrice="wholeSalePrice"
 				:exceed-quantity="exceedQuantity"
+				:unit="unitProductValid"
 				class="container-product-detail"
 				@update="loadData"
 				@selected="selectFeature"
@@ -42,6 +43,7 @@
 				@open-dialog="openDialog"
 				@open-confirm-modal="showConfirmModal = true"
 				@unit-selection="selectedUnit"
+				@update-number="updateNumber"
 			/>
 		</div>
 		<div v-if="!disabled" class="detail-tab-publicity">
@@ -86,7 +88,7 @@ import warehousesModal from '@/components/products/warehouses-modal';
 import productPublicity from '@/components/products/product-publicity';
 import appModal from '@/components/shared/modal/app-modal';
 import helper from '@/shared/helper';
-import { setNewProperty, map } from '@/shared/lib';
+// import { setNewProperty, map } from '@/shared/lib';
 
 async function created() {
 	this.$loading(true);
@@ -117,7 +119,7 @@ function addToCar() {
 }
 
 function noStock() {
-	return helper.stockGreaterThanCero(this.product);
+	return helper.noStock(this.product);
 }
 
 function mounted() {
@@ -140,24 +142,14 @@ async function loadProduct() {
 	try {
 		const { data: response } = await this.isLoggedUser();
 		this.product = response;
-		let conversionsFormatted = [];
-		const { conversions } = this.product;
 		if (this.showUnity) {
-			if (conversions) {
-				conversionsFormatted = map(
-					k => setNewProperty('id', Number(k))(conversions[k]),
-					Object.keys(conversions),
-				);
-			}
-			this.stockAvaible =
-				conversionsFormatted && conversionsFormatted[0]
-					? parseInt(
-							this.product.stockWarehouse / conversionsFormatted[0].quantity,
-							10,
-					  )
-					: 0;
-			// this.stockAvaible = parseInt(this.product.stock / conversionsFormatted[0]
-			// 	? conversionsFormatted[0].quantity : 0, 10);
+			const { conversions } = this.product;
+			const stock = helper.stockProductByType(this.product);
+			const firstConversion = Object.keys(conversions || {})[0];
+			const stockAvaible = firstConversion
+				? parseInt(stock / firstConversion.quantity, 10)
+				: stock;
+			this.stockAvaible = stockAvaible;
 			this.$store.dispatch('setStock', this.stockAvaible);
 		}
 		this.updatePageTitle(this.product.name.toUpperCase());
@@ -181,7 +173,8 @@ async function loadProduct() {
 
 async function loadData(id) {
 	this.$store.dispatch('LOAD_RELATED_PRODUCTS', { context: this, id });
-	if (this.getCommerceData.settings.flagGrouper !== 2) {
+	const commerceData = this.getCommerceData || {};
+	if (commerceData.settings && commerceData.settings.flagGrouper !== 2) {
 		const requests = [
 			this.$httpProductsPublic.get(`products-public/${id}/children`),
 		];
@@ -206,7 +199,7 @@ async function loadData(id) {
 	this.tabs.push('Comentarios');
 	this.lastIndex = this.product.sections.length;
 	const user =
-		JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
+		JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || {};
 	const commercePriceListId =
 		user && user.salPriceListId ? user.salPriceListId : null;
 	this.productInstance = new ProductDetails(
@@ -217,6 +210,7 @@ async function loadData(id) {
 	this.productInstance.firstProductSelected(this.product);
 	this.globalFeatures = [...this.productInstance.getFeatures()];
 	this.productDetails = { ...this.productInstance.getProductDetails() };
+	this.priceOrigin = this.productDetails.priceDiscount;
 	if (!Array.isArray(this.productDetails.sections)) {
 		this.showNotification(
 			'Se esta cargando mal la información del producto',
@@ -401,7 +395,7 @@ function clickQuantity(value) {
 		(this.unitProductValid.quantity || 1) * num,
 		10,
 	);
-	if (this.quantityStock > this.product.stockWarehouse) {
+	if (this.quantityStock > helper.stockProductByType(this.product)) {
 		this.showNotification(
 			`El producto ${this.product.name} no cuenta con más stock en la presentación ${this.unitProductValid.name}.`,
 			'warning',
@@ -416,20 +410,6 @@ function clickQuantity(value) {
 		this.showNotification(`Cantidad: ${num} no disponible`, 'primary');
 	}
 }
-
-// function getProductPrice() {
-// 	const { priceList, unitId, quantity } = this.product;
-// 	const user = JSON.parse(localStorage.getItem('ecommerce::ecommerce-user')) || [];
-// 	const priceListId = this.getCommerceData.settings.salPriceListId;
-// 	const commercePriceListId = user && user.salPriceListId ? user.salPriceListId : null;
-// 	this.priceListIdSelected = commercePriceListId || priceListId;
-// 	const priceListSelected = priceList[this.priceListIdSelected];
-// 	const unitSelected = priceListSelected.units ? priceList.units[unitId] : null;
-// 	const listRanges = priceListSelected.ranges || [];
-// 	const listRangeApply = listRanges.find(lr => quantity >= lr.from && quantity <= lr.to);
-// 	console.log(this.product, unitSelected, listRangeApply);
-// 	return 0;
-// }
 
 function inputQuantity(num) {
 	const newProductdetail = { ...this.product };
@@ -451,11 +431,12 @@ function checkValidQuantity(quantity) {
 	if (this.productInstance.isService || this.$allowOrderStockNegative) {
 		return true;
 	}
-	const { stock } = this.productInstance;
+	const stockByProduct = helper.stockProductByType(this.product);
+	// const { stock } = this.productInstance;
 	const quantityCalc =
 		this.productInstance.unit.quantity * quantity || quantity;
-	this.exceedQuantity = !(stock >= quantityCalc);
-	return stock >= quantityCalc;
+	this.exceedQuantity = !(stockByProduct >= quantityCalc);
+	return stockByProduct >= quantityCalc;
 }
 
 async function openDialog() {
@@ -487,18 +468,14 @@ function selectedUnit(unit) {
 	};
 	this.unitProductValid = unit || unitDefault;
 	this.exceedQuantity = this.quantityStock > this.product.stockWarehouse;
-	if (
-		this.quantityStock > this.product.stockWarehouse &&
-		!this.$allowOrderStockNegative
-	) {
+	if (this.noStock) {
 		// const validQuantity = parseInt(this.product.stockWarehouse / unit.quantity, 10);
 		// const newProductdetail = { ...this.product };
 		// this.$set(newProductdetail, 'quantity', validQuantity);
 		// this.product = { ...newProductdetail };
 		// this.productInstance.updateQuantity(validQuantity);
 		this.showNotification(
-			`El producto ${this.product.name}
-		no cuenta con más stock en la presentación ${unit.name}`,
+			`El producto ${this.product.name} no cuenta con más stock en la presentación ${unit.name}`,
 			'warning',
 		);
 	} else {
@@ -567,6 +544,7 @@ function data() {
 		warehouses: [],
 		wholeSalePrice: [],
 		totalPriceProduct: 0,
+		priceOrigin: null,
 	};
 }
 
@@ -632,6 +610,20 @@ export default {
 			);
 			if (this.$flagShowBaseUnit === 1 && priceList.length > 0) {
 				this.productDetails.priceDiscount = priceList[0].price;
+			}
+		},
+		updateNumber(num) {
+			this.productDetails.quantity = Number(num);
+			const priceList = this.productDetails.priceList
+				? Object.values(this.productDetails.priceList)
+				: null;
+			if (priceList && priceList[0].ranges.length) {
+				const range = priceList[0].ranges.find(
+					r => Number(num) >= r.from && Number(num) <= r.to,
+				);
+				this.productDetails.priceDiscount = range
+					? range.price
+					: this.priceOrigin;
 			}
 		},
 	},

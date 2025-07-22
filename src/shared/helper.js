@@ -19,24 +19,27 @@ function isVariation(product) {
 	return variationCode === TypeProduct.variation;
 }
 
-function noStock(product) {
+function stockProductByType(product) {
 	const allowOrderStockNegative = Vue.prototype.$allowOrderStockNegative;
+	const { stockComposite, stockVirtual, stockWarehouse } = product;
+
 	if (allowOrderStockNegative) {
-		return false;
+		return Infinity;
 	}
 	if (isComposed(product)) {
-		const { stockComposite } = product;
-		return stockComposite === 0;
+		return stockComposite;
 	}
 	if (isService(product)) {
-		return false;
+		return Infinity;
 	}
 	if (isVariation(product)) {
-		const { stockVirtual } = product;
-		return stockVirtual === 0;
+		return stockVirtual;
 	}
-	const { stockWarehouse } = product;
-	return stockWarehouse <= 0;
+	return stockWarehouse;
+}
+
+function noStock(product) {
+	return stockProductByType(product) <= 0;
 }
 
 function stockGreaterThanCero(product) {
@@ -82,7 +85,8 @@ function generateBlob(data, contentType = 'application/pdf') {
 }
 
 function getLocalData(key) {
-	return JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::${key}`));
+	const item = localStorage.getItem(`${process.env.STORAGE_USER_KEY}::${key}`);
+	return item ? JSON.parse(item) : null;
 }
 
 function getLocalStorage() {
@@ -98,7 +102,10 @@ function removeLocalData(key) {
 }
 
 function setLocalData(key, data) {
-	return localStorage.setItem(`${process.env.STORAGE_USER_KEY}::${key}`, JSON.stringify(data));
+	return localStorage.setItem(
+		`${process.env.STORAGE_USER_KEY}::${key}`,
+		JSON.stringify(data),
+	);
 }
 
 function showDownloadDialog(blob, name, extension) {
@@ -113,7 +120,8 @@ function showDownloadDialog(blob, name, extension) {
 function debounce(func, wait = 800, immediate) {
 	var timeout;
 	return function () {
-		var context = this, args = arguments;
+		var context = this,
+			args = arguments;
 		var later = function () {
 			timeout = null;
 			if (!immediate) func.apply(context, args);
@@ -123,35 +131,50 @@ function debounce(func, wait = 800, immediate) {
 		timeout = setTimeout(later, wait);
 		if (callNow) func.apply(context, args);
 	};
-};
+}
 
 function setPrices(product, priceListId, flag, priceListDefault) {
 	const priceList = product.priceList || {};
-	const { price, discount } = priceList[priceListId] || priceList[priceListDefault] || {};
+	const { price, discount } =
+		priceList[priceListId] || priceList[priceListDefault] || {};
 	const newPrice = price || 0;
 	const newDiscount = discount || 0;
-	const priceDiscount = Number(((1 - (newDiscount / 100)) * newPrice).toFixed(2));
-	const objPrice = { price: discount ? newPrice : 0, priceDiscount: priceDiscount || 0 };
+	const priceDiscount = Number(((1 - newDiscount / 100) * newPrice).toFixed(2));
+	const objPrice = {
+		price: discount ? newPrice : 0,
+		priceDiscount: priceDiscount || 0,
+	};
 	return objPrice[flag];
-
 }
 
 function updateOrderDetailsInLocalStorage(products) {
 	const localOrder = JSON.parse(localStorage.getItem('ecommerce-order'));
-	const localOrderState = JSON.parse(localStorage.getItem('ecommerce-order-state'));
+	const localOrderState = JSON.parse(
+		localStorage.getItem('ecommerce-order-state'),
+	);
 	if (!isEmpty(localOrder)) {
 		localOrder.details = [...products];
-		localStorage.setItem('ecommerce-order', JSON.stringify(localOrder))
-		localStorage.setItem('ecommerce-order-state', JSON.stringify(localOrderState));
+		localStorage.setItem('ecommerce-order', JSON.stringify(localOrder));
+		localStorage.setItem(
+			'ecommerce-order-state',
+			JSON.stringify(localOrderState),
+		);
 	}
 }
 
 function buildOrderBody(flagFinish, getters) {
-	const { id, name, address } = getters.getCommerceData.settings.defaultWarehouse;
-	const { getDeliveryAddress, getCustomerAddress, getCustomerAddressId } = getters;
+	const { defaultWarehouse, salPriceListId } = getters.getCommerceData.settings;
+	const { id, name, address } = defaultWarehouse;
+	const {
+		getDeliveryAddress,
+		getCustomerAddress,
+		getCustomerAddressId,
+	} = getters;
 	const isStore = getters.getFlagPickUp === waysDeliveries.store.value;
 	const storeAddress = isStore ? getDeliveryAddress : null;
-	const placeAddress = getCustomerAddressId ? getDeliveryAddress : getCustomerAddress;
+	const placeAddress = getCustomerAddressId
+		? getDeliveryAddress
+		: getCustomerAddress;
 	const deliveryAddress = isStore ? storeAddress : placeAddress;
 	const body = {
 		additionalInfo: getters.getAdditionalInformation,
@@ -160,10 +183,11 @@ function buildOrderBody(flagFinish, getters) {
 		costShippingTax: getters.getShippingTax,
 		costShippingTaxAmount: getters.getShippingTaxAmount,
 		customerAddressId: isStore ? null : getCustomerAddressId,
-		customerAddress: getCustomerAddressId || isStore ? null : getCustomerAddress,
+		customerAddress:
+			getCustomerAddressId || isStore ? null : getCustomerAddress,
 		customerBill: getters.getFlagBill ? getters.getBillingData : null,
 		deliveryAddress,
-		details: getOrderDetails(getters.getOrderDetails, id, name),
+		details: getOrderDetails(getters.getOrderDetails, id, name, salPriceListId),
 		flagPickUp: getters.getFlagPickUp,
 		responsiblePickUp: getters.getResponsible,
 		warehouseId: id,
@@ -175,7 +199,8 @@ function buildOrderBody(flagFinish, getters) {
 	if (flagFinish) {
 		body.orderStateId = 1;
 	} else {
-		body.orderStateId = getters.getOrderStatus && getters.getOrderId ? getters.getOrderStatus : 8;
+		body.orderStateId =
+			getters.getOrderStatus && getters.getOrderId ? getters.getOrderStatus : 8;
 	}
 	if (getters.getOrderId && getters.getOrderStatus) {
 		// body.orderStateId = getters.getOrderStatus;
@@ -189,11 +214,13 @@ function buildOrderBody(flagFinish, getters) {
 	return body;
 }
 
-function getOrderDetails(products, warehouseId, warehouseName) {
-	return products.map((p) => {
+function getOrderDetails(products, warehouseId, warehouseName, salPriceListId) {
+	return products.map(p => {
 		const { taxes, conversions } = p;
 		const extractConversions = conversions ? Object.values(conversions) : null;
-		const unitConversion = extractConversions ? extractConversions.find(conv => conv.code === p.unit.code) : { quantity: p.unitConversion };
+		const unitConversion = extractConversions
+			? extractConversions.find(conv => conv.code === p.unit.code)
+			: { quantity: p.unitConversion };
 		const newTaxes = setTaxes(taxes);
 		const newP = {
 			alternateCode: p.alternateCode,
@@ -214,11 +241,21 @@ function getOrderDetails(products, warehouseId, warehouseName) {
 			productId: p.productId || p.id,
 			productImage: p.urlImage || p.productImage,
 			productName: p.name || p.productName,
+			priceList:
+				salPriceListId &&
+					p.priceList &&
+					p.priceList[salPriceListId] !== undefined
+					? p.priceList[salPriceListId]
+					: null,
 			quantity: p.quantity,
-			salePrice:  p.wholeSalePrice && p.wholeSalePrice.length > 0 &&
-			Number(p.quantity) >= p.wholeSalePrice[0].from &&
-			Number(p.quantity) <= p.wholeSalePrice[0].to &&
-			p.wholeSalePrice[0].price !== 0 ? p.wholeSalePrice[0].price : p.priceDiscount || p.salePrice || p.price,
+			salePrice:
+				p.wholeSalePrice &&
+					p.wholeSalePrice.length > 0 &&
+					Number(p.quantity) >= p.wholeSalePrice[0].from &&
+					Number(p.quantity) <= p.wholeSalePrice[0].to &&
+					p.wholeSalePrice[0].price !== 0
+					? p.wholeSalePrice[0].price
+					: p.priceDiscount || p.salePrice || p.price,
 			stockQuantity: p.stock,
 			taxes: newTaxes,
 			unit: p.unit,
@@ -268,40 +305,40 @@ function copyFn(node) {
 	window.getSelection().removeRange(range);
 }
 
-const getRangesOfProduct = (product) => {
-	const [, priceList] = Object.entries(product.priceList).flat()
-	return priceList.ranges
-}
+const getRangesOfProduct = product => {
+	const [, priceList] = Object.entries(product.priceList).flat();
+	return priceList.ranges;
+};
 
-function getKeyStorage(value) {
-	const urls = JSON.parse(localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`)) || [];
+function getDomainDynamic(value) {
+	const urls =
+		JSON.parse(
+			localStorage.getItem(`${process.env.STORAGE_USER_KEY}::domains`),
+		) || [];
 	const keyFind = urls.find(p => p.code === value);
 	return keyFind || undefined;
 }
 
-const getPriceByRange = ({
-	ranges,
-	originalPrice,
-	quantity
-}) => {
+const getPriceByRange = ({ ranges, originalPrice, quantity }) => {
+	if (ranges.length === 0) return originalPrice;
 
-	if(ranges.length === 0) return originalPrice
+	const sortedRanges = ranges.toSorted((a, b) => a.from - b.from);
 
-	const sortedRanges = ranges.toSorted((a, b) => a.from - b.from)
-  
 	const index = sortedRanges.findIndex(
-	  range => range.from <= quantity && range.to >= quantity
-	)
+		range => range.from <= quantity && range.to >= quantity,
+	);
 
-	if(index === -1) return originalPrice
-	
-	if(sortedRanges && (sortedRanges[index].to === 0 || sortedRanges[index].price === 0)){
-		return originalPrice
+	if (index === -1) return originalPrice;
+
+	if (
+		sortedRanges &&
+		(sortedRanges[index].to === 0 || sortedRanges[index].price === 0)
+	) {
+		return originalPrice;
 	}
 
 	return sortedRanges ? sortedRanges[index].price : originalPrice;
-	
-}
+};
 
 const methods = {
 	buildOrderBody,
@@ -323,7 +360,8 @@ const methods = {
 	updateOrderDetailsInLocalStorage,
 	getRangesOfProduct,
 	getPriceByRange,
-	getKeyStorage,
+	getDomainDynamic,
+	stockProductByType,
 };
 
 export default methods;

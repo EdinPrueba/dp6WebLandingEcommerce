@@ -39,8 +39,17 @@ const getters = {
 						quantity <= wholeSalePrice[0].to) {
 						return twoDecimals(wholeSalePrice[0].price * quantity) + acc;
 					}
+					const priceListArr = priceList
+						? Object.values(priceList)
+						: null;
+					if (priceListArr && priceListArr[0].ranges.length) {
+						const range = priceListArr[0].ranges.find(
+							r => quantity >= r.from && quantity <= r.to,
+						);
+						const priceToShow = (priceDiscount || salePrice || priceList.price) || priceDiscount;
+						return range ? range.price : twoDecimals(priceToShow * quantity) + acc;
+					}
 					const priceToShow = (priceDiscount || salePrice || priceList.price) || priceDiscount;
-
 					return twoDecimals(priceToShow * quantity) + acc;
 				}, 0);
 		}

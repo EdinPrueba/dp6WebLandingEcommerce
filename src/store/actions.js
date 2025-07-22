@@ -76,13 +76,7 @@ function removeProductToBuyCar(context, product) {
 	);
 	if (index > -1) {
 		const currentProduct = productsSelected[index];
-		// const { stock, stockWarehouse, stockComposite } = currentProduct;
-		// const finalStock = helper.isComposed(currentProduct) ?
-		// 	stockComposite : (stockWarehouse || stock);
 		const quantity = currentProduct.quantity - newProduct.quantity;
-		// const allowOrderStockNegative = Vue.prototype.$allowOrderStockNegative;
-		// console.log({ finalStock, quantity });
-		// console.log(allowOrderStockNegative);
 
 		if (quantity > 0) {
 			productsSelected[index].quantity = quantity;

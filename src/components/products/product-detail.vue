@@ -85,7 +85,6 @@
 					{{ wholeSalePrice[0].price | currencyFormat }}
 				</small>
 			</div>
-
 			<span
 				v-if="data.price"
 				:class="[
@@ -109,7 +108,10 @@
 		/>
 		<v-flex mt-3 text-xs-center class="content-dis" v-if="showUnity">
 			<h4 :style="`color:${globalColors.title}`">
-				Disponibilidad: <span class="number-dispon">{{ stockAvaible }}</span>
+				Disponibilidad:
+				<span class="number-dispon">{{
+					stockAvaible === Infinity ? 'Ilimitado' : stockAvaible
+				}}</span>
 			</h4>
 		</v-flex>
 		<product-childrens
@@ -125,9 +127,11 @@
 			:open-warehouse="openWarehouse"
 			:number="data.quantity"
 			:product="data"
+			:unit="unit"
 			@click="clickQuantity"
 			@add-to-car="addToCar"
 			@open-dialog="$emit('open-dialog')"
+			@update-number="$emit('update-number', $event)"
 		/>
 		<cart-bottom
 			:exceed-quantity="exceedQuantity"
@@ -314,6 +318,10 @@ export default {
 		exceedQuantity: {
 			type: Boolean,
 			default: false,
+		},
+		unit: {
+			default: () => {},
+			type: Object,
 		},
 	},
 };
